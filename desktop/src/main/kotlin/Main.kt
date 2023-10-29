@@ -1,41 +1,40 @@
 import androidx.compose.desktop.ui.tooling.preview.Preview
-import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
-import io.ktor.client.*
-import io.ktor.client.engine.cio.*
-import io.ktor.client.request.*
-import io.ktor.client.statement.*
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-
-val httpClient = HttpClient(CIO)
+import sidebar.ChatPreview
+import sidebar.Sidebar
 
 @Composable
 @Preview
 fun App() {
-    var text by remember { mutableStateOf("Hello") }
-
+    var chatPreviews = mutableStateListOf<ChatPreview>(
+        ChatPreview("Chat1", "Some message", null),
+        ChatPreview("Chat2", "Super story", 2),
+        ChatPreview("Chat3", "Super ssssssssdvlnkd;vnekvjbnlqkevbrlkasbdvlna bdvslbas", 10),
+        ChatPreview("Chat4", "Super story", null),
+        ChatPreview("Chat5", "Super story", null),
+    )
     val scope = rememberCoroutineScope()
-
-    MaterialTheme {
-        Button(onClick = {
-            scope.launch {
-                println("test")
-                val get: HttpResponse = httpClient.get("https://ya.ru")
-                println("end")
-            }
-            text = "Hello World"
-        }) {
-            Text(text)
+    scope.launch {
+        while (true) {
+            delay(5000)
+            chatPreviews.add(ChatPreview("AAAAA", "bbbb", null))
+            chatPreviews[0].lastMessage = "SDcsdcvlnsnclwjnw"
         }
+    }
+    MaterialTheme {
+        Sidebar(chatPreviews)
     }
 }
 
 fun main() = application {
-    Window(title = "Telegram", onCloseRequest = ::exitApplication.also { httpClient.close() } ) {
+    Window(title = "Telegram", onCloseRequest = {exitApplication(); httpClient.close()} ) {
         App()
     }
 }
