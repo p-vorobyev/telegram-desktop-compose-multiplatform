@@ -1,35 +1,39 @@
 import androidx.compose.desktop.ui.tooling.preview.Preview
+import androidx.compose.foundation.layout.Row
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
+import com.fasterxml.jackson.core.type.TypeReference
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import io.ktor.client.request.*
+import io.ktor.client.statement.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import sidebar.ChatPreview
 import sidebar.Sidebar
 
+val mapper = jacksonObjectMapper()
+
 @Composable
 @Preview
 fun App() {
-    var chatPreviews = mutableStateListOf<ChatPreview>(
-        ChatPreview("Chat1", "Some message", null),
-        ChatPreview("Chat2", "Super story", 2),
-        ChatPreview("Chat3", "Super ssssssssdvlnkd;vnekvjbnlqkevbrlkasbdvlna bdvslbas", 10),
-        ChatPreview("Chat4", "Super story", null),
-        ChatPreview("Chat5", "Super story", null),
-    )
+    var chatPreviews = mutableStateListOf<ChatPreview>()
     val scope = rememberCoroutineScope()
     scope.launch {
+        val json = httpClient.get("http://localhost:8080/client/loadCahts").bodyAsText()
+        val loadedChats: List<ChatPreview> = mapper.readValue(json, object : TypeReference<List<ChatPreview>>() {})
+        chatPreviews.addAll(loadedChats)
         while (true) {
-            delay(5000)
-            chatPreviews.add(ChatPreview("AAAAA", "bbbb", null))
-            chatPreviews[0].lastMessage = "SDcsdcvlnsnclwjnw"
+            delay(1000)
         }
     }
     MaterialTheme {
-        Sidebar(chatPreviews)
+        Row {
+            Sidebar(chatPreviews)
+        }
     }
 }
 
