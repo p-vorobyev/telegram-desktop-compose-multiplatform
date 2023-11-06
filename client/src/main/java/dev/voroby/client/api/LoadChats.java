@@ -4,6 +4,7 @@ import dev.voroby.client.dto.ChatPreview;
 import dev.voroby.springframework.telegram.client.TdApi;
 import dev.voroby.springframework.telegram.client.TelegramClient;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,7 +18,7 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 
-@Service
+@Service @Slf4j
 public class LoadChats implements Supplier<List<ChatPreview>> {
 
     @Autowired
@@ -39,7 +40,7 @@ public class LoadChats implements Supplier<List<ChatPreview>> {
                             case TdApi.MessageText.CONSTRUCTOR -> msgText = ((TdApi.MessageText) content).text.text;
                             case TdApi.MessagePhoto.CONSTRUCTOR -> msgText = ((TdApi.MessagePhoto) content).caption.text;
                             case TdApi.MessageVideo.CONSTRUCTOR -> msgText = ((TdApi.MessageVideo) content).caption.text;
-                            default -> {/*do nothing*/}
+                            default -> log.warn("Unsupported message:\n{}", lastMessage);
                         }
                         String photoBase64 = null;
                         TdApi.ChatPhotoInfo photo = chat.photo;
