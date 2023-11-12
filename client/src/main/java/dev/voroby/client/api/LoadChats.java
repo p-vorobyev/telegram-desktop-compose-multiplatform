@@ -27,11 +27,11 @@ public class LoadChats implements Supplier<List<ChatPreview>> {
     @Override
     public List<ChatPreview> get() {
         List<ChatPreview> previews = new ArrayList<>();
-        CompletableFuture<List<Long>> future = telegramClient.sendAsync(new TdApi.GetChats(new TdApi.ChatListMain(), 100), TdApi.Chats.class)
+        CompletableFuture<List<Long>> future = telegramClient.sendAsync(new TdApi.GetChats(new TdApi.ChatListMain(), 100))
                 .thenApply(chats -> Arrays.stream(chats.chatIds).boxed().toList())
                 .thenApply(ids -> {
                     for (Long chatId : ids) {
-                        TdApi.Chat chat = telegramClient.sendSync(new TdApi.GetChat(chatId), TdApi.Chat.class);
+                        TdApi.Chat chat = telegramClient.sendSync(new TdApi.GetChat(chatId));
                         if (chat.title.isBlank()) continue;
                         TdApi.Message lastMessage = chat.lastMessage;
                         TdApi.MessageContent content = lastMessage.content;
@@ -61,7 +61,7 @@ public class LoadChats implements Supplier<List<ChatPreview>> {
     private String getPhotoBase64(TdApi.ChatPhotoInfo photo) {
         String photoBase64;
         TdApi.File small = photo.small;
-        small = telegramClient.sendSync(new TdApi.DownloadFile(small.id, 10, 0, 0, true), TdApi.File.class);
+        small = telegramClient.sendSync(new TdApi.DownloadFile(small.id, 10, 0, 0, true));
         byte[] bytes = Files.readAllBytes(Path.of(small.local.path));
         photoBase64 = Base64.getEncoder().encodeToString(bytes);
         return photoBase64;
