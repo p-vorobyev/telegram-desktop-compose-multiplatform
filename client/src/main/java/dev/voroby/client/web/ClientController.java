@@ -50,7 +50,7 @@ public class ClientController {
             ChatPreview newChatTitle = getChatNewTitle.get();
             ChatPreview chatNewOrder = getChatNewOrder.get();
             ChatPreview chatReadInbox = getChatReadInbox.get();
-            if (lastMsgChanged == null && newChatTitle == null && chatNewOrder == null && chatReadInbox != null) break;
+            if (lastMsgChanged == null && newChatTitle == null && chatNewOrder == null && chatReadInbox == null) break;
             if (lastMsgChanged != null) computeUpdatedPreviews(updatedPreviews, lastMsgChanged);
             if (newChatTitle != null) computeUpdatedPreviews(updatedPreviews, newChatTitle);
             if (chatNewOrder != null) computeUpdatedPreviews(updatedPreviews, chatNewOrder);
