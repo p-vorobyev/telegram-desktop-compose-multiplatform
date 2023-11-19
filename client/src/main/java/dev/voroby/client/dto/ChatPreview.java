@@ -8,5 +8,6 @@ public record ChatPreview(
         String title,
         String photo,
         String lastMessage,
-        long unreadCount
+        long unreadCount,
+        long order
 ) {}

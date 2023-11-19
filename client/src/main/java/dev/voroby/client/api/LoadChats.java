@@ -11,10 +11,7 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Base64;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 
@@ -34,20 +31,14 @@ public class LoadChats implements Supplier<List<ChatPreview>> {
                         TdApi.Chat chat = telegramClient.sendSync(new TdApi.GetChat(chatId));
                         if (chat.title.isBlank()) continue;
                         TdApi.Message lastMessage = chat.lastMessage;
-                        TdApi.MessageContent content = lastMessage.content;
-                        String msgText = "Unsupported message type.";
-                        switch (content.getConstructor()) {
-                            case TdApi.MessageText.CONSTRUCTOR -> msgText = ((TdApi.MessageText) content).text.text;
-                            case TdApi.MessagePhoto.CONSTRUCTOR -> msgText = ((TdApi.MessagePhoto) content).caption.text;
-                            case TdApi.MessageVideo.CONSTRUCTOR -> msgText = ((TdApi.MessageVideo) content).caption.text;
-                            default -> log.warn("Unsupported message:\n{}", lastMessage);
-                        }
+                        String msgText = Utils.getMessageText(lastMessage);
                         String photoBase64 = null;
                         TdApi.ChatPhotoInfo photo = chat.photo;
                         if (photo != null) {
                             photoBase64 = getPhotoBase64(photo);
                         }
-                        var chatPreview = new ChatPreview(chatId, chat.title, photoBase64, msgText, chat.unreadCount);
+                        long order = Utils.mainChatListPositionOrder(chat.positions);
+                        var chatPreview = new ChatPreview(chatId, chat.title, photoBase64, msgText, chat.unreadCount, order);
                         previews.add(chatPreview);
                     }
                     return ids;

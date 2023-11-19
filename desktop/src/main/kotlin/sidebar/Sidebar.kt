@@ -1,10 +1,13 @@
 package sidebar
 
 import androidx.compose.desktop.ui.tooling.preview.Preview
-import androidx.compose.foundation.*
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.SnapshotStateList
@@ -20,6 +23,8 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.jetbrains.skia.Bitmap
 import java.util.*
 import java.util.stream.Collectors
@@ -29,6 +34,15 @@ import java.util.stream.Collectors
 @Preview
 fun Sidebar(chats: SnapshotStateList<ChatPreview>) {
     var selectedIndex by remember { mutableStateOf(-1) }
+
+    val chatListUpdateScope = rememberCoroutineScope()
+    chatListUpdateScope.launch {
+        while (true) {
+            handleLastMessageUpdate(chats)
+            delay(1500)
+        }
+    }
+
     Column (modifier = Modifier.verticalScroll(rememberScrollState())) {
         chats.forEachIndexed { index, chatPreview ->
             Row (verticalAlignment = Alignment.CenterVertically) {
@@ -70,8 +84,8 @@ fun Sidebar(chats: SnapshotStateList<ChatPreview>) {
                         Column(verticalArrangement = Arrangement.Center) {
                             Text(fontWeight = FontWeight.Bold, text = if (title.length > 30) "${title.substring(0, 20)}..." else title)
                             Text(
-                                if (chatPreview.lastMessage.length > 30)
-                                    "${chatPreview.lastMessage.substring(0, 20)}..."
+                                if (chatPreview.lastMessage.length > 50)
+                                    "${chatPreview.lastMessage.substring(0, 50)}..."
                                 else
                                     chatPreview.lastMessage
                             )
@@ -92,11 +106,3 @@ fun Sidebar(chats: SnapshotStateList<ChatPreview>) {
         }
     }
 }
-
-data class ChatPreview(
-    var id: Long = -1,
-    var title: String,
-    var photo: String?,
-    var lastMessage: String,
-    var unreadCount: Int?
-)

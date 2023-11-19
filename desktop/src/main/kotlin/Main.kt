@@ -7,20 +7,17 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import com.fasterxml.jackson.core.type.TypeReference
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import sidebar.ChatPreview
 import sidebar.Sidebar
-
-val mapper = jacksonObjectMapper()
 
 @Composable
 @Preview
 fun App() {
     val chatPreviews = mutableStateListOf<ChatPreview>()
     LaunchedEffect(Unit) {
-        val json = httpClient.get("http://localhost:8080/client/loadCahts").bodyAsText()
+        val json = httpClient.get("http://localhost:8080/client/loadChats").bodyAsText()
         val loadedChats: List<ChatPreview> = mapper.readValue(json, object : TypeReference<List<ChatPreview>>() {})
         chatPreviews.addAll(loadedChats)
     }
