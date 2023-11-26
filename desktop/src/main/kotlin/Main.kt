@@ -4,22 +4,20 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
+import androidx.compose.ui.window.WindowState
 import androidx.compose.ui.window.application
-import com.fasterxml.jackson.core.type.TypeReference
-import io.ktor.client.request.*
-import io.ktor.client.statement.*
 import sidebar.ChatPreview
 import sidebar.Sidebar
+import sidebar.loadChats
 
 @Composable
 @Preview
 fun App() {
     val chatPreviews = mutableStateListOf<ChatPreview>()
     LaunchedEffect(Unit) {
-        val json = httpClient.get("http://localhost:8080/client/loadChats").bodyAsText()
-        val loadedChats: List<ChatPreview> = mapper.readValue(json, object : TypeReference<List<ChatPreview>>() {})
-        chatPreviews.addAll(loadedChats)
+        chatPreviews.addAll(loadChats())
     }
     MaterialTheme {
         Row {
@@ -29,7 +27,11 @@ fun App() {
 }
 
 fun main() = application {
-    Window(title = "Telegram", onCloseRequest = {exitApplication(); httpClient.close()} ) {
+    Window(
+        title = "Telegram",
+        state = WindowState(width = 1200.dp, height = 800.dp),
+        onCloseRequest = {exitApplication(); httpClient.close()}
+    ) {
         App()
     }
 }

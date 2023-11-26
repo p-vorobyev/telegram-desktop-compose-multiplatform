@@ -1,21 +1,19 @@
 package dev.voroby.client.web;
 
-import dev.voroby.client.api.*;
+import dev.voroby.client.api.GetSidebarUpdates;
+import dev.voroby.client.api.LoadChats;
+import dev.voroby.client.api.MarkMessagesAsRead;
 import dev.voroby.client.dto.ChatPreview;
 import dev.voroby.springframework.telegram.client.TdApi;
 import dev.voroby.springframework.telegram.client.TelegramClient;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
-@RestController
+@RestController @Slf4j
 @RequestMapping(value = "/client")
 public class ClientController {
 
@@ -26,16 +24,10 @@ public class ClientController {
     private TelegramClient telegramClient;
 
     @Autowired
-    private GetChatLastMessage getChatLastMessage;
+    private MarkMessagesAsRead markMessagesAsRead;
 
     @Autowired
-    private GetChatNewTitle getChatNewTitle;
-
-    @Autowired
-    private GetChatNewOrder getChatNewOrder;
-
-    @Autowired
-    private GetChatReadInbox getChatReadInbox;
+    private GetSidebarUpdates getSidebarUpdates;
 
     @GetMapping(value = "/loadChats", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<ChatPreview> loadChats() {
@@ -44,29 +36,12 @@ public class ClientController {
 
     @GetMapping(value = "/updateSidebar", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<ChatPreview> updateSidebar() {
-        Map<Long, ChatPreview> updatedPreviews = new LinkedHashMap<>();
-        for (int i = 0; i < 10; i++) {
-            ChatPreview lastMsgChanged = getChatLastMessage.get();
-            ChatPreview newChatTitle = getChatNewTitle.get();
-            ChatPreview chatNewOrder = getChatNewOrder.get();
-            ChatPreview chatReadInbox = getChatReadInbox.get();
-            if (lastMsgChanged == null && newChatTitle == null && chatNewOrder == null && chatReadInbox == null) break;
-            if (lastMsgChanged != null) computeUpdatedPreviews(updatedPreviews, lastMsgChanged);
-            if (newChatTitle != null) computeUpdatedPreviews(updatedPreviews, newChatTitle);
-            if (chatNewOrder != null) computeUpdatedPreviews(updatedPreviews, chatNewOrder);
-            if (chatReadInbox != null) computeUpdatedPreviews(updatedPreviews, chatReadInbox);
-        }
-
-        return new ArrayList<>(updatedPreviews.values());
+        return getSidebarUpdates.get();
     }
 
-    private void computeUpdatedPreviews(Map<Long, ChatPreview> updatedPreviews, ChatPreview chatPreview) {
-        updatedPreviews.compute(chatPreview.id(), (key, value) -> {
-            if (value == null) {
-                value = chatPreview;
-            }
-            return value;
-        });
+    @PostMapping(value = "/markasread/{chatId}")
+    public void markMessagesAsRead(@PathVariable("chatId") long chatId) {
+        markMessagesAsRead.accept(chatId);
     }
 
     @GetMapping("/sendHello")

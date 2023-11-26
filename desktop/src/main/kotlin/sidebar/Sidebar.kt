@@ -1,14 +1,17 @@
 package sidebar
 
 import androidx.compose.desktop.ui.tooling.preview.Preview
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.KeyboardArrowUp
+import androidx.compose.material.icons.rounded.Search
 import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
@@ -29,7 +32,12 @@ import org.jetbrains.skia.Bitmap
 import java.util.*
 import java.util.stream.Collectors
 
-@OptIn(ExperimentalMaterialApi::class)
+val blueColor = Color(51, 182, 255)
+
+val greyColor = Color(red = 230, green = 230, blue = 230)
+
+
+@OptIn(ExperimentalMaterialApi::class, ExperimentalFoundationApi::class)
 @Composable
 @Preview
 fun Sidebar(chats: SnapshotStateList<ChatPreview>) {
@@ -38,71 +46,156 @@ fun Sidebar(chats: SnapshotStateList<ChatPreview>) {
     val chatListUpdateScope = rememberCoroutineScope()
     chatListUpdateScope.launch {
         while (true) {
-            handleLastMessageUpdate(chats)
-            delay(1500)
+            handleSidebarUpdates(chats)
+            delay(1000)
         }
     }
 
-    Column (modifier = Modifier.verticalScroll(rememberScrollState())) {
-        chats.forEachIndexed { index, chatPreview ->
-            Row (verticalAlignment = Alignment.CenterVertically) {
-                val color = if (selectedIndex == index) Color.LightGray else MaterialTheme.colors.surface
-                var imageBitMap: ImageBitmap? = null
-                chatPreview.photo?.let {
-                    val img: ByteArray = Base64.getDecoder().decode(it)
-                    imageBitMap = Bitmap.makeFromImage(org.jetbrains.skia.Image.makeFromEncoded(img)).asComposeImageBitmap()
-                }
-                Card(modifier = Modifier.width(width = 400.dp).height(60.dp), backgroundColor = color, onClick = {selectedIndex= index}) {
-                    Row {
-                        val title = chatPreview.title.replace("\n", " ")
-                        if (imageBitMap != null) {
-                            Image(
-                                bitmap = imageBitMap!!,
-                                contentScale = ContentScale.Crop,
-                                modifier = Modifier.size(60.dp).clip(CircleShape),
-                                contentDescription = "",
-                                alignment = Alignment.Center
-                            )
-                        } else {
-                            val blueColor = Color(51, 182, 255)
-                            Box(
-                                modifier = Modifier
-                                    .size(60.dp)
-                                    .graphicsLayer {
-                                        clip = true
-                                        shape = CircleShape
-                                    }.background(blueColor)
-                            ) {
-                                val iconText = title.split(" ").stream().limit(2).map { it.substring(0,1).uppercase() }.collect(Collectors.joining())
-                                Text(
-                                    iconText,
-                                    style = TextStyle(color = Color.White, fontSize = 20.sp),
-                                    modifier = Modifier.align(Alignment.Center)
-                                )
-                            }
-                        }
-                        Column(verticalArrangement = Arrangement.Center) {
-                            Text(fontWeight = FontWeight.Bold, text = if (title.length > 30) "${title.substring(0, 20)}..." else title)
-                            Text(
-                                if (chatPreview.lastMessage.length > 50)
-                                    "${chatPreview.lastMessage.substring(0, 50)}..."
-                                else
-                                    chatPreview.lastMessage
-                            )
-                        }
-                    }
-                    Box(contentAlignment = Alignment.CenterEnd) {
-                        chatPreview.unreadCount?.let {
-                            if (it != 0) {
-                                Card(shape = RoundedCornerShape(10.dp), backgroundColor = Color.LightGray) {
-                                    Text(fontSize = 14.sp, text = it.toString())
+    var chatSearchInput: String by remember { mutableStateOf("") }
+
+    val cardModifier = Modifier.width(width = 450.dp).height(60.dp)
+
+    val lazyListState = rememberLazyListState()
+
+    Scaffold(
+        topBar = {
+            if (chats.isNotEmpty()) {
+                Row (modifier = cardModifier.then(Modifier.background(MaterialTheme.colors.surface))) {
+                    Icon(Icons.Rounded.Search, contentDescription = "Filter", modifier = Modifier.align(Alignment.CenterVertically))
+                    if (lazyListState.firstVisibleItemIndex > 3) {
+                        Icon(
+                            Icons.Rounded.KeyboardArrowUp,
+                            contentDescription = "Up",
+                            modifier = Modifier.align(Alignment.CenterVertically)
+                                .background(greyColor)
+                                .onClick {
+                                    chatListUpdateScope.launch {
+                                        lazyListState.scrollToItem(0)
+                                    }
                                 }
-                            }
-                        }
+                        )
                     }
+                    OutlinedTextField(
+                        value = chatSearchInput,
+                        onValueChange = {chatSearchInput = it},
+                        placeholder = {Text("Search")},
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = TextFieldDefaults.outlinedTextFieldColors(
+                            focusedBorderColor = blueColor
+                        )
+                    )
                 }
             }
-            Divider(modifier = Modifier.height(2.dp).width(1.dp))
+        },
+        backgroundColor = greyColor
+    ) {
+
+        Row {
+
+            LazyColumn(state = lazyListState ) {
+
+                itemsIndexed(chats, {k, v -> v}) { index, chatPreview ->
+
+                    if (chatSearchInput.isBlank() || chatPreview.title.contains(chatSearchInput, ignoreCase = true)) {
+
+                        ContextMenuArea(items = {
+                            listOf(
+                                ContextMenuItem("Mark as read") {
+                                    chatListUpdateScope.launch {
+                                        markAsRead(chatPreview.id)
+                                    }
+                                }
+                            )
+                        }) {
+
+                            Row (verticalAlignment = Alignment.CenterVertically) {
+                                val color = if (selectedIndex == index) Color.LightGray else MaterialTheme.colors.surface
+                                var imageBitMap: ImageBitmap? = null
+                                chatPreview.photo?.let {
+                                    val img: ByteArray = Base64.getDecoder().decode(it)
+                                    imageBitMap = Bitmap.makeFromImage(org.jetbrains.skia.Image.makeFromEncoded(img)).asComposeImageBitmap()
+                                }
+
+                                Card(modifier = cardModifier, backgroundColor = color, onClick = {selectedIndex = index}) {
+
+                                    Row {
+                                        val title = chatPreview.title.replace("\n", " ")
+                                        if (imageBitMap != null) {
+                                            Image(
+                                                bitmap = imageBitMap!!,
+                                                contentScale = ContentScale.Crop,
+                                                modifier = Modifier.size(60.dp).clip(CircleShape),
+                                                contentDescription = "",
+                                                alignment = Alignment.Center
+                                            )
+                                        } else {
+                                            Box(
+                                                modifier = Modifier
+                                                    .size(60.dp)
+                                                    .graphicsLayer {
+                                                        clip = true
+                                                        shape = CircleShape
+                                                    }.background(blueColor)
+                                            ) {
+                                                val iconText = if (title.isBlank()) "" else
+                                                    title.split(" ").stream().limit(2).map { it.substring(0,1).uppercase() }.collect(Collectors.joining())
+                                                Text(
+                                                    iconText,
+                                                    style = TextStyle(color = Color.White, fontSize = 20.sp),
+                                                    modifier = Modifier.align(Alignment.Center)
+                                                )
+                                            }
+                                        }
+                                        Column(verticalArrangement = Arrangement.Center) {
+                                            Text(fontWeight = FontWeight.Bold, text = if (title.length > 30) "${title.substring(0, 20)}..." else title)
+                                            Text(
+                                                if (chatPreview.lastMessage.length > 50)
+                                                    "${chatPreview.lastMessage.substring(0, 50)}..."
+                                                else
+                                                    chatPreview.lastMessage
+                                            )
+                                        }
+                                    }
+
+                                    Box(contentAlignment = Alignment.CenterEnd) {
+                                        chatPreview.unreadCount?.let {
+                                            if (it != 0) {
+                                                Card(shape = RoundedCornerShape(10.dp), backgroundColor = Color.LightGray) {
+                                                    Text(fontSize = 14.sp, text = it.toString())
+                                                }
+                                            }
+                                        }
+
+                                    }
+
+                                }
+
+                            }
+
+                        }
+
+                        Divider(modifier = Modifier.height(2.dp).width(1.dp))
+
+                    }
+
+                }
+
+            }
+
+            Column(
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.fillMaxSize()
+            ) {
+                if (selectedIndex == -1 && chats.isNotEmpty()) {
+                    Text("Chat not selected")
+                } else if (selectedIndex != -1) {
+                    Text(chats[selectedIndex].title)
+                }
+            }
+
         }
+
     }
+
 }

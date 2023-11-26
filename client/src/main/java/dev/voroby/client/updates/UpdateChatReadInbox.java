@@ -15,7 +15,8 @@ public class UpdateChatReadInbox  implements UpdateNotificationListener<TdApi.Up
 
     @Override
     public void handleNotification(TdApi.UpdateChatReadInbox notification) {
-        updatesQueues.addUpdateChatReadInbox(notification);
+        //updatesQueues.addUpdateChatReadInbox(notification);
+        updatesQueues.addIncomingSidebarUpdate(notification);
     }
 
     @Override

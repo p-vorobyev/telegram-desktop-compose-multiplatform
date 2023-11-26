@@ -15,7 +15,8 @@ public class UpdateChatTitleHandler implements UpdateNotificationListener<TdApi.
 
     @Override
     public void handleNotification(TdApi.UpdateChatTitle updateChatTitle) {
-        updatesQueues.addUpdateChatTitle(updateChatTitle);
+        //updatesQueues.addUpdateChatTitle(updateChatTitle);
+        updatesQueues.addIncomingSidebarUpdate(updateChatTitle);
     }
 
     @Override

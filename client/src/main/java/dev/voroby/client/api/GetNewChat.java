@@ -9,15 +9,16 @@ import org.springframework.stereotype.Component;
 import java.util.function.Function;
 
 @Component
-public class GetChatNewTitle extends AbstractUpdates implements Function<TdApi.UpdateChatTitle, ChatPreview> {
+public class GetNewChat extends AbstractUpdates implements Function<TdApi.UpdateNewChat, ChatPreview> {
 
-    protected GetChatNewTitle(UpdatesQueues updatesQueues, TelegramClient telegramClient) {
+    protected GetNewChat(UpdatesQueues updatesQueues, TelegramClient telegramClient) {
         super(updatesQueues, telegramClient);
     }
 
     @Override
-    public ChatPreview apply(TdApi.UpdateChatTitle updateChatTitle) {
-        return getCurrentChatPreview(updateChatTitle.chatId);
+    public ChatPreview apply(TdApi.UpdateNewChat updateNewChat) {
+        TdApi.Chat chat = updateNewChat.chat;
+        return getCurrentChatPreview(chat);
     }
 
 }

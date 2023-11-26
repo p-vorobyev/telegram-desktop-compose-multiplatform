@@ -15,7 +15,8 @@ public class UpdateChatLastMessageHandler implements UpdateNotificationListener<
 
     @Override
     public void handleNotification(TdApi.UpdateChatLastMessage updateChatLastMessage) {
-        updatesQueues.addChatLastMessage(updateChatLastMessage);
+        //updatesQueues.addChatLastMessage(updateChatLastMessage);
+        updatesQueues.addIncomingSidebarUpdate(updateChatLastMessage);
     }
 
     @Override

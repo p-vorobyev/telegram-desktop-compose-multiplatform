@@ -20,6 +20,8 @@ val httpClient = HttpClient(CIO) {
     }
 }
 
+const val baseUrl = "http://localhost:8080/client"
+
 class TrustAllManager: X509TrustManager {
     override fun checkClientTrusted(chain: Array<out X509Certificate>?, authType: String?) {
         /*skip check*/

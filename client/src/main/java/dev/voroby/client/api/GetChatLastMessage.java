@@ -4,10 +4,12 @@ import dev.voroby.client.dto.ChatPreview;
 import dev.voroby.client.updates.UpdatesQueues;
 import dev.voroby.springframework.telegram.client.TdApi;
 import dev.voroby.springframework.telegram.client.TelegramClient;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
-@Service
-public class GetChatLastMessage extends AbstractUpdatesSupplier<ChatPreview> {
+import java.util.function.Function;
+
+@Component
+public class GetChatLastMessage extends AbstractUpdates implements Function<TdApi.UpdateChatLastMessage, ChatPreview> {
 
     protected GetChatLastMessage(UpdatesQueues updatesQueues,
                                  TelegramClient telegramClient) {
@@ -15,13 +17,9 @@ public class GetChatLastMessage extends AbstractUpdatesSupplier<ChatPreview> {
     }
 
     @Override
-    public ChatPreview get() {
-        TdApi.UpdateChatLastMessage updateChatLastMessage = updatesQueues.pollChatLastMessage();
-        if (updateChatLastMessage != null && updateChatLastMessage.lastMessage != null) {
-            TdApi.Chat chat = telegramClient.sendSync(new TdApi.GetChat(updateChatLastMessage.chatId));
-            String msgText = Utils.getMessageText(chat.lastMessage);
-            long order = Utils.mainChatListPositionOrder(chat.positions);
-            return new ChatPreview(chat.id, chat.title, null, msgText, chat.unreadCount, order);
+    public ChatPreview apply(TdApi.UpdateChatLastMessage updateChatLastMessage) {
+        if (updateChatLastMessage.lastMessage != null) {
+            return getCurrentChatPreview(updateChatLastMessage.chatId);
         }
         return null;
     }
