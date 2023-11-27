@@ -13,7 +13,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.KeyboardArrowUp
 import androidx.compose.material.icons.rounded.Search
 import androidx.compose.runtime.*
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -40,13 +39,18 @@ val greyColor = Color(red = 230, green = 230, blue = 230)
 @OptIn(ExperimentalMaterialApi::class, ExperimentalFoundationApi::class)
 @Composable
 @Preview
-fun Sidebar(chats: SnapshotStateList<ChatPreview>) {
+fun Sidebar() {
     var selectedIndex by remember { mutableStateOf(-1) }
+
+    val chatPreviews = mutableStateListOf<ChatPreview>()
+    LaunchedEffect(Unit) {
+        chatPreviews.addAll(loadChats())
+    }
 
     val chatListUpdateScope = rememberCoroutineScope()
     chatListUpdateScope.launch {
         while (true) {
-            handleSidebarUpdates(chats)
+            handleSidebarUpdates(chatPreviews)
             delay(1000)
         }
     }
@@ -59,7 +63,7 @@ fun Sidebar(chats: SnapshotStateList<ChatPreview>) {
 
     Scaffold(
         topBar = {
-            if (chats.isNotEmpty()) {
+            if (chatPreviews.isNotEmpty()) {
                 Row (modifier = cardModifier.then(Modifier.background(MaterialTheme.colors.surface))) {
                     Icon(Icons.Rounded.Search, contentDescription = "Filter", modifier = Modifier.align(Alignment.CenterVertically))
                     if (lazyListState.firstVisibleItemIndex > 3) {
@@ -94,7 +98,7 @@ fun Sidebar(chats: SnapshotStateList<ChatPreview>) {
 
             LazyColumn(state = lazyListState ) {
 
-                itemsIndexed(chats, {k, v -> v}) { index, chatPreview ->
+                itemsIndexed(chatPreviews, {_, v -> v}) { index, chatPreview ->
 
                     if (chatSearchInput.isBlank() || chatPreview.title.contains(chatSearchInput, ignoreCase = true)) {
 
@@ -187,10 +191,10 @@ fun Sidebar(chats: SnapshotStateList<ChatPreview>) {
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier.fillMaxSize()
             ) {
-                if (selectedIndex == -1 && chats.isNotEmpty()) {
+                if (selectedIndex == -1 && chatPreviews.isNotEmpty()) {
                     Text("Chat not selected")
                 } else if (selectedIndex != -1) {
-                    Text(chats[selectedIndex].title)
+                    Text(chatPreviews[selectedIndex].title)
                 }
             }
 
