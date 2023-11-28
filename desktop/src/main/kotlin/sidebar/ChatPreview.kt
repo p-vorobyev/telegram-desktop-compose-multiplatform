@@ -6,5 +6,6 @@ data class ChatPreview(
     var photo: String?,
     var lastMessage: String,
     var unreadCount: Int?,
-    var order: Long
+    var order: Long,
+    var chatType: ChatType
 )

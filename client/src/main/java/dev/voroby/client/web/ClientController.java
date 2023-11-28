@@ -1,5 +1,6 @@
 package dev.voroby.client.web;
 
+import dev.voroby.client.api.DeleteChat;
 import dev.voroby.client.api.GetSidebarUpdates;
 import dev.voroby.client.api.LoadChats;
 import dev.voroby.client.api.MarkMessagesAsRead;
@@ -27,6 +28,9 @@ public class ClientController {
     private MarkMessagesAsRead markMessagesAsRead;
 
     @Autowired
+    private DeleteChat deleteChat;
+
+    @Autowired
     private GetSidebarUpdates getSidebarUpdates;
 
     @GetMapping(value = "/loadChats", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -42,6 +46,11 @@ public class ClientController {
     @PostMapping(value = "/markasread/{chatId}")
     public void markMessagesAsRead(@PathVariable("chatId") long chatId) {
         markMessagesAsRead.accept(chatId);
+    }
+
+    @PostMapping(value = "/delete/{chatId}")
+    public void deleteChat(@PathVariable("chatId") long chatId) {
+        deleteChat.accept(chatId);
     }
 
     @GetMapping("/sendHello")

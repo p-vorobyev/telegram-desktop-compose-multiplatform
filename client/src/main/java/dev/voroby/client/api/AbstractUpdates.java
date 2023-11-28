@@ -1,6 +1,7 @@
 package dev.voroby.client.api;
 
 import dev.voroby.client.dto.ChatPreview;
+import dev.voroby.client.dto.ChatType;
 import dev.voroby.client.updates.UpdatesQueues;
 import dev.voroby.springframework.telegram.client.TdApi;
 import dev.voroby.springframework.telegram.client.TelegramClient;
@@ -44,7 +45,14 @@ abstract public class AbstractUpdates {
             }
         }
         long order = Utils.mainChatListPositionOrder(chat.positions);
-        return new ChatPreview(chat.id, chat.title, photoBase64, msgText, chat.unreadCount, order);
+        ChatType chatType = null;
+        switch (chat.type.getConstructor()) {
+            case TdApi.ChatTypePrivate.CONSTRUCTOR -> chatType = ChatType.Private;
+            case TdApi.ChatTypeSecret.CONSTRUCTOR -> chatType = ChatType.Secret;
+            case TdApi.ChatTypeBasicGroup.CONSTRUCTOR -> chatType = ChatType.BasicGroup;
+            case TdApi.ChatTypeSupergroup.CONSTRUCTOR -> chatType = ChatType.Supergroup;
+        }
+        return new ChatPreview(chat.id, chat.title, photoBase64, msgText, chat.unreadCount, order, chatType);
     }
 
     @SneakyThrows(IOException.class)

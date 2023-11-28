@@ -41,6 +41,10 @@ suspend fun markAsRead(chatId: Long) {
     httpClient.post("${baseUrl}/markasread/${chatId}")
 }
 
+suspend fun deleteChat(chatId: Long) {
+    httpClient.post("${baseUrl}/delete/${chatId}")
+}
+
 suspend fun loadChats(): List<ChatPreview> {
     val json = httpClient.get("${baseUrl}/loadChats").bodyAsText()
     return mapper.readValue(json, object : TypeReference<List<ChatPreview>>() {})

@@ -25,6 +25,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.jetbrains.skia.Bitmap
@@ -102,15 +103,7 @@ fun Sidebar() {
 
                     if (chatSearchInput.isBlank() || chatPreview.title.contains(chatSearchInput, ignoreCase = true)) {
 
-                        ContextMenuArea(items = {
-                            listOf(
-                                ContextMenuItem("Mark as read") {
-                                    chatListUpdateScope.launch {
-                                        markAsRead(chatPreview.id)
-                                    }
-                                }
-                            )
-                        }) {
+                        ContextMenuArea(items = { contextMenuItems(chatListUpdateScope, chatPreview) }) {
 
                             Row (verticalAlignment = Alignment.CenterVertically) {
                                 val color = if (selectedIndex == index) Color.LightGray else MaterialTheme.colors.surface
@@ -202,4 +195,40 @@ fun Sidebar() {
 
     }
 
+}
+
+
+/*
+* Context menu on right click on chat in the sidebar.
+*/
+private fun contextMenuItems(
+    chatListUpdateScope: CoroutineScope,
+    chatPreview: ChatPreview
+): MutableList<ContextMenuItem> {
+    val items: MutableList<ContextMenuItem> = mutableListOf()
+    items.add(
+        ContextMenuItem("Mark as read") {
+            chatListUpdateScope.launch {
+                markAsRead(chatPreview.id)
+            }
+        }
+    )
+    if (chatPreview.chatType == ChatType.Private || chatPreview.chatType == ChatType.Secret) {
+        items.add(
+            ContextMenuItem("Delete") {
+                chatListUpdateScope.launch {
+                    deleteChat(chatPreview.id)
+                }
+            }
+        )
+    } else {
+        items.add(
+            ContextMenuItem("Leave") {
+                chatListUpdateScope.launch {
+                    deleteChat(chatPreview.id)
+                }
+            }
+        )
+    }
+    return items
 }
