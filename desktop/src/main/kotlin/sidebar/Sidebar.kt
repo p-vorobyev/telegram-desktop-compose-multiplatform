@@ -65,30 +65,36 @@ fun Sidebar() {
     Scaffold(
         topBar = {
             if (chatPreviews.isNotEmpty()) {
-                Row (modifier = cardModifier.then(Modifier.background(MaterialTheme.colors.surface))) {
-                    Icon(Icons.Rounded.Search, contentDescription = "Filter", modifier = Modifier.align(Alignment.CenterVertically))
-                    if (lazyListState.firstVisibleItemIndex > 3) {
-                        Icon(
-                            Icons.Rounded.KeyboardArrowUp,
-                            contentDescription = "Up",
-                            modifier = Modifier.align(Alignment.CenterVertically)
-                                .background(greyColor)
-                                .onClick {
-                                    chatListUpdateScope.launch {
-                                        lazyListState.scrollToItem(0)
+                Column {
+                    Row(modifier = Modifier.width(width = 450.dp).height(40.dp).then(Modifier.background(MaterialTheme.colors.surface)),
+                        horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
+                        Text("Chats")
+                    }
+                    Row (modifier = cardModifier.then(Modifier.background(MaterialTheme.colors.surface))) {
+                        Icon(Icons.Rounded.Search, contentDescription = "Filter", modifier = Modifier.align(Alignment.CenterVertically))
+                        if (lazyListState.firstVisibleItemIndex > 3) {
+                            Icon(
+                                Icons.Rounded.KeyboardArrowUp,
+                                contentDescription = "Up",
+                                modifier = Modifier.align(Alignment.CenterVertically)
+                                    .background(greyColor)
+                                    .onClick {
+                                        chatListUpdateScope.launch {
+                                            lazyListState.scrollToItem(0)
+                                        }
                                     }
-                                }
+                            )
+                        }
+                        OutlinedTextField(
+                            value = chatSearchInput,
+                            onValueChange = {chatSearchInput = it},
+                            placeholder = {Text("Search")},
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = TextFieldDefaults.outlinedTextFieldColors(
+                                focusedBorderColor = blueColor
+                            )
                         )
                     }
-                    OutlinedTextField(
-                        value = chatSearchInput,
-                        onValueChange = {chatSearchInput = it},
-                        placeholder = {Text("Search")},
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = TextFieldDefaults.outlinedTextFieldColors(
-                            focusedBorderColor = blueColor
-                        )
-                    )
                 }
             }
         },

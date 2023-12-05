@@ -2,6 +2,7 @@ package sidebar
 
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import baseUrl
+import clientUri
 import com.fasterxml.jackson.core.type.TypeReference
 import httpClient
 import io.ktor.client.request.*
@@ -33,19 +34,19 @@ suspend fun handleSidebarUpdates(chats: SnapshotStateList<ChatPreview>) {
 }
 
 private suspend fun updatedPreviews(): List<ChatPreview> {
-    val json = httpClient.get("${baseUrl}/updateSidebar").bodyAsText()
+    val json = httpClient.get("${baseUrl}/${clientUri}/updateSidebar").bodyAsText()
     return mapper.readValue(json, object : TypeReference<List<ChatPreview>>(){})
 }
 
 suspend fun markAsRead(chatId: Long) {
-    httpClient.post("${baseUrl}/markasread/${chatId}")
+    httpClient.post("${baseUrl}/${clientUri}/markasread/${chatId}")
 }
 
 suspend fun deleteChat(chatId: Long) {
-    httpClient.post("${baseUrl}/delete/${chatId}")
+    httpClient.post("${baseUrl}/${clientUri}/delete/${chatId}")
 }
 
 suspend fun loadChats(): List<ChatPreview> {
-    val json = httpClient.get("${baseUrl}/loadChats").bodyAsText()
+    val json = httpClient.get("${baseUrl}/${clientUri}/loadChats").bodyAsText()
     return mapper.readValue(json, object : TypeReference<List<ChatPreview>>() {})
 }

@@ -1,5 +1,6 @@
 package dev.voroby.client;
 
+import dev.voroby.client.api.LoadChats;
 import dev.voroby.springframework.telegram.client.TdApi;
 import dev.voroby.springframework.telegram.client.TelegramClient;
 import dev.voroby.springframework.telegram.client.updates.ClientAuthorizationState;
@@ -26,6 +27,9 @@ public class ClientApplication {
     @Autowired
     private ClientAuthorizationState authorizationState;
 
+    @Autowired
+    private LoadChats loadChats;
+
     @Bean
     public ApplicationRunner applicationRunner() {
         return args -> {
@@ -45,6 +49,7 @@ public class ClientApplication {
             TdApi.LoadChats loadChatsQuery = new TdApi.LoadChats(new TdApi.ChatListMain(), 100);
             telegramClient.sendWithCallback(loadChatsQuery, this::loadChatsHandler);
         } else {
+            loadChats.setInitialLoadDone();
             log.info("Chats loaded.");
         }
     }

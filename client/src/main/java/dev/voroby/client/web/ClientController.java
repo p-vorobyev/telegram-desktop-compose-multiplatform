@@ -13,6 +13,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 @RestController @Slf4j
 @RequestMapping(value = "/client")
@@ -34,7 +35,10 @@ public class ClientController {
     private GetSidebarUpdates getSidebarUpdates;
 
     @GetMapping(value = "/loadChats", produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<ChatPreview> loadChats() {
+    public List<ChatPreview> loadChats() throws InterruptedException {
+        while (!loadChats.chatLoaded()) {
+            TimeUnit.MILLISECONDS.sleep(100);
+        }
         return loadChats.get();
     }
 

@@ -5,7 +5,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping(value = "/api/authorization")
+@RequestMapping(value = "/authorization")
 public class AuthorizationController {
 
     private final ClientAuthorizationState authorizationState;
@@ -24,6 +24,16 @@ public class AuthorizationController {
     @PostMapping(value = "/password", consumes = MediaType.APPLICATION_JSON_VALUE)
     public void updatePassword(@RequestBody Credential credential) {
         authorizationState.checkAuthenticationPassword(credential.value);
+    }
+
+    @GetMapping(value = "/waitCode")
+    public boolean waitCode() {
+        return authorizationState.isWaitAuthenticationCode();
+    }
+
+    @GetMapping(value = "/waitPass")
+    public boolean waitPass() {
+        return authorizationState.isWaitAuthenticationPassword();
     }
 
     @GetMapping(value = "/status")

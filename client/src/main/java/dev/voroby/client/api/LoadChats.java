@@ -10,13 +10,24 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
 
 @Component
 public class LoadChats extends AbstractUpdates implements Supplier<List<ChatPreview>> {
 
+    private final AtomicBoolean initialLoadDone = new AtomicBoolean(false);
+
     protected LoadChats(UpdatesQueues updatesQueues, TelegramClient telegramClient) {
         super(updatesQueues, telegramClient);
+    }
+
+    public boolean chatLoaded() {
+        return initialLoadDone.get();
+    }
+
+    public void setInitialLoadDone() {
+        initialLoadDone.set(true);
     }
 
     @Override
