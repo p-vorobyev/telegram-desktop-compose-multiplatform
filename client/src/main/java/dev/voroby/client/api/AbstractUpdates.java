@@ -59,7 +59,7 @@ abstract public class AbstractUpdates {
     String getPhotoBase64(TdApi.ChatPhotoInfo photo) {
         String photoBase64;
         TdApi.File small = photo.small;
-        small = telegramClient.sendSync(new TdApi.DownloadFile(small.id, 10, 0, 0, true));
+        small = telegramClient.sendSync(new TdApi.DownloadFile(small.id, 32, 0, 0, true));
         byte[] bytes = Files.readAllBytes(Path.of(small.local.path));
         photoBase64 = Base64.getEncoder().encodeToString(bytes);
         return photoBase64;

@@ -15,7 +15,6 @@ public class UpdateNewChat implements UpdateNotificationListener<TdApi.UpdateNew
 
     @Override
     public void handleNotification(TdApi.UpdateNewChat updateNewChat) {
-        //updatesQueues.addUpdateNewChat(updateNewChat);
         updatesQueues.addIncomingSidebarUpdate(updateNewChat);
     }
 

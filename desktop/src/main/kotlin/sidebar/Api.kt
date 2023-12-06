@@ -50,3 +50,7 @@ suspend fun loadChats(): List<ChatPreview> {
     val json = httpClient.get("${baseUrl}/${clientUri}/loadChats").bodyAsText()
     return mapper.readValue(json, object : TypeReference<List<ChatPreview>>() {})
 }
+
+suspend fun chatsLoaded(): Boolean {
+    return httpClient.get("${baseUrl}/${clientUri}/chatsLoaded").bodyAsText().toBoolean()
+}

@@ -1,7 +1,13 @@
 import androidx.compose.desktop.ui.tooling.preview.Preview
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowState
@@ -10,6 +16,7 @@ import auth.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import sidebar.Sidebar
+import sidebar.chatsLoaded
 
 @Composable
 @Preview
@@ -18,18 +25,15 @@ fun App() {
         Row {
             var waitCode by remember { mutableStateOf(false) }
             var waitPass by remember { mutableStateOf(false) }
-            /*var codeSent by remember { mutableStateOf(false) }
-            var passSent by remember { mutableStateOf(false) }
-            var credentials by remember { mutableStateOf("") }*/
             var status by remember { mutableStateOf(Status.NOT_AUTHORIZED) }
 
             LaunchedEffect(Unit) {
                 status = authorizationStatus()
             }
 
-            val authScope = rememberCoroutineScope()
+            val mainScope = rememberCoroutineScope()
 
-            authScope.launch {
+            mainScope.launch {
                 while (true) {
                     status = authorizationStatus()
                     if (status == Status.AUTHORIZED) break
@@ -39,12 +43,31 @@ fun App() {
                 }
             }
 
+            var chatLoading by remember { mutableStateOf(true) }
+
+            mainScope.launch {
+                while (chatLoading) {
+                    chatLoading = !chatsLoaded()
+                    delay(500)
+                }
+            }
+
             if (status == Status.AUTHORIZED) {
-                Sidebar()
+                if (chatLoading) {
+                    Column(
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        Text("Loading chats...")
+                    }
+                } else {
+                    Sidebar()
+                }
             } else if (waitCode) {
-                AuthForm(AuthType.CODE, authScope)
+                AuthForm(AuthType.CODE, mainScope)
             } else if (waitPass) {
-                AuthForm(AuthType.PASSWORD, authScope)
+                AuthForm(AuthType.PASSWORD, mainScope)
             }
         }
     }

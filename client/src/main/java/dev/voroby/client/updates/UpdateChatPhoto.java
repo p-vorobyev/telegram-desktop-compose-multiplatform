@@ -15,7 +15,6 @@ public class UpdateChatPhoto implements UpdateNotificationListener<TdApi.UpdateC
 
     @Override
     public void handleNotification(TdApi.UpdateChatPhoto updateChatPhoto) {
-        //updatesQueues.addUpdateChatPhoto(updateChatPhoto);
         updatesQueues.addIncomingSidebarUpdate(updateChatPhoto);
     }
 

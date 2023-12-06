@@ -22,7 +22,7 @@ public class LoadChats extends AbstractUpdates implements Supplier<List<ChatPrev
         super(updatesQueues, telegramClient);
     }
 
-    public boolean chatLoaded() {
+    public boolean chatsLoaded() {
         return initialLoadDone.get();
     }
 
@@ -33,12 +33,10 @@ public class LoadChats extends AbstractUpdates implements Supplier<List<ChatPrev
     @Override
     public List<ChatPreview> get() {
         List<ChatPreview> previews = new ArrayList<>();
-        CompletableFuture<List<Long>> future = telegramClient.sendAsync(new TdApi.GetChats(new TdApi.ChatListMain(), 100))
+        CompletableFuture<List<Long>> future = telegramClient.sendAsync(new TdApi.GetChats(new TdApi.ChatListMain(), 500))
                 .thenApply(chats -> Arrays.stream(chats.chatIds).boxed().toList())
                 .thenApply(ids -> {
                     for (Long chatId : ids) {
-                        TdApi.Chat chat = telegramClient.sendSync(new TdApi.GetChat(chatId));
-                        if (chat.title.isBlank()) continue;
                         previews.add(getCurrentChatPreview(chatId));
                     }
                     return ids;

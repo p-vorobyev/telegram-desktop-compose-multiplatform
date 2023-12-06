@@ -16,7 +16,6 @@ public class UpdateChatNewOrder implements UpdateNotificationListener<TdApi.Upda
     @Override
     public void handleNotification(TdApi.UpdateChatPosition notification) {
         if (notification.position.list instanceof TdApi.ChatListMain) {
-            //updatesQueues.addUpdateChatPosition(notification);
             updatesQueues.addIncomingSidebarUpdate(notification);
         }
     }
