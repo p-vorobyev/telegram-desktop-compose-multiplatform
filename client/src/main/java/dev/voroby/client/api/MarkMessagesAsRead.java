@@ -16,24 +16,24 @@ public class MarkMessagesAsRead implements Consumer<Long> {
     }
 
     @Override
-    public void accept(Long chatId) {
-        telegramClient.sendAsync(new TdApi.GetChat(chatId))
-                .thenApply(chat -> chat.lastReadInboxMessageId)
-                .thenAccept(lastReadInboxMessageId -> {
-                    long nextFromMessageId = 0;
-                    do {
-                        var getChatHistory = new TdApi.GetChatHistory(chatId, nextFromMessageId, 0, 100, false);
-                        TdApi.Messages messages = telegramClient.sendSync(getChatHistory);
-                        TdApi.Message[] msgs = messages.messages;
-                        long[] ids = new long[msgs.length];
-                        for (int i = 0; i < msgs.length; i++) {
-                            ids[i] = msgs[i].id;
-                        }
-                        var viewMessages = new TdApi.ViewMessages(chatId, ids, null, true);
-                        telegramClient.sendSync(viewMessages);
-                        nextFromMessageId = ids[ids.length - 1];
-                    } while (nextFromMessageId != lastReadInboxMessageId);
-                });
+    synchronized public void accept(Long chatId) {
+        long lastReadInboxMessageId;
+        long nextFromMessageId = 0;
+        do {
+            TdApi.Chat chat = telegramClient.sendSync(new TdApi.GetChat(chatId));
+            lastReadInboxMessageId = chat.lastReadInboxMessageId;
+            var getChatHistory = new TdApi.GetChatHistory(chatId, nextFromMessageId, 0, 100, false);
+            TdApi.Messages messages = telegramClient.sendSync(getChatHistory);
+            TdApi.Message[] msgs = messages.messages;
+            if (msgs.length == 0) break;
+            long[] ids = new long[msgs.length];
+            for (int i = 0; i < msgs.length; i++) {
+                ids[i] = msgs[i].id;
+            }
+            var viewMessages = new TdApi.ViewMessages(chatId, ids, null, true);
+            telegramClient.sendSync(viewMessages);
+            nextFromMessageId = ids[ids.length - 1];
+        } while (nextFromMessageId != lastReadInboxMessageId);
     }
 
 }
