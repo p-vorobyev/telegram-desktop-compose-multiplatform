@@ -17,7 +17,10 @@ public class GetChatNewTitle extends AbstractUpdates implements Function<TdApi.U
 
     @Override
     public ChatPreview apply(TdApi.UpdateChatTitle updateChatTitle) {
-        return getCurrentChatPreview(updateChatTitle.chatId);
+        if (mainListChatIds.contains(updateChatTitle.chatId)) {
+            return getCurrentChatPreview(updateChatTitle.chatId);
+        }
+        return null;
     }
 
 }

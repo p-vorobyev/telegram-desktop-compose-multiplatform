@@ -18,7 +18,7 @@ public class GetChatLastMessage extends AbstractUpdates implements Function<TdAp
 
     @Override
     public ChatPreview apply(TdApi.UpdateChatLastMessage updateChatLastMessage) {
-        if (updateChatLastMessage.lastMessage != null) {
+        if (updateChatLastMessage.lastMessage != null && mainListChatIds.contains(updateChatLastMessage.chatId)) {
             return getCurrentChatPreview(updateChatLastMessage.chatId);
         }
         return null;

@@ -1,5 +1,6 @@
 package dev.voroby.client.updates;
 
+import dev.voroby.client.api.AbstractUpdates;
 import dev.voroby.springframework.telegram.client.TdApi;
 import dev.voroby.springframework.telegram.client.updates.UpdateNotificationListener;
 import org.springframework.stereotype.Service;
@@ -16,6 +17,7 @@ public class UpdateChatNewOrder implements UpdateNotificationListener<TdApi.Upda
     @Override
     public void handleNotification(TdApi.UpdateChatPosition notification) {
         if (notification.position.list instanceof TdApi.ChatListMain) {
+            AbstractUpdates.mainListChatIds.add(notification.chatId);
             updatesQueues.addIncomingSidebarUpdate(notification);
         }
     }

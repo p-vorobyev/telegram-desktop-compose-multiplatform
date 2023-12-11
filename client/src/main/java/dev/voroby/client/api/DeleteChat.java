@@ -2,11 +2,12 @@ package dev.voroby.client.api;
 
 import dev.voroby.springframework.telegram.client.TdApi;
 import dev.voroby.springframework.telegram.client.TelegramClient;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.util.function.Consumer;
 
-@Component
+@Component @Slf4j
 public class DeleteChat implements Consumer<Long> {
 
     private final TelegramClient telegramClient;
@@ -26,5 +27,6 @@ public class DeleteChat implements Consumer<Long> {
                         telegramClient.sendAsync(new TdApi.LeaveChat(chatId));
                     }
                 });
+        log.info("Delete chat: [chatId: {}]", chatId);
     }
 }

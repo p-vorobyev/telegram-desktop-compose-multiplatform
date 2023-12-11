@@ -1,10 +1,15 @@
 package auth
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.OffsetMapping
+import androidx.compose.ui.text.input.TransformedText
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -33,7 +38,14 @@ fun AuthForm(type: AuthType,  authScope: CoroutineScope = rememberCoroutineScope
             colors = TextFieldDefaults.outlinedTextFieldColors(
                 focusedBorderColor = blueColor
             ),
-            singleLine = true
+            singleLine = true,
+            visualTransformation = {
+                TransformedText(
+                    AnnotatedString("*".repeat(it.text.length)),
+                    OffsetMapping.Identity
+                )
+            },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
         )
         Button(
             onClick = {

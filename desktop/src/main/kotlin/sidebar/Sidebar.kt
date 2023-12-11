@@ -25,9 +25,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import org.jetbrains.skia.Bitmap
 import java.util.*
 import java.util.stream.Collectors
@@ -44,23 +42,40 @@ fun Sidebar() {
     var selectedIndex by remember { mutableStateOf(-1) }
 
     val chatPreviews = mutableStateListOf<ChatPreview>()
+
+    var needToScrollUpSidebar by remember { mutableStateOf(false) }
+
+    var chatSearchInput: String by remember { mutableStateOf("") }
+
     LaunchedEffect(Unit) {
         chatPreviews.addAll(loadChats())
     }
 
     val chatListUpdateScope = rememberCoroutineScope()
+
+    val lazyListState = rememberLazyListState()
+
     chatListUpdateScope.launch {
         while (true) {
+            val chatsSizeBeforeUpdates = chatPreviews.size
+            var firstChatPreviewBeforeUpdates: ChatPreview? = null
+            if (chatPreviews.isNotEmpty()) {
+                firstChatPreviewBeforeUpdates = chatPreviews[0]
+            }
+
             handleSidebarUpdates(chatPreviews)
+
+            needToScrollUpSidebar = (chatPreviews.size > chatsSizeBeforeUpdates) ||
+                    (chatPreviews.isNotEmpty() && lazyListState.firstVisibleItemIndex < 3 && firstChatPreviewBeforeUpdates != chatPreviews[0])
+            if (needToScrollUpSidebar) {
+                lazyListState.scrollToItem(0)
+            }
+
             delay(1000)
         }
     }
 
-    var chatSearchInput: String by remember { mutableStateOf("") }
-
     val cardModifier = Modifier.width(width = 450.dp).height(60.dp)
-
-    val lazyListState = rememberLazyListState()
 
     Scaffold(
         topBar = {
@@ -89,10 +104,11 @@ fun Sidebar() {
                             value = chatSearchInput,
                             onValueChange = {chatSearchInput = it},
                             placeholder = {Text("Search")},
-                            modifier = Modifier.fillMaxWidth(),
+                            modifier = Modifier.fillMaxWidth().height(50.dp),
                             colors = TextFieldDefaults.outlinedTextFieldColors(
                                 focusedBorderColor = blueColor
-                            )
+                            ),
+                            singleLine = true
                         )
                     }
                 }

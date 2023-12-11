@@ -75,7 +75,7 @@ fun App() {
 
 fun main() = application {
     Window(
-        title = "Telegram",
+        title = "Telegram JLV",
         state = WindowState(width = 1200.dp, height = 800.dp),
         onCloseRequest = {exitApplication(); httpClient.close()}
     ) {

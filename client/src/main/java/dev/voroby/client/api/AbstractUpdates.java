@@ -11,8 +11,11 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Base64;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 abstract public class AbstractUpdates {
 
@@ -21,6 +24,8 @@ abstract public class AbstractUpdates {
     final TelegramClient telegramClient;
 
     private final Map<Long, String> chatBase64IconCache = new ConcurrentHashMap<>();
+
+    public static Set<Long> mainListChatIds = new CopyOnWriteArraySet<>();
 
     protected AbstractUpdates(UpdatesQueues updatesQueues, TelegramClient telegramClient) {
         this.updatesQueues = updatesQueues;

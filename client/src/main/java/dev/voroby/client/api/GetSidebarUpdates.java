@@ -45,15 +45,20 @@ public class GetSidebarUpdates implements Supplier<List<ChatPreview>> {
                 ChatPreview preview = getChatLastMessage.apply(upd);
                 if (preview != null) previews.add(preview);
             } else if (update instanceof TdApi.UpdateChatTitle upd) {
-                previews.add(getChatNewTitle.apply(upd));
+                ChatPreview preview = getChatNewTitle.apply(upd);
+                if (preview != null) previews.add(preview);
             } else if (update instanceof TdApi.UpdateChatPosition upd) {
-                previews.add(getChatNewOrder.apply(upd));
+                ChatPreview preview = getChatNewOrder.apply(upd);
+                if (preview != null) previews.add(preview);
             } else if (update instanceof TdApi.UpdateChatReadInbox upd) {
-                previews.add(getChatReadInbox.apply(upd));
+                ChatPreview preview = getChatReadInbox.apply(upd);
+                if (preview != null) previews.add(preview);
             } else if (update instanceof TdApi.UpdateNewChat upd) {
-                previews.add(getNewChat.apply(upd));
+                ChatPreview preview = getNewChat.apply(upd);
+                if (preview != null) previews.add(preview);
             } else if (update instanceof TdApi.UpdateChatPhoto upd) {
-                previews.add(getNewChatPhoto.apply(upd));
+                ChatPreview preview = getNewChatPhoto.apply(upd);
+                if (preview != null) previews.add(preview);
             }
 
         }
