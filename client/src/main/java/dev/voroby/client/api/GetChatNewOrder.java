@@ -17,10 +17,7 @@ public class GetChatNewOrder extends AbstractUpdates implements Function<TdApi.U
 
     @Override
     public ChatPreview apply(TdApi.UpdateChatPosition updateChatPosition) {
-        if (mainListChatIds.contains(updateChatPosition.chatId)) {
-            return getCurrentChatPreview(updateChatPosition.chatId);
-        }
-        return null;
+        return checkMainListChatIds_And_GetCurrentChatPreview(updateChatPosition.chatId);
     }
 
 }

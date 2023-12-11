@@ -42,10 +42,10 @@ public class ClientApplication {
         };
     }
 
-    public void loadChatsHandler(TdApi.Object object) {
+    public void loadChatsHandler(TdApi.Object object, TdApi.Error error) {
         // https://core.telegram.org/tdlib/docs/classtd_1_1td__api_1_1load_chats.html
         // Returns a 404 error if all chats have been loaded.
-        if (object instanceof TdApi.Ok) {
+        if (error == null) {
             TdApi.LoadChats loadChatsQuery = new TdApi.LoadChats(new TdApi.ChatListMain(), 100);
             telegramClient.sendWithCallback(loadChatsQuery, this::loadChatsHandler);
         } else {

@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 @Component
@@ -42,28 +43,29 @@ public class GetSidebarUpdates implements Supplier<List<ChatPreview>> {
             if (update == null) break;
 
             if (update instanceof TdApi.UpdateChatLastMessage upd) {
-                ChatPreview preview = getChatLastMessage.apply(upd);
-                if (preview != null) previews.add(preview);
+                addPreviewFromUpdate(getChatLastMessage, upd, previews);
             } else if (update instanceof TdApi.UpdateChatTitle upd) {
-                ChatPreview preview = getChatNewTitle.apply(upd);
-                if (preview != null) previews.add(preview);
+                addPreviewFromUpdate(getChatNewTitle, upd, previews);
             } else if (update instanceof TdApi.UpdateChatPosition upd) {
-                ChatPreview preview = getChatNewOrder.apply(upd);
-                if (preview != null) previews.add(preview);
+                addPreviewFromUpdate(getChatNewOrder, upd, previews);
             } else if (update instanceof TdApi.UpdateChatReadInbox upd) {
-                ChatPreview preview = getChatReadInbox.apply(upd);
-                if (preview != null) previews.add(preview);
+                addPreviewFromUpdate(getChatReadInbox, upd, previews);
             } else if (update instanceof TdApi.UpdateNewChat upd) {
-                ChatPreview preview = getNewChat.apply(upd);
-                if (preview != null) previews.add(preview);
+                addPreviewFromUpdate(getNewChat, upd, previews);
             } else if (update instanceof TdApi.UpdateChatPhoto upd) {
-                ChatPreview preview = getNewChatPhoto.apply(upd);
-                if (preview != null) previews.add(preview);
+                addPreviewFromUpdate(getNewChatPhoto, upd, previews);
             }
 
         }
 
         return previews;
+    }
+
+    private <T extends TdApi.Update> void addPreviewFromUpdate(Function<T, ChatPreview> func,
+                                                               T update,
+                                                               List<ChatPreview> previews) {
+        ChatPreview preview = func.apply(update);
+        if (preview != null) previews.add(preview);
     }
 
 }

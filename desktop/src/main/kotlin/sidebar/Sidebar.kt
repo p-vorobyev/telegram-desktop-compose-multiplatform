@@ -43,13 +43,29 @@ fun Sidebar() {
 
     val chatPreviews = mutableStateListOf<ChatPreview>()
 
+    var chatLoading by remember { mutableStateOf(true) }
+
     var needToScrollUpSidebar by remember { mutableStateOf(false) }
 
     var chatSearchInput: String by remember { mutableStateOf("") }
 
     LaunchedEffect(Unit) {
+        while (chatLoading) {
+            chatLoading = !chatsLoaded()
+            delay(500)
+        }
         chatPreviews.addAll(loadChats())
     }
+
+    /*if (chatPreviews.isEmpty()) {
+        Column(
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.fillMaxSize()
+        ) {
+            Text("Loading chats...")
+        }
+    }*/
 
     val chatListUpdateScope = rememberCoroutineScope()
 

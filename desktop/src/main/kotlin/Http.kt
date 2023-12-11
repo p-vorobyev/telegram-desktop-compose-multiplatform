@@ -13,7 +13,7 @@ val httpClient = HttpClient(CIO) {
         jackson ()
     }
     engine {
-        requestTimeout = 60000
+        requestTimeout = 90000
         https {
             trustManager = TrustAllManager()
         }

@@ -17,10 +17,7 @@ public class GetNewChatPhoto extends AbstractUpdates implements Function<TdApi.U
 
     @Override
     public ChatPreview apply(TdApi.UpdateChatPhoto updateChatPhoto) {
-        if (mainListChatIds.contains(updateChatPhoto.chatId)) {
-            return getCurrentChatPreview(updateChatPhoto.chatId);
-        }
-        return null;
+        return checkMainListChatIds_And_GetCurrentChatPreview(updateChatPhoto.chatId);
     }
 
 }

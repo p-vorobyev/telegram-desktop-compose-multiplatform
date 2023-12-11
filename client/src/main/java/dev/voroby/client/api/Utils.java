@@ -3,12 +3,8 @@ package dev.voroby.client.api;
 import dev.voroby.springframework.telegram.client.TdApi;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.concurrent.atomic.AtomicBoolean;
-
 @Slf4j
 public class Utils {
-
-    public static AtomicBoolean updatesConsumerLocked = new AtomicBoolean(false);
 
     static String getMessageText(TdApi.Message message) {
         if (message == null) return "";

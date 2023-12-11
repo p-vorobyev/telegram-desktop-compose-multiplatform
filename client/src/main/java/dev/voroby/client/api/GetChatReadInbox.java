@@ -17,10 +17,7 @@ public class GetChatReadInbox extends AbstractUpdates implements Function<TdApi.
 
     @Override
     public ChatPreview apply(TdApi.UpdateChatReadInbox updateChatReadInbox) {
-        if (mainListChatIds.contains(updateChatReadInbox.chatId)) {
-            return getCurrentChatPreview(updateChatReadInbox.chatId);
-        }
-        return null;
+        return checkMainListChatIds_And_GetCurrentChatPreview(updateChatReadInbox.chatId);
     }
 
 }

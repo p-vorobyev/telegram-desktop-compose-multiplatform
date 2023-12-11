@@ -43,17 +43,17 @@ fun App() {
                 }
             }
 
-            var chatLoading by remember { mutableStateOf(true) }
+            /*var chatLoading by remember { mutableStateOf(true) }
 
             mainScope.launch {
                 while (chatLoading) {
                     chatLoading = !chatsLoaded()
                     delay(500)
                 }
-            }
+            }*/
 
             if (status == Status.AUTHORIZED) {
-                if (chatLoading) {
+                /*if (chatLoading) {
                     Column(
                         verticalArrangement = Arrangement.Center,
                         horizontalAlignment = Alignment.CenterHorizontally,
@@ -63,7 +63,8 @@ fun App() {
                     }
                 } else {
                     Sidebar()
-                }
+                }*/
+                Sidebar()
             } else if (waitCode) {
                 AuthForm(AuthType.CODE, mainScope)
             } else if (waitPass) {

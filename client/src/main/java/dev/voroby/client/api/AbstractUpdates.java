@@ -32,6 +32,17 @@ abstract public class AbstractUpdates {
         this.telegramClient = telegramClient;
     }
 
+    /**
+     * For some reason, TDLib sends updates with deleted chats.
+     * For this reason, we check it so as not calling deleted chats.
+     */
+    ChatPreview checkMainListChatIds_And_GetCurrentChatPreview(long chatId) {
+        if (mainListChatIds.contains(chatId)) {
+            return getCurrentChatPreview(chatId);
+        }
+        return null;
+    }
+
     ChatPreview getCurrentChatPreview(long chatId) {
         TdApi.Chat chat = telegramClient.sendSync(new TdApi.GetChat(chatId));
         return getCurrentChatPreview(chat);
