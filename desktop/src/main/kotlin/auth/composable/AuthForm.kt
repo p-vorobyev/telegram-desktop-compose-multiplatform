@@ -1,4 +1,4 @@
-package auth
+package auth.composable
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
@@ -11,16 +11,18 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.OffsetMapping
 import androidx.compose.ui.text.input.TransformedText
 import androidx.compose.ui.unit.dp
+import auth.api.sendCode
+import auth.api.sendPass
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import sidebar.blueColor
+import sidebar.composable.blueColor
 
 enum class AuthType {
     CODE, PASSWORD
 }
 
 @Composable
-fun AuthForm(type: AuthType,  authScope: CoroutineScope = rememberCoroutineScope()) {
+fun AuthForm(type: AuthType, authScope: CoroutineScope = rememberCoroutineScope()) {
     var credentials by remember { mutableStateOf("") }
     var credSent by remember { mutableStateOf(false) }
 

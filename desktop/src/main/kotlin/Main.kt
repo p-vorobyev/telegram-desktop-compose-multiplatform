@@ -1,22 +1,21 @@
 import androidx.compose.desktop.ui.tooling.preview.Preview
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowState
 import androidx.compose.ui.window.application
-import auth.*
+import auth.api.Status
+import auth.api.authorizationStatus
+import auth.api.waitCode
+import auth.api.waitPass
+import auth.composable.AuthForm
+import auth.composable.AuthType
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import sidebar.Sidebar
-import sidebar.chatsLoaded
+import sidebar.composable.Sidebar
+import transport.httpClient
 
 @Composable
 @Preview
@@ -43,27 +42,7 @@ fun App() {
                 }
             }
 
-            /*var chatLoading by remember { mutableStateOf(true) }
-
-            mainScope.launch {
-                while (chatLoading) {
-                    chatLoading = !chatsLoaded()
-                    delay(500)
-                }
-            }*/
-
             if (status == Status.AUTHORIZED) {
-                /*if (chatLoading) {
-                    Column(
-                        verticalArrangement = Arrangement.Center,
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        modifier = Modifier.fillMaxSize()
-                    ) {
-                        Text("Loading chats...")
-                    }
-                } else {
-                    Sidebar()
-                }*/
                 Sidebar()
             } else if (waitCode) {
                 AuthForm(AuthType.CODE, mainScope)

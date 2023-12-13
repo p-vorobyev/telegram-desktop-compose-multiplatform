@@ -1,13 +1,14 @@
-package sidebar
+package sidebar.api
 
 import androidx.compose.runtime.snapshots.SnapshotStateList
-import baseUrl
-import clientUri
 import com.fasterxml.jackson.core.type.TypeReference
-import httpClient
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
-import mapper
+import sidebar.dto.ChatPreview
+import transport.baseUrl
+import transport.clientUri
+import transport.httpClient
+import transport.mapper
 
 suspend fun handleSidebarUpdates(chats: SnapshotStateList<ChatPreview>) {
     val updatedPreviews: List<ChatPreview> = updatedPreviews()

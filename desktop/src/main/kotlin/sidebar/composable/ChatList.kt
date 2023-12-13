@@ -1,6 +1,5 @@
-package sidebar
+package sidebar.composable
 
-import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -13,6 +12,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.KeyboardArrowUp
 import androidx.compose.material.icons.rounded.Search
 import androidx.compose.runtime.*
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -25,47 +25,34 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.jetbrains.skia.Bitmap
+import org.jetbrains.skia.Image
+import sidebar.api.deleteChat
+import sidebar.api.handleSidebarUpdates
+import sidebar.api.markAsRead
+import sidebar.dto.ChatPreview
+import sidebar.dto.ChatType
 import java.util.*
 import java.util.stream.Collectors
 
-val blueColor = Color(51, 182, 255)
-
-val greyColor = Color(red = 230, green = 230, blue = 230)
 
 
-@OptIn(ExperimentalMaterialApi::class, ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterialApi::class)
 @Composable
-@Preview
-fun Sidebar() {
+fun ChatList(chatPreviewsArg: SnapshotStateList<ChatPreview>) {
+
+    val chatPreviews = remember {  mutableStateListOf<ChatPreview>() }.apply {
+        addAll(chatPreviewsArg)
+    }
+
     var selectedIndex by remember { mutableStateOf(-1) }
-
-    val chatPreviews = mutableStateListOf<ChatPreview>()
-
-    var chatLoading by remember { mutableStateOf(true) }
 
     var needToScrollUpSidebar by remember { mutableStateOf(false) }
 
     var chatSearchInput: String by remember { mutableStateOf("") }
-
-    LaunchedEffect(Unit) {
-        while (chatLoading) {
-            chatLoading = !chatsLoaded()
-            delay(500)
-        }
-        chatPreviews.addAll(loadChats())
-    }
-
-    /*if (chatPreviews.isEmpty()) {
-        Column(
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.fillMaxSize()
-        ) {
-            Text("Loading chats...")
-        }
-    }*/
 
     val chatListUpdateScope = rememberCoroutineScope()
 
@@ -119,7 +106,7 @@ fun Sidebar() {
                         OutlinedTextField(
                             value = chatSearchInput,
                             onValueChange = {chatSearchInput = it},
-                            placeholder = {Text("Search")},
+                            placeholder = { Text("Search") },
                             modifier = Modifier.fillMaxWidth().height(50.dp),
                             colors = TextFieldDefaults.outlinedTextFieldColors(
                                 focusedBorderColor = blueColor
@@ -148,7 +135,7 @@ fun Sidebar() {
                                 var imageBitMap: ImageBitmap? = null
                                 chatPreview.photo?.let {
                                     val img: ByteArray = Base64.getDecoder().decode(it)
-                                    imageBitMap = Bitmap.makeFromImage(org.jetbrains.skia.Image.makeFromEncoded(img)).asComposeImageBitmap()
+                                    imageBitMap = Bitmap.makeFromImage(Image.makeFromEncoded(img)).asComposeImageBitmap()
                                 }
 
                                 Card(modifier = cardModifier, backgroundColor = color, onClick = {selectedIndex = index}) {
@@ -173,7 +160,8 @@ fun Sidebar() {
                                                     }.background(blueColor)
                                             ) {
                                                 val iconText = if (title.isBlank()) "" else
-                                                    title.split(" ").stream().limit(2).map { it.substring(0,1).uppercase() }.collect(Collectors.joining())
+                                                    title.split(" ").stream().limit(2).map { it.substring(0,1).uppercase() }.collect(
+                                                        Collectors.joining())
                                                 Text(
                                                     iconText,
                                                     style = TextStyle(color = Color.White, fontSize = 20.sp),

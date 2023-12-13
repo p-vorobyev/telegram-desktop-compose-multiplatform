@@ -1,11 +1,11 @@
-package auth
+package auth.api
 
-import authorizationUri
-import baseUrl
-import httpClient
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
+import transport.authorizationUri
+import transport.baseUrl
+import transport.httpClient
 
 enum class Status {
     AUTHORIZED, NOT_AUTHORIZED
