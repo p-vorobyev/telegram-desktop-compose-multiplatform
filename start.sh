@@ -11,5 +11,5 @@ if [ $LOG_FILE != "" ]; then
 fi
 
 nohup java -jar client.jar > client.log &
-sleep 5
+sleep 3
 java -jar telegram.jar

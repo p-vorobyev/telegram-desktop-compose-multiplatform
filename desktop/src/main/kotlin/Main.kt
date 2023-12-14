@@ -12,10 +12,14 @@ import auth.api.waitCode
 import auth.api.waitPass
 import auth.composable.AuthForm
 import auth.composable.AuthType
+import io.ktor.client.request.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import sidebar.composable.Sidebar
+import transport.baseUrl
+import transport.clientUri
 import transport.httpClient
+import java.util.concurrent.atomic.AtomicBoolean
 
 @Composable
 @Preview
@@ -33,7 +37,7 @@ fun App() {
             val mainScope = rememberCoroutineScope()
 
             mainScope.launch {
-                while (true) {
+                while (!terminatingApp.get()) {
                     status = authorizationStatus()
                     if (status == Status.AUTHORIZED) break
                     waitCode = waitCode()
@@ -53,11 +57,23 @@ fun App() {
     }
 }
 
+val terminatingApp = AtomicBoolean(false)
+
 fun main() = application {
+    val appScope = rememberCoroutineScope()
     Window(
-        title = "Telegram JLV",
-        state = WindowState(width = 1200.dp, height = 800.dp),
-        onCloseRequest = {exitApplication(); httpClient.close()}
+        title = "Telegram Compose Multiplatform",
+        state = WindowState(width = 1500.dp, height = 1000.dp),
+        onCloseRequest = {
+            terminatingApp.set(true)
+            appScope.launch {
+                delay(300)
+                httpClient.post("${baseUrl}/${clientUri}/shutdown")
+            }.invokeOnCompletion {
+                exitApplication()
+                httpClient.close()
+            }
+        }
     ) {
         App()
     }

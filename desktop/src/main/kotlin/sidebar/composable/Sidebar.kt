@@ -4,6 +4,7 @@ import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.runtime.*
 import androidx.compose.ui.graphics.Color
 import kotlinx.coroutines.delay
+import terminatingApp
 import sidebar.api.chatsLoaded
 import sidebar.api.loadChats
 import sidebar.dto.ChatPreview
@@ -23,7 +24,7 @@ fun Sidebar() {
     var initChatsCompleted by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
-        while (chatLoading) {
+        while (chatLoading && !terminatingApp.get()) {
             chatLoading = !chatsLoaded()
             delay(500)
         }
@@ -34,7 +35,15 @@ fun Sidebar() {
     if (!initChatsCompleted) {
         ChatsLoadingDisclaimer()
     } else {
-        ChatList(chatPreviews)
+        //ChatList(chatPreviews)
+        //TODO check
+        for (i in 0..3) {
+            if (i == 1) {
+                ChatsLoadingDisclaimer()
+            } else {
+                ChatList(chatPreviews)
+            }
+        }
     }
 
 }

@@ -8,14 +8,20 @@ import dev.voroby.client.dto.ChatPreview;
 import dev.voroby.springframework.telegram.client.TelegramClient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.SpringApplication;
+import org.springframework.context.ApplicationContext;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 @RestController @Slf4j
 @RequestMapping(value = "/client")
 public class ClientController {
+
+    @Autowired
+    private ApplicationContext ctx;
 
     @Autowired
     private LoadChats loadChats;
@@ -55,6 +61,11 @@ public class ClientController {
     @PostMapping(value = "/delete/{chatId}")
     public void deleteChat(@PathVariable("chatId") long chatId) {
         deleteChat.accept(chatId);
+    }
+
+    @PostMapping(value = "/shutdown")
+    public void shutDownApp() {
+        CompletableFuture.runAsync(() -> SpringApplication.exit(ctx, () -> 0));
     }
 
 }
