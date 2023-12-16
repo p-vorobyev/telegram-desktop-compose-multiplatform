@@ -40,7 +40,7 @@ compose.desktop {
 
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-            packageName = "Telegram JLV"
+            packageName = "TelegramCM"
             packageVersion = "1.0.0"
         }
     }

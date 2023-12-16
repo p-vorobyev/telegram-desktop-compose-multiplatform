@@ -32,18 +32,12 @@ fun Sidebar() {
         initChatsCompleted = true
     }
 
+    val sidebarStates = SidebarStates(chatPreviews = remember {  mutableStateListOf() })
+    sidebarStates.chatPreviews = chatPreviews
     if (!initChatsCompleted) {
         ChatsLoadingDisclaimer()
     } else {
-        //ChatList(chatPreviews)
-        //TODO check
-        for (i in 0..3) {
-            if (i == 1) {
-                ChatsLoadingDisclaimer()
-            } else {
-                ChatList(chatPreviews)
-            }
-        }
+        ChatList(sidebarStates)
     }
 
 }
