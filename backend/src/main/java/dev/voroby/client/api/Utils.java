@@ -14,6 +14,8 @@ public class Utils {
             case TdApi.MessageText.CONSTRUCTOR -> msgText = ((TdApi.MessageText) content).text.text;
             case TdApi.MessagePhoto.CONSTRUCTOR -> msgText = ((TdApi.MessagePhoto) content).caption.text;
             case TdApi.MessageVideo.CONSTRUCTOR -> msgText = ((TdApi.MessageVideo) content).caption.text;
+            case TdApi.MessageAnimation.CONSTRUCTOR -> msgText = ((TdApi.MessageAnimation) content).caption.text;
+            case TdApi.MessageDocument.CONSTRUCTOR -> msgText = ((TdApi.MessageDocument) content).caption.text;
             default -> {}
         }
 

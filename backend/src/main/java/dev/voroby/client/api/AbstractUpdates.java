@@ -11,7 +11,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Base64;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -26,6 +25,8 @@ abstract public class AbstractUpdates {
     private final Map<Long, String> chatBase64IconCache = new ConcurrentHashMap<>();
 
     public static Set<Long> mainListChatIds = new CopyOnWriteArraySet<>();
+
+    public static Map<Long, TdApi.Chat> initialChatCache = new ConcurrentHashMap<>();
 
     protected AbstractUpdates(UpdatesQueues updatesQueues, TelegramClient telegramClient) {
         this.updatesQueues = updatesQueues;
@@ -45,6 +46,7 @@ abstract public class AbstractUpdates {
 
     ChatPreview getCurrentChatPreview(long chatId) {
         TdApi.Chat chat = telegramClient.sendSync(new TdApi.GetChat(chatId));
+        initialChatCache.put(chat.id, chat);
         return getCurrentChatPreview(chat);
     }
 
@@ -60,7 +62,9 @@ abstract public class AbstractUpdates {
                 chatBase64IconCache.put(chat.id, photoBase64);
             }
         }
+
         long order = Utils.mainChatListPositionOrder(chat.positions);
+
         ChatType chatType = null;
         switch (chat.type.getConstructor()) {
             case TdApi.ChatTypePrivate.CONSTRUCTOR -> chatType = ChatType.Private;
@@ -68,7 +72,14 @@ abstract public class AbstractUpdates {
             case TdApi.ChatTypeBasicGroup.CONSTRUCTOR -> chatType = ChatType.BasicGroup;
             case TdApi.ChatTypeSupergroup.CONSTRUCTOR -> chatType = ChatType.Supergroup;
         }
-        return new ChatPreview(chat.id, chat.title, photoBase64, msgText, chat.unreadCount, order, chatType);
+
+        long unreadCount = chat.unreadCount;
+        //if chat is a forum and contains topics. not implemented
+        if (chat.viewAsTopics) {
+            unreadCount = 0;
+        }
+
+        return new ChatPreview(chat.id, chat.title, photoBase64, msgText, unreadCount, order, chatType);
     }
 
     @SneakyThrows(IOException.class)

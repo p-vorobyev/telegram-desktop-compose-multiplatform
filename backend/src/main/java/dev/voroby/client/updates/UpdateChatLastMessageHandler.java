@@ -1,5 +1,6 @@
 package dev.voroby.client.updates;
 
+import dev.voroby.client.api.AbstractUpdates;
 import dev.voroby.springframework.telegram.client.TdApi;
 import dev.voroby.springframework.telegram.client.updates.UpdateNotificationListener;
 import org.springframework.stereotype.Service;
@@ -15,6 +16,10 @@ public class UpdateChatLastMessageHandler implements UpdateNotificationListener<
 
     @Override
     public void handleNotification(TdApi.UpdateChatLastMessage updateChatLastMessage) {
+        TdApi.Chat chat = AbstractUpdates.initialChatCache.get(updateChatLastMessage.chatId);
+        synchronized (chat) {
+            chat.lastMessage = updateChatLastMessage.lastMessage;
+        }
         updatesQueues.addIncomingSidebarUpdate(updateChatLastMessage);
     }
 

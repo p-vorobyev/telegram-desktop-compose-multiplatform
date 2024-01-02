@@ -18,6 +18,7 @@ public class UpdateNewChat implements UpdateNotificationListener<TdApi.UpdateNew
     public void handleNotification(TdApi.UpdateNewChat updateNewChat) {
         long chatId = updateNewChat.chat.id;
         if (chatId != 0 && chatId != -1) {
+            AbstractUpdates.initialChatCache.put(updateNewChat.chat.id, updateNewChat.chat);
             AbstractUpdates.mainListChatIds.add(updateNewChat.chat.id);
             updatesQueues.addIncomingSidebarUpdate(updateNewChat);
         }

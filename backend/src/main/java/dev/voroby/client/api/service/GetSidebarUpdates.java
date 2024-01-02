@@ -1,5 +1,6 @@
-package dev.voroby.client.api;
+package dev.voroby.client.api.service;
 
+import dev.voroby.client.api.*;
 import dev.voroby.client.dto.ChatPreview;
 import dev.voroby.client.updates.UpdatesQueues;
 import dev.voroby.springframework.telegram.client.TdApi;
