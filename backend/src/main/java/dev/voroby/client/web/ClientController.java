@@ -1,9 +1,10 @@
 package dev.voroby.client.web;
 
 import dev.voroby.client.api.DeleteChat;
-import dev.voroby.client.api.GetSidebarUpdates;
+import dev.voroby.client.api.service.GetSidebarUpdates;
 import dev.voroby.client.api.LoadChats;
 import dev.voroby.client.api.MarkMessagesAsRead;
+import dev.voroby.client.api.service.OpenChatService;
 import dev.voroby.client.dto.ChatPreview;
 import dev.voroby.springframework.telegram.client.TelegramClient;
 import lombok.extern.slf4j.Slf4j;
@@ -38,6 +39,9 @@ public class ClientController {
     @Autowired
     private GetSidebarUpdates getSidebarUpdates;
 
+    @Autowired
+    private OpenChatService openChatService;
+
     @GetMapping(value = "/loadChats", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<ChatPreview> loadChats() {
         return loadChats.get();
@@ -61,6 +65,11 @@ public class ClientController {
     @PostMapping(value = "/delete/{chatId}")
     public void deleteChat(@PathVariable("chatId") long chatId) {
         deleteChat.accept(chatId);
+    }
+
+    @PostMapping(value = "/open/chat/{chatId}")
+    public void openChat(@PathVariable("chatId") long chatId) {
+        openChatService.openChat(chatId);
     }
 
     @PostMapping(value = "/shutdown")
