@@ -1,20 +1,36 @@
 package sidebar.composable
 
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.onClick
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.KeyboardArrowUp
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asComposeImageBitmap
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.launch
+import org.jetbrains.skia.Bitmap
+import org.jetbrains.skia.Image
+import sidebar.dto.ChatPreview
+import java.util.*
+import java.util.stream.Collectors
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -22,7 +38,8 @@ fun ScaffoldTopBar(
     sidebarStates: SidebarStates,
     lazyListState: LazyListState = rememberLazyListState(),
     chatSearchInput: MutableState<String> = mutableStateOf(""),
-    filterUnreadChats: MutableState<Boolean> = mutableStateOf(false)
+    filterUnreadChats: MutableState<Boolean> = mutableStateOf(false),
+    selectedIndex: MutableState<Int> = remember { mutableStateOf(-1) }
 ) {
 
     val chatListTopBarScope = rememberCoroutineScope()
@@ -79,9 +96,65 @@ fun ScaffoldTopBar(
                 }
                 Divider(modifier = Modifier.height(2.dp).width(450.dp), color = greyColor)
             }
-            Column(modifier = Modifier.fillMaxWidth()) {
 
+            Column {
+                if (selectedIndex.value != -1) {
+
+                    val chatPreview: ChatPreview = sidebarStates.chatPreviews[selectedIndex.value]
+                    var imageBitMap: ImageBitmap? = null
+                    chatPreview.photo?.let {
+                        val img: ByteArray = Base64.getDecoder().decode(it)
+                        imageBitMap = Bitmap.makeFromImage(Image.makeFromEncoded(img)).asComposeImageBitmap()
+                    }
+                    val title = chatPreview.title.replace("\n", " ")
+
+                    Card(modifier = Modifier.fillMaxWidth().height(85.dp).background(MaterialTheme.colors.surface)) {
+
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+
+                            Spacer(modifier = Modifier.width(10.dp))
+
+                            if (imageBitMap != null) {
+                                Image(
+                                    bitmap = imageBitMap!!,
+                                    contentScale = ContentScale.Crop,
+                                    modifier = Modifier.size(60.dp).clip(CircleShape),
+                                    contentDescription = "",
+                                    alignment = Alignment.Center
+                                )
+                            } else {
+                                Box(
+                                    modifier = Modifier
+                                        .size(60.dp)
+                                        .graphicsLayer {
+                                            clip = true
+                                            shape = CircleShape
+                                        }.background(blueColor)
+                                ) {
+                                    val iconText = if (title.isBlank()) "" else
+                                        title.split(" ").stream().limit(2).map { it.substring(0,1).uppercase() }.collect(
+                                            Collectors.joining())
+                                    Text(
+                                        iconText,
+                                        style = TextStyle(color = Color.White, fontSize = 20.sp),
+                                        modifier = Modifier.align(Alignment.Center)
+                                    )
+                                }
+                            }
+
+                            Spacer(modifier = Modifier.width(5.dp))
+
+                            Column(verticalArrangement = Arrangement.Center) {
+                                Text(fontWeight = FontWeight.Bold, text = if (title.length > 30) "${title.substring(0, 20)}..." else title)
+                                Text("todo...")
+                            }
+
+                        }
+                    }
+
+                }
             }
+
         }
     }
 }

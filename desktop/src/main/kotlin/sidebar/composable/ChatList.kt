@@ -13,6 +13,7 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import sidebar.api.handleSidebarUpdates
+import sidebar.api.openChat
 import sidebar.dto.ChatPreview
 import terminatingApp
 
@@ -53,7 +54,7 @@ fun ChatList(sidebarStates: SidebarStates) {
     }
 
     Scaffold(
-        topBar = { ScaffoldTopBar(sidebarStates, lazyListState, chatSearchInput, filterUnreadChats) },
+        topBar = { ScaffoldTopBar(sidebarStates, lazyListState, chatSearchInput, filterUnreadChats, selectedIndex) },
         backgroundColor = greyColor
     ) {
 
@@ -85,14 +86,17 @@ fun ChatList(sidebarStates: SidebarStates) {
             }
 
             Column(
-                verticalArrangement = Arrangement.spacedBy(5.dp, Alignment.Top),
+                verticalArrangement = Arrangement.Top,
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier.fillMaxSize()
             ) {
                 if (selectedIndex.value == -1 && sidebarStates.chatPreviews.isNotEmpty()) {
                     Text("Chat not selected")
                 } else if (selectedIndex.value != -1) {
-                    Text(sidebarStates.chatPreviews[selectedIndex.value].title)
+                    val selectedChatPreview = sidebarStates.chatPreviews[selectedIndex.value]
+                    chatListUpdateScope.launch {
+                        openChat(selectedChatPreview.id)
+                    }
                 }
             }
 

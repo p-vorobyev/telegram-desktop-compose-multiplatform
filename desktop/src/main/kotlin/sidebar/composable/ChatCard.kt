@@ -6,7 +6,6 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.MaterialTheme
@@ -81,26 +80,29 @@ fun ChatCard(chatListUpdateScope: CoroutineScope, chatPreview: ChatPreview, sele
                             )
                         }
                     }
-                    Column(verticalArrangement = Arrangement.Center) {
+                    Column(verticalArrangement = Arrangement.Center, modifier = Modifier.width(370.dp)) {
                         Text(fontWeight = FontWeight.Bold, text = if (title.length > 30) "${title.substring(0, 20)}..." else title)
-                        Text(
+                        Text(fontSize = 14.sp, text =
                             if (chatPreview.lastMessage.length > 50)
-                                "${chatPreview.lastMessage.substring(0, 50)}..."
+                                "${chatPreview.lastMessage.replace("\n", " ").substring(0, 50)}..."
                             else
-                                chatPreview.lastMessage
+                                chatPreview.lastMessage.replace("\n", " ")
                         )
                     }
-                }
 
-                Box(contentAlignment = Alignment.CenterEnd) {
                     chatPreview.unreadCount?.let {
                         if (it != 0) {
-                            Card(shape = RoundedCornerShape(10.dp), backgroundColor = Color.LightGray) {
-                                Text(fontSize = 14.sp, text = it.toString())
+                            Box(modifier = Modifier.align(Alignment.CenterVertically)
+                                .size(20.dp)
+                                .graphicsLayer {
+                                    clip = true
+                                    shape = CircleShape
+                                }.background(Color.LightGray)
+                            ) {
+                                Text(modifier = Modifier.align(Alignment.Center), fontSize = 12.sp, text = it.toString())
                             }
                         }
                     }
-
                 }
 
             }
