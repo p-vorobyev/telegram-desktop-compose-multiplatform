@@ -2,7 +2,6 @@ package sidebar.composable
 
 import androidx.compose.foundation.ContextMenuArea
 import androidx.compose.foundation.ContextMenuItem
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -14,26 +13,18 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.asComposeImageBitmap
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import common.composable.ChatIcon
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import org.jetbrains.skia.Bitmap
-import org.jetbrains.skia.Image
 import sidebar.api.deleteChat
 import sidebar.api.markAsRead
 import sidebar.dto.ChatPreview
 import sidebar.dto.ChatType
-import java.util.*
-import java.util.stream.Collectors
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -43,45 +34,14 @@ fun ChatCard(chatListUpdateScope: CoroutineScope, chatPreview: ChatPreview, sele
     ContextMenuArea(items = { contextMenuItems(chatListUpdateScope, chatPreview) }) {
         Row (verticalAlignment = Alignment.CenterVertically) {
             val color = if (selectedIndex.value == index) Color.LightGray else MaterialTheme.colors.surface
-            var imageBitMap: ImageBitmap? = null
-            chatPreview.photo?.let {
-                val img: ByteArray = Base64.getDecoder().decode(it)
-                imageBitMap = Bitmap.makeFromImage(Image.makeFromEncoded(img)).asComposeImageBitmap()
-            }
-
             Card(modifier = cardModifier, backgroundColor = color, onClick = {selectedIndex.value = index}) {
 
                 Row {
-                    val title = chatPreview.title.replace("\n", " ")
-                    if (imageBitMap != null) {
-                        Image(
-                            bitmap = imageBitMap!!,
-                            contentScale = ContentScale.Crop,
-                            modifier = Modifier.size(60.dp).clip(CircleShape),
-                            contentDescription = "",
-                            alignment = Alignment.Center
-                        )
-                    } else {
-                        Box(
-                            modifier = Modifier
-                                .size(60.dp)
-                                .graphicsLayer {
-                                    clip = true
-                                    shape = CircleShape
-                                }.background(blueColor)
-                        ) {
-                            val iconText = if (title.isBlank()) "" else
-                                title.split(" ").stream().limit(2).map { it.substring(0,1).uppercase() }.collect(
-                                    Collectors.joining())
-                            Text(
-                                iconText,
-                                style = TextStyle(color = Color.White, fontSize = 20.sp),
-                                modifier = Modifier.align(Alignment.Center)
-                            )
-                        }
-                    }
+                    val cleanedTitle = chatPreview.title.replace("\n", " ")
+                    ChatIcon(chatPreview.photo, cleanedTitle)
+
                     Column(verticalArrangement = Arrangement.Center, modifier = Modifier.width(370.dp)) {
-                        Text(fontWeight = FontWeight.Bold, text = if (title.length > 30) "${title.substring(0, 20)}..." else title)
+                        Text(fontWeight = FontWeight.Bold, text = if (cleanedTitle.length > 30) "${cleanedTitle.substring(0, 20)}..." else cleanedTitle)
                         Text(fontSize = 14.sp, text =
                             if (chatPreview.lastMessage.length > 50)
                                 "${chatPreview.lastMessage.replace("\n", " ").substring(0, 50)}..."
@@ -103,6 +63,7 @@ fun ChatCard(chatListUpdateScope: CoroutineScope, chatPreview: ChatPreview, sele
                             }
                         }
                     }
+
                 }
 
             }
