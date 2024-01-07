@@ -12,26 +12,26 @@ import androidx.compose.material.icons.rounded.KeyboardArrowUp
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
-import common.composable.ChatIcon
+import androidx.compose.ui.unit.sp
+import chat.composable.ChatHeader
+import common.state.ClientStates
 import kotlinx.coroutines.launch
-import sidebar.dto.ChatPreview
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ScaffoldTopBar(
-    sidebarStates: SidebarStates,
+    clientStates: ClientStates,
     lazyListState: LazyListState = rememberLazyListState(),
     chatSearchInput: MutableState<String> = mutableStateOf(""),
-    filterUnreadChats: MutableState<Boolean> = mutableStateOf(false),
-    selectedIndex: MutableState<Int> = remember { mutableStateOf(-1) }
+    filterUnreadChats: MutableState<Boolean> = mutableStateOf(false)
 ) {
 
     val chatListTopBarScope = rememberCoroutineScope()
 
-    if (sidebarStates.chatPreviews.isNotEmpty()) {
+    if (clientStates.chatPreviews.isNotEmpty()) {
         Row {
             val topHeaderModifier = Modifier.width(width = 450.dp).height(50.dp).background(MaterialTheme.colors.surface)
 
@@ -43,11 +43,13 @@ fun ScaffoldTopBar(
                     OutlinedTextField(
                         value = chatSearchInput.value,
                         onValueChange = { chatSearchInput.value = it },
+                        shape = MaterialTheme.shapes.medium,
                         placeholder = { Text("Search") },
                         modifier = Modifier.fillMaxWidth().padding(start = 5.dp, end = 5.dp),
                         colors = TextFieldDefaults.outlinedTextFieldColors(
                             focusedBorderColor = blueColor
                         ),
+                        textStyle = TextStyle(fontSize = 14.sp),
                         singleLine = true
                     )
                 }
@@ -98,30 +100,8 @@ fun ScaffoldTopBar(
             }
 
             Column {
-                if (selectedIndex.value != -1) {
-
-                    val chatPreview: ChatPreview = sidebarStates.chatPreviews[selectedIndex.value]
-
-                    val cleanedTitle = chatPreview.title.replace("\n", " ")
-
-                    Card(modifier = Modifier.fillMaxWidth().height(85.dp).background(MaterialTheme.colors.surface)) {
-
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-
-                            Spacer(modifier = Modifier.width(10.dp))
-
-                            ChatIcon(chatPreview.photo, cleanedTitle)
-
-                            Spacer(modifier = Modifier.width(5.dp))
-
-                            Column(verticalArrangement = Arrangement.Center) {
-                                Text(fontWeight = FontWeight.Bold, text = if (cleanedTitle.length > 30) "${cleanedTitle.substring(0, 20)}..." else cleanedTitle)
-                                Text("todo...")
-                            }
-
-                        }
-                    }
-
+                clientStates.selectedChatPreview.value?.let {
+                    ChatHeader(clientStates)
                 }
             }
 

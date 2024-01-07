@@ -10,6 +10,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import common.state.ClientStates
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import sidebar.api.handleSidebarUpdates
@@ -19,7 +20,7 @@ import terminatingApp
 
 
 @Composable
-fun ChatList(sidebarStates: SidebarStates) {
+fun ChatList(clientStates: ClientStates) {
 
     val selectedIndex: MutableState<Int> = remember { mutableStateOf(-1) }
 
@@ -35,16 +36,16 @@ fun ChatList(sidebarStates: SidebarStates) {
 
     chatListUpdateScope.launch {
         while (!terminatingApp.get()) {
-            val chatsSizeBeforeUpdates = sidebarStates.chatPreviews.size
+            val chatsSizeBeforeUpdates = clientStates.chatPreviews.size
             var firstChatPreviewBeforeUpdates: ChatPreview? = null
-            if (sidebarStates.chatPreviews.isNotEmpty()) {
-                firstChatPreviewBeforeUpdates = sidebarStates.chatPreviews[0]
+            if (clientStates.chatPreviews.isNotEmpty()) {
+                firstChatPreviewBeforeUpdates = clientStates.chatPreviews[0]
             }
 
-            handleSidebarUpdates(sidebarStates.chatPreviews)
+            handleSidebarUpdates(clientStates.chatPreviews)
 
-            needToScrollUpSidebar = (sidebarStates.chatPreviews.size > chatsSizeBeforeUpdates) ||
-                    (sidebarStates.chatPreviews.isNotEmpty() && lazyListState.firstVisibleItemIndex < 3 && firstChatPreviewBeforeUpdates != sidebarStates.chatPreviews[0])
+            needToScrollUpSidebar = (clientStates.chatPreviews.size > chatsSizeBeforeUpdates) ||
+                    (clientStates.chatPreviews.isNotEmpty() && lazyListState.firstVisibleItemIndex < 3 && firstChatPreviewBeforeUpdates != clientStates.chatPreviews[0])
             if (needToScrollUpSidebar) {
                 lazyListState.scrollToItem(0)
             }
@@ -54,7 +55,7 @@ fun ChatList(sidebarStates: SidebarStates) {
     }
 
     Scaffold(
-        topBar = { ScaffoldTopBar(sidebarStates, lazyListState, chatSearchInput, filterUnreadChats, selectedIndex) },
+        topBar = { ScaffoldTopBar(clientStates, lazyListState, chatSearchInput, filterUnreadChats) },
         backgroundColor = greyColor
     ) {
 
@@ -62,7 +63,7 @@ fun ChatList(sidebarStates: SidebarStates) {
 
             LazyColumn(state = lazyListState, modifier = Modifier.width(450.dp).background(MaterialTheme.colors.surface).fillMaxHeight()) {
 
-                itemsIndexed(sidebarStates.chatPreviews, {_, v -> v}) { index, chatPreview ->
+                itemsIndexed(clientStates.chatPreviews, { _, v -> v}) { index, chatPreview ->
 
                     if (chatSearchInput.value.isBlank() || chatPreview.title.contains(chatSearchInput.value, ignoreCase = true)) {
                         var hasUnread = false
@@ -90,12 +91,15 @@ fun ChatList(sidebarStates: SidebarStates) {
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier.fillMaxSize()
             ) {
-                if (selectedIndex.value == -1 && sidebarStates.chatPreviews.isNotEmpty()) {
+                if (selectedIndex.value == -1 && clientStates.chatPreviews.isNotEmpty()) {
                     Text("Chat not selected")
                 } else if (selectedIndex.value != -1) {
-                    val selectedChatPreview = sidebarStates.chatPreviews[selectedIndex.value]
                     chatListUpdateScope.launch {
-                        openChat(selectedChatPreview.id)
+                        clientStates.selectedChatPreview.value = clientStates.chatPreviews[selectedIndex.value]
+                        openChat(clientStates.chatPreviews[selectedIndex.value].id)
+                    }
+                    clientStates.selectedChatPreview.value?.let {
+                        Text(it.title)
                     }
                 }
             }

@@ -34,7 +34,7 @@ fun ChatCard(chatListUpdateScope: CoroutineScope, chatPreview: ChatPreview, sele
     ContextMenuArea(items = { contextMenuItems(chatListUpdateScope, chatPreview) }) {
         Row (verticalAlignment = Alignment.CenterVertically) {
             val color = if (selectedIndex.value == index) Color.LightGray else MaterialTheme.colors.surface
-            Card(modifier = cardModifier, backgroundColor = color, onClick = {selectedIndex.value = index}) {
+            Card(modifier = cardModifier, backgroundColor = color, onClick = { selectedIndex.value = index }) {
 
                 Row {
                     val cleanedTitle = chatPreview.title.replace("\n", " ")

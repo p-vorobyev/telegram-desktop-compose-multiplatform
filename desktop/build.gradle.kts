@@ -36,11 +36,13 @@ kotlin {
 
 compose.desktop {
     application {
-        mainClass = "MainKt"
+        mainClass = "TelegramComposeMultiplatformKt"
+
+        jvmArgs += listOf("-Xmx128m")
 
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-            packageName = "TelegramCM"
+            packageName = "TelegramComposeMultiplatform"
             packageVersion = "1.0.0"
         }
     }

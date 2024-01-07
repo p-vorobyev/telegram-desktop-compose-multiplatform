@@ -40,11 +40,11 @@ private suspend fun updatedPreviews(): List<ChatPreview> {
 }
 
 suspend fun markAsRead(chatId: Long) {
-    httpClient.post("${baseUrl}/${clientUri}/markasread/${chatId}")
+    httpClient.post("${baseUrl}/${clientUri}/chat/markasread/${chatId}")
 }
 
 suspend fun deleteChat(chatId: Long) {
-    httpClient.post("${baseUrl}/${clientUri}/delete/${chatId}")
+    httpClient.post("${baseUrl}/${clientUri}/chat/delete/${chatId}")
 }
 
 suspend fun loadChats(): List<ChatPreview> {
@@ -57,5 +57,5 @@ suspend fun chatsLoaded(): Boolean {
 }
 
 suspend fun openChat(chatId: Long) {
-    httpClient.post("${baseUrl}/${clientUri}/open/chat/${chatId}")
+    httpClient.post("${baseUrl}/${clientUri}/chat/open/${chatId}")
 }

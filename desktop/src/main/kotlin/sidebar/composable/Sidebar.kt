@@ -3,11 +3,14 @@ package sidebar.composable
 import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.runtime.*
 import androidx.compose.ui.graphics.Color
+import common.api.refreshChatsMemberCount
+import common.state.ClientStates
+import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
-import terminatingApp
 import sidebar.api.chatsLoaded
 import sidebar.api.loadChats
 import sidebar.dto.ChatPreview
+import terminatingApp
 
 val blueColor = Color(51, 182, 255)
 
@@ -23,6 +26,8 @@ fun Sidebar() {
 
     var initChatsCompleted by remember { mutableStateOf(false) }
 
+    val clientStates = ClientStates(chatPreviews = remember {  mutableStateListOf()}, chatsMemberCount = remember { mutableMapOf() })
+
     LaunchedEffect(Unit) {
         while (chatLoading && !terminatingApp.get()) {
             chatLoading = !chatsLoaded()
@@ -30,14 +35,16 @@ fun Sidebar() {
         }
         chatPreviews.addAll(loadChats())
         initChatsCompleted = true
+        async {
+            refreshChatsMemberCount(clientStates)
+        }
     }
 
-    val sidebarStates = SidebarStates(chatPreviews = remember {  mutableStateListOf() })
-    sidebarStates.chatPreviews = chatPreviews
+    clientStates.chatPreviews = chatPreviews
     if (!initChatsCompleted) {
         ChatsLoadingDisclaimer()
     } else {
-        ChatList(sidebarStates)
+        ChatList(clientStates)
     }
 
 }
