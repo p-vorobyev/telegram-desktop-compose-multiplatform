@@ -1,5 +1,6 @@
 package dev.voroby.client.api;
 
+import dev.voroby.client.dto.ChatGroupInfo;
 import dev.voroby.client.dto.ChatPreview;
 import dev.voroby.client.dto.ChatType;
 import dev.voroby.client.updates.UpdatesQueues;
@@ -24,9 +25,13 @@ abstract public class AbstractUpdates {
 
     private final Map<Long, String> chatBase64IconCache = new ConcurrentHashMap<>();
 
-    public static Set<Long> mainListChatIds = new CopyOnWriteArraySet<>();
+    public final static Set<Long> mainListChatIds = new CopyOnWriteArraySet<>();
 
-    public static Map<Long, TdApi.Chat> initialChatCache = new ConcurrentHashMap<>();
+    public final static Map<Long, TdApi.Chat> initialChatCache = new ConcurrentHashMap<>();
+
+    public final static Map<Long, Long> chatIdToGroupIdCache = new ConcurrentHashMap<>();
+
+    public final static Map<Long, ChatGroupInfo> groupIdToGroupInfoCache = new ConcurrentHashMap<>();
 
     protected AbstractUpdates(UpdatesQueues updatesQueues, TelegramClient telegramClient) {
         this.updatesQueues = updatesQueues;
