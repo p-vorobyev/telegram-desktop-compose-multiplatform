@@ -15,7 +15,7 @@ import common.composable.ChatIcon
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import common.state.ClientStates
-import sidebar.dto.ChatType
+import scene.dto.ChatType
 
 @Composable
 fun ChatHeader(clientStates: ClientStates) {

@@ -1,4 +1,4 @@
-package sidebar.composable
+package scene.composable
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column

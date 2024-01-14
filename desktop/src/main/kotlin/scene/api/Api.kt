@@ -1,10 +1,10 @@
-package sidebar.api
+package scene.api
 
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import com.fasterxml.jackson.core.type.TypeReference
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
-import sidebar.dto.ChatPreview
+import scene.dto.ChatPreview
 import transport.baseUrl
 import transport.clientUri
 import transport.httpClient

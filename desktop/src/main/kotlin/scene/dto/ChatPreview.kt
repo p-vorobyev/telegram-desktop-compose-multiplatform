@@ -1,4 +1,4 @@
-package sidebar.dto
+package scene.dto
 
 data class ChatPreview(
     var id: Long = -1,

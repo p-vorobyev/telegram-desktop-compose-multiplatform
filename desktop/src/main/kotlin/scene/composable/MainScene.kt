@@ -1,4 +1,4 @@
-package sidebar.composable
+package scene.composable
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -13,14 +13,14 @@ import androidx.compose.ui.unit.dp
 import common.state.ClientStates
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import sidebar.api.handleSidebarUpdates
-import sidebar.api.openChat
-import sidebar.dto.ChatPreview
+import scene.api.handleSidebarUpdates
+import scene.api.openChat
+import scene.dto.ChatPreview
 import terminatingApp
 
 
 @Composable
-fun ChatList(clientStates: ClientStates) {
+fun MainScene(clientStates: ClientStates) {
 
     val selectedIndex: MutableState<Int> = remember { mutableStateOf(-1) }
 
@@ -92,7 +92,7 @@ fun ChatList(clientStates: ClientStates) {
                 modifier = Modifier.fillMaxSize()
             ) {
                 if (selectedIndex.value == -1 && clientStates.chatPreviews.isNotEmpty()) {
-                    Text("Chat not selected")
+                    Text("Select chat to start messaging")
                 } else if (selectedIndex.value != -1) {
                     chatListUpdateScope.launch {
                         clientStates.selectedChatPreview.value = clientStates.chatPreviews[selectedIndex.value]

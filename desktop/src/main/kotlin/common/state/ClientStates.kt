@@ -3,7 +3,7 @@ package common.state
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.snapshots.SnapshotStateList
-import sidebar.dto.ChatPreview
+import scene.dto.ChatPreview
 
 data class ClientStates (
     var chatPreviews: SnapshotStateList<ChatPreview>,

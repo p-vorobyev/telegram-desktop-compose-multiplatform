@@ -15,7 +15,7 @@ import auth.composable.AuthType
 import io.ktor.client.request.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import sidebar.composable.Sidebar
+import scene.composable.InitialLoad
 import transport.baseUrl
 import transport.clientUri
 import transport.httpClient
@@ -47,7 +47,7 @@ fun App() {
             }
 
             if (status == Status.AUTHORIZED) {
-                Sidebar()
+                InitialLoad()
             } else if (waitCode) {
                 AuthForm(AuthType.CODE, mainScope)
             } else if (waitPass) {

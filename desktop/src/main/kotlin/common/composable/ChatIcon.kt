@@ -20,7 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.jetbrains.skia.Bitmap
 import org.jetbrains.skia.Image
-import sidebar.composable.blueColor
+import scene.composable.blueColor
 import java.util.*
 import java.util.stream.Collectors
 

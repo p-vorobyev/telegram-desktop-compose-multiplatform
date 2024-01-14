@@ -1,4 +1,4 @@
-package sidebar.composable
+package scene.composable
 
 import androidx.compose.foundation.ContextMenuArea
 import androidx.compose.foundation.ContextMenuItem
@@ -21,10 +21,10 @@ import androidx.compose.ui.unit.sp
 import common.composable.ChatIcon
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import sidebar.api.deleteChat
-import sidebar.api.markAsRead
-import sidebar.dto.ChatPreview
-import sidebar.dto.ChatType
+import scene.api.deleteChat
+import scene.api.markAsRead
+import scene.dto.ChatPreview
+import scene.dto.ChatType
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable

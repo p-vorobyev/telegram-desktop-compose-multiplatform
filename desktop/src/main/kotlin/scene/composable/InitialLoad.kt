@@ -1,4 +1,4 @@
-package sidebar.composable
+package scene.composable
 
 import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.runtime.*
@@ -7,9 +7,9 @@ import common.api.refreshChatsMemberCount
 import common.state.ClientStates
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
-import sidebar.api.chatsLoaded
-import sidebar.api.loadChats
-import sidebar.dto.ChatPreview
+import scene.api.chatsLoaded
+import scene.api.loadChats
+import scene.dto.ChatPreview
 import terminatingApp
 
 val blueColor = Color(51, 182, 255)
@@ -19,7 +19,7 @@ val greyColor = Color(red = 230, green = 230, blue = 230)
 
 @Composable
 @Preview
-fun Sidebar() {
+fun InitialLoad() {
     val chatPreviews = remember {  mutableStateListOf<ChatPreview>() }
 
     var chatLoading by remember { mutableStateOf(true) }
@@ -44,7 +44,7 @@ fun Sidebar() {
     if (!initChatsCompleted) {
         ChatsLoadingDisclaimer()
     } else {
-        ChatList(clientStates)
+        MainScene(clientStates)
     }
 
 }

@@ -15,7 +15,7 @@ import auth.api.sendCode
 import auth.api.sendPass
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import sidebar.composable.blueColor
+import scene.composable.blueColor
 
 enum class AuthType {
     CODE, PASSWORD

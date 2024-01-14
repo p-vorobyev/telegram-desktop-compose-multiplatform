@@ -1,4 +1,4 @@
-package sidebar.composable
+package scene.composable
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
