@@ -2,6 +2,7 @@ package dev.voroby.client.api;
 
 import dev.voroby.springframework.telegram.client.TdApi;
 import dev.voroby.springframework.telegram.client.TelegramClient;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 import java.util.function.Consumer;
@@ -11,13 +12,13 @@ public class OpenChat implements Consumer<Long> {
 
     private final TelegramClient telegramClient;
 
-    public OpenChat(TelegramClient telegramClient) {
+    public OpenChat(@Lazy TelegramClient telegramClient) {
         this.telegramClient = telegramClient;
     }
 
     @Override
     public void accept(Long chatId) {
-        telegramClient.sendAsync(new TdApi.OpenChat(chatId));
+        telegramClient.sendWithCallback(new TdApi.OpenChat(chatId), (obj, error) -> {/*do nothing*/});
     }
 
 }

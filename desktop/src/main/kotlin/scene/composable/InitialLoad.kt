@@ -26,7 +26,11 @@ fun InitialLoad() {
 
     var initChatsCompleted by remember { mutableStateOf(false) }
 
-    val clientStates = ClientStates(chatPreviews = remember {  mutableStateListOf()}, chatsMemberCount = remember { mutableMapOf() })
+    val clientStates = ClientStates(
+        chatPreviews = remember {  mutableStateListOf()},
+        chatsMemberCount = remember { mutableMapOf() },
+        chatHistory = remember { mutableStateListOf()}
+    )
 
     LaunchedEffect(Unit) {
         while (chatLoading && !terminatingApp.get()) {

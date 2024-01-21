@@ -1,5 +1,6 @@
 package dev.voroby.client.api;
 
+import dev.voroby.client.cache.Caches;
 import dev.voroby.client.dto.ChatPreview;
 import dev.voroby.client.updates.UpdatesQueues;
 import dev.voroby.springframework.telegram.client.TelegramClient;
@@ -30,8 +31,8 @@ public class LoadChats extends AbstractUpdates implements Supplier<List<ChatPrev
     @Override
     public List<ChatPreview> get() {
         List<ChatPreview> previews = new ArrayList<>();
-        AbstractUpdates.initialChatCache.values().forEach(chat -> {
-            if (AbstractUpdates.mainListChatIds.contains(chat.id)) {
+        Caches.initialChatCache.values().forEach(chat -> {
+            if (Caches.mainListChatIds.contains(chat.id)) {
                 previews.add(getCurrentChatPreview(chat));
             }
         });

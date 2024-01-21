@@ -1,7 +1,12 @@
 package dev.voroby.client.api;
 
 import dev.voroby.springframework.telegram.client.TdApi;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Base64;
 
 @Slf4j
 public class Utils {
@@ -24,7 +29,7 @@ public class Utils {
             msgText = MESSAGE_DISCLAIMER;
         }
 
-        return msgText;
+        return msgText.trim();
     }
 
     static long mainChatListPositionOrder(TdApi.ChatPosition[] positions) {
@@ -34,6 +39,17 @@ public class Utils {
             }
         }
         return -1;
+    }
+
+    public static void logError(TdApi.Error error) {
+        String errorLogString = String.format("TDLib error:\n[\ncode: %d,\nmessage: %s\n]\n", error.code, error.message);
+        log.error(errorLogString);
+    }
+
+    @SneakyThrows()
+    public static String fileBase64Encode(String path) {
+        byte[] bytes = Files.readAllBytes(Path.of(path));
+        return Base64.getEncoder().encodeToString(bytes);
     }
 
 }

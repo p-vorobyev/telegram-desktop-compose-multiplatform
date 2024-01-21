@@ -3,6 +3,7 @@ package scene.composable
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.*
@@ -10,11 +11,13 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import chat.api.openChat
+import chat.dto.ChatMessage
 import common.state.ClientStates
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import scene.api.handleSidebarUpdates
-import scene.api.openChat
 import scene.dto.ChatPreview
 import terminatingApp
 
@@ -94,12 +97,31 @@ fun MainScene(clientStates: ClientStates) {
                 if (selectedIndex.value == -1 && clientStates.chatPreviews.isNotEmpty()) {
                     Text("Select chat to start messaging")
                 } else if (selectedIndex.value != -1) {
+
+                    var openedIdx by remember { mutableStateOf(-1L) }
+
+                    val chatHistoryListState = rememberLazyListState()
+
                     chatListUpdateScope.launch {
                         clientStates.selectedChatPreview.value = clientStates.chatPreviews[selectedIndex.value]
-                        openChat(clientStates.chatPreviews[selectedIndex.value].id)
+                        val chatId = clientStates.chatPreviews[selectedIndex.value].id
+                        if (openedIdx != chatId) {
+                            clientStates.chatHistory.clear()
+                            openedIdx = chatId
+                            val chatHistory: List<ChatMessage> = openChat(chatId)
+                            clientStates.chatHistory.addAll(chatHistory)
+                            if (clientStates.chatHistory.isNotEmpty()) {
+                                //scroll to the end when open chat
+                                chatHistoryListState.scrollToItem(clientStates.chatHistory.size - 1)
+                            }
+                        }
                     }
-                    clientStates.selectedChatPreview.value?.let {
-                        Text(it.title)
+
+                    LazyColumn(state = chatHistoryListState) {
+                        items(clientStates.chatHistory) { message ->
+                            Text(text = message.messageText, fontSize = 14.sp)
+                            Spacer(modifier = Modifier.height(24.dp))
+                        }
                     }
                 }
             }

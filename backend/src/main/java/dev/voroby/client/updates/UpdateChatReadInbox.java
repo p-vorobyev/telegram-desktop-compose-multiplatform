@@ -1,6 +1,6 @@
 package dev.voroby.client.updates;
 
-import dev.voroby.client.api.AbstractUpdates;
+import dev.voroby.client.cache.Caches;
 import dev.voroby.springframework.telegram.client.TdApi;
 import dev.voroby.springframework.telegram.client.updates.UpdateNotificationListener;
 import org.springframework.stereotype.Service;
@@ -16,7 +16,7 @@ public class UpdateChatReadInbox  implements UpdateNotificationListener<TdApi.Up
 
     @Override
     public void handleNotification(TdApi.UpdateChatReadInbox notification) {
-        TdApi.Chat chat = AbstractUpdates.initialChatCache.get(notification.chatId);
+        TdApi.Chat chat = Caches.initialChatCache.get(notification.chatId);
         synchronized (chat) {
             chat.unreadCount = notification.unreadCount;
             chat.lastReadInboxMessageId = notification.lastReadInboxMessageId;

@@ -41,8 +41,9 @@ fun App() {
                     status = authorizationStatus()
                     if (status == Status.AUTHORIZED) break
                     waitCode = waitCode()
+                    delay(300)
                     waitPass = waitPass()
-                    delay(500)
+                    delay(300)
                 }
             }
 

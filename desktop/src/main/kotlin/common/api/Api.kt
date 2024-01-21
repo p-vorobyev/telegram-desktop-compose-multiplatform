@@ -26,6 +26,6 @@ suspend fun refreshChatsMemberCount(clientStates: ClientStates) {
         memberCount.forEach { (k, v) ->
             clientStates.chatsMemberCount[k] = v
         }
-        delay(3000)
+        delay(5000)
     }
 }

@@ -5,12 +5,16 @@ import dev.voroby.springframework.telegram.client.TdApi;
 import dev.voroby.springframework.telegram.client.TelegramClient;
 import jakarta.annotation.PreDestroy;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
+import java.util.Deque;
+import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Consumer;
 
 @Component @Slf4j
-public class OpenChatService {
+public class OpenChatService implements Consumer<Long> {
 
     private final TelegramClient telegramClient;
 
@@ -18,23 +22,46 @@ public class OpenChatService {
 
     private final AtomicReference<Long> openedChat = new AtomicReference<>(null);
 
-    public OpenChatService(TelegramClient telegramClient,
+    private final Deque<TdApi.Message> incomingChatMessages = new ConcurrentLinkedDeque<>();
+
+    private final Deque<TdApi.UpdateMessageContent> updatedContentInMessages = new ConcurrentLinkedDeque<>();
+
+    //TODO Handle deleted messages
+
+    public OpenChatService(@Lazy TelegramClient telegramClient,
                            OpenChat openChat) {
         this.telegramClient = telegramClient;
         this.openChatFunc = openChat;
     }
 
-    synchronized public void openChat(long chatId) {
+    @Override
+    public synchronized void accept(Long chatId) {
         closeCurrentChatIfOpened();
         openChatFunc.accept(chatId);
         openedChat.set(chatId);
         log.info("Chat opened: [chatId: {}]", chatId);
     }
 
+    public Long openedChat() {
+        return openedChat.get();
+    }
+
+    public void addIncomingMessage(TdApi.Message message) {
+        log.info("Incoming message in opened chat: [chatId: {}, msgId: {}]", message.chatId, message.id);
+        incomingChatMessages.addLast(message);
+    }
+
+    public void addUpdatedContent(TdApi.UpdateMessageContent updateMessageContent) {
+        log.info("Updated message content in opened chat: [chatId: {}, msgId: {}]", updateMessageContent.chatId, updateMessageContent.messageId);
+        updatedContentInMessages.addLast(updateMessageContent);
+    }
+
     private void closeCurrentChatIfOpened() {
         Long chatId = openedChat.get();
         if (chatId != null) {
             telegramClient.sendSync(new TdApi.CloseChat(chatId));
+            incomingChatMessages.clear();
+            updatedContentInMessages.clear();
             log.info("Chat closed: [chatId: {}]", chatId);
         }
     }

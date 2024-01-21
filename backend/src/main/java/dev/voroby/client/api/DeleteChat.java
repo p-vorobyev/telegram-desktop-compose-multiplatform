@@ -1,5 +1,6 @@
 package dev.voroby.client.api;
 
+import dev.voroby.springframework.telegram.client.QueryResultHandler;
 import dev.voroby.springframework.telegram.client.TdApi;
 import dev.voroby.springframework.telegram.client.TelegramClient;
 import lombok.extern.slf4j.Slf4j;
@@ -21,12 +22,18 @@ public class DeleteChat implements Consumer<Long> {
         telegramClient.sendAsync(new TdApi.GetChat(chatId))
                 .thenAccept(chat -> {
                     TdApi.ChatType type = chat.type;
+                    QueryResultHandler<TdApi.Ok> okQueryResultHandler = (obj, error) -> {
+                        if (error == null) {
+                            log.info("Delete chat: [chatId: {}]", chatId);
+                        } else {
+                            Utils.logError(error);
+                        }
+                    };
                     if (type instanceof TdApi.ChatTypePrivate || type instanceof TdApi.ChatTypeSecret) {
-                        telegramClient.sendAsync(new TdApi.DeleteChat(chatId));
+                        telegramClient.sendWithCallback(new TdApi.DeleteChat(chatId), okQueryResultHandler);
                     } else {
-                        telegramClient.sendAsync(new TdApi.LeaveChat(chatId));
+                        telegramClient.sendWithCallback(new TdApi.LeaveChat(chatId), okQueryResultHandler);
                     }
                 });
-        log.info("Delete chat: [chatId: {}]", chatId);
     }
 }

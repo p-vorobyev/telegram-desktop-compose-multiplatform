@@ -1,5 +1,6 @@
 package dev.voroby.client.api;
 
+import dev.voroby.client.cache.Caches;
 import dev.voroby.client.dto.ChatPreview;
 import dev.voroby.client.updates.UpdatesQueues;
 import dev.voroby.springframework.telegram.client.TdApi;
@@ -18,7 +19,7 @@ public class GetChatLastMessage extends AbstractUpdates implements Function<TdAp
 
     @Override
     public ChatPreview apply(TdApi.UpdateChatLastMessage updateChatLastMessage) {
-        if (updateChatLastMessage.lastMessage != null && mainListChatIds.contains(updateChatLastMessage.chatId)) {
+        if (updateChatLastMessage.lastMessage != null && Caches.mainListChatIds.contains(updateChatLastMessage.chatId)) {
             return getCurrentChatPreview(updateChatLastMessage.chatId);
         }
         return null;

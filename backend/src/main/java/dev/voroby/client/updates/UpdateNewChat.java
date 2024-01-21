@@ -1,6 +1,6 @@
 package dev.voroby.client.updates;
 
-import dev.voroby.client.api.AbstractUpdates;
+import dev.voroby.client.cache.Caches;
 import dev.voroby.client.dto.ChatGroupInfo;
 import dev.voroby.springframework.telegram.client.TdApi;
 import dev.voroby.springframework.telegram.client.updates.UpdateNotificationListener;
@@ -19,8 +19,8 @@ public class UpdateNewChat implements UpdateNotificationListener<TdApi.UpdateNew
     public void handleNotification(TdApi.UpdateNewChat updateNewChat) {
         long chatId = updateNewChat.chat.id;
         if (chatId != 0 && chatId != -1) {
-            AbstractUpdates.initialChatCache.put(updateNewChat.chat.id, updateNewChat.chat);
-            AbstractUpdates.mainListChatIds.add(updateNewChat.chat.id);
+            Caches.initialChatCache.put(updateNewChat.chat.id, updateNewChat.chat);
+            Caches.mainListChatIds.add(updateNewChat.chat.id);
             if (updateNewChat.chat.type instanceof TdApi.ChatTypeBasicGroup basic) {
                 cacheGroupIds(updateNewChat.chat.id, basic.basicGroupId);
             }
@@ -32,8 +32,8 @@ public class UpdateNewChat implements UpdateNotificationListener<TdApi.UpdateNew
     }
 
     private void cacheGroupIds(long chatId, long groupId) {
-        AbstractUpdates.chatIdToGroupIdCache.put(chatId, groupId);
-        AbstractUpdates.groupIdToGroupInfoCache.compute(groupId, (groupId1, chatGroupInfo) -> {
+        Caches.chatIdToGroupIdCache.put(chatId, groupId);
+        Caches.groupIdToGroupInfoCache.compute(groupId, (groupId1, chatGroupInfo) -> {
             if (chatGroupInfo == null) {
                 chatGroupInfo = new ChatGroupInfo();
             }

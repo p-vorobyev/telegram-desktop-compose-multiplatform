@@ -1,21 +1,17 @@
 package dev.voroby.client.api;
 
-import dev.voroby.client.dto.ChatGroupInfo;
+import dev.voroby.client.cache.Caches;
+import dev.voroby.client.dto.ChatPhotoFile;
 import dev.voroby.client.dto.ChatPreview;
 import dev.voroby.client.dto.ChatType;
 import dev.voroby.client.updates.UpdatesQueues;
 import dev.voroby.springframework.telegram.client.TdApi;
 import dev.voroby.springframework.telegram.client.TelegramClient;
-import lombok.SneakyThrows;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.Base64;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArraySet;
+import static dev.voroby.client.cache.Caches.chatIdToPhotoCache;
+import static dev.voroby.client.cache.Caches.initialChatCache;
 
 abstract public class AbstractUpdates {
 
@@ -23,15 +19,8 @@ abstract public class AbstractUpdates {
 
     final TelegramClient telegramClient;
 
-    private final Map<Long, String> chatBase64IconCache = new ConcurrentHashMap<>();
-
-    public final static Set<Long> mainListChatIds = new CopyOnWriteArraySet<>();
-
-    public final static Map<Long, TdApi.Chat> initialChatCache = new ConcurrentHashMap<>();
-
-    public final static Map<Long, Long> chatIdToGroupIdCache = new ConcurrentHashMap<>();
-
-    public final static Map<Long, ChatGroupInfo> groupIdToGroupInfoCache = new ConcurrentHashMap<>();
+    @Autowired @Lazy
+    private NotifyChatPhotoCached notifyChatPhotoCached;
 
     protected AbstractUpdates(UpdatesQueues updatesQueues, TelegramClient telegramClient) {
         this.updatesQueues = updatesQueues;
@@ -43,7 +32,7 @@ abstract public class AbstractUpdates {
      * For this reason, we check it so as not calling deleted chats.
      */
     ChatPreview checkMainListChatIds_And_GetCurrentChatPreview(long chatId) {
-        if (mainListChatIds.contains(chatId)) {
+        if (Caches.mainListChatIds.contains(chatId)) {
             return getCurrentChatPreview(chatId);
         }
         return null;
@@ -58,14 +47,11 @@ abstract public class AbstractUpdates {
     ChatPreview getCurrentChatPreview(TdApi.Chat chat) {
         String msgText = Utils.getMessageText(chat.lastMessage);
         String photoBase64 = null;
-        if (chatBase64IconCache.containsKey(chat.id)) {
-            photoBase64 = chatBase64IconCache.get(chat.id);
-        } else {
-            TdApi.ChatPhotoInfo photo = chat.photo;
-            if (photo != null) {
-                photoBase64 = getPhotoBase64(photo);
-                chatBase64IconCache.put(chat.id, photoBase64);
-            }
+
+        if (chat.photo != null && !Caches.photoIdToChatIdCache.containsKey(chat.photo.small.id)) {
+            cacheChatPhoto(chat.photo, chat.id);
+        } else if (chatIdToPhotoCache.containsKey(chat.id)) {
+            photoBase64 = chatIdToPhotoCache.get(chat.id);
         }
 
         long order = Utils.mainChatListPositionOrder(chat.positions);
@@ -87,14 +73,18 @@ abstract public class AbstractUpdates {
         return new ChatPreview(chat.id, chat.title, photoBase64, msgText, unreadCount, order, chatType);
     }
 
-    @SneakyThrows(IOException.class)
-    String getPhotoBase64(TdApi.ChatPhotoInfo photo) {
-        String photoBase64;
+    void cacheChatPhoto(TdApi.ChatPhotoInfo photo, long chatId) {
         TdApi.File small = photo.small;
-        small = telegramClient.sendSync(new TdApi.DownloadFile(small.id, 32, 0, 0, true));
-        byte[] bytes = Files.readAllBytes(Path.of(small.local.path));
-        photoBase64 = Base64.getEncoder().encodeToString(bytes);
-        return photoBase64;
+        if (small.local.isDownloadingCompleted) {
+            Caches.photoIdToChatIdCache.put(small.id, chatId);
+            notifyChatPhotoCached.accept(new ChatPhotoFile(chatId, small));
+        } else {
+            telegramClient.sendWithCallback(new TdApi.DownloadFile(small.id, 32, 0, 0, false), (file, error) -> {
+                if (error == null) {
+                    Caches.photoIdToChatIdCache.put(file.id, chatId);
+                }
+            });
+        }
     }
 
 }

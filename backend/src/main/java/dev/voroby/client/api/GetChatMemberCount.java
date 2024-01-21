@@ -1,5 +1,6 @@
 package dev.voroby.client.api;
 
+import dev.voroby.client.cache.Caches;
 import dev.voroby.client.dto.ChatGroupInfo;
 import dev.voroby.client.updates.UpdatesQueues;
 import dev.voroby.springframework.telegram.client.TelegramClient;
@@ -16,9 +17,9 @@ public class GetChatMemberCount extends AbstractUpdates implements Function<Long
 
     @Override
     public Long apply(Long chatId) {
-        Long groupId = chatIdToGroupIdCache.get(chatId);
+        Long groupId = Caches.chatIdToGroupIdCache.get(chatId);
         if (groupId != null) {
-            ChatGroupInfo chatGroupInfo = groupIdToGroupInfoCache.get(groupId);
+            ChatGroupInfo chatGroupInfo = Caches.groupIdToGroupInfoCache.get(groupId);
             if (chatGroupInfo.getSupergroupFullInfo() != null) {
                 return (long) chatGroupInfo.getSupergroupFullInfo().memberCount;
             } else if (chatGroupInfo.getSupergroup() != null) {

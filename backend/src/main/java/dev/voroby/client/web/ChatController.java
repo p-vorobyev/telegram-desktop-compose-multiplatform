@@ -1,9 +1,9 @@
 package dev.voroby.client.web;
 
-import dev.voroby.client.api.DeleteChat;
-import dev.voroby.client.api.GetChatMemberCount;
-import dev.voroby.client.api.MarkMessagesAsRead;
+import dev.voroby.client.api.*;
 import dev.voroby.client.api.service.OpenChatService;
+import dev.voroby.client.dto.ChatHistoryRequest;
+import dev.voroby.client.dto.ChatMessage;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -29,6 +29,12 @@ public class ChatController {
     @Autowired
     private GetChatMemberCount getChatMemberCount;
 
+    @Autowired
+    private GetChatHistory getChatHistory;
+
+    @Autowired
+    private ConvertToChatMessages convertToChatMessages;
+
     @PostMapping(value = "/markasread/{chatId}")
     public void markMessagesAsRead(@PathVariable("chatId") long chatId) {
         markMessagesAsRead.accept(chatId);
@@ -40,8 +46,11 @@ public class ChatController {
     }
 
     @PostMapping(value = "/open/{chatId}")
-    public void openChat(@PathVariable("chatId") long chatId) {
-        openChatService.openChat(chatId);
+    public List<ChatMessage> openChat(@PathVariable("chatId") long chatId) {
+        openChatService.accept(chatId);
+        return getChatHistory
+                .andThen(convertToChatMessages)
+                .apply(new ChatHistoryRequest(chatId, 0, 0));
     }
 
     @GetMapping(value = "/members/{chatId}")

@@ -31,7 +31,7 @@ fun AuthForm(type: AuthType, authScope: CoroutineScope = rememberCoroutineScope(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.fillMaxSize()
     ) {
-        Text("Authorization")
+        Text(if (type == AuthType.CODE) "Authorization code" else "2-Step verification password")
         OutlinedTextField(
             value = credentials,
             onValueChange = { credentials = it },

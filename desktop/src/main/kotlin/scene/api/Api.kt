@@ -55,7 +55,3 @@ suspend fun loadChats(): List<ChatPreview> {
 suspend fun chatsLoaded(): Boolean {
     return httpClient.get("${baseUrl}/${clientUri}/chatsLoaded").bodyAsText().toBoolean()
 }
-
-suspend fun openChat(chatId: Long) {
-    httpClient.post("${baseUrl}/${clientUri}/chat/open/${chatId}")
-}
