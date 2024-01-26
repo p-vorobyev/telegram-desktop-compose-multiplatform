@@ -8,5 +8,6 @@ public record ChatMessage(
         String date,
         String editDate,
         String senderInfo,
+        String senderPhoto,
         boolean isCurrentUser
 ) {}

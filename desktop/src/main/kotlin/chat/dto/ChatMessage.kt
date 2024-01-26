@@ -8,5 +8,6 @@ data class ChatMessage(
     val date: String,
     val editDate: String,
     val senderInfo: String,
+    val senderPhoto: String,
     val isCurrentUser: Boolean
 )

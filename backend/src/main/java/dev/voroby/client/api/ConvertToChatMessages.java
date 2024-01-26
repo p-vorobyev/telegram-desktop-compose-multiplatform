@@ -22,11 +22,15 @@ public class ConvertToChatMessages extends AbstractUpdates implements Function<L
 
     private final CurrentUserService currentUserService;
 
+    private final GetProfilePhoto getProfilePhoto;
+
     protected ConvertToChatMessages(UpdatesQueues updatesQueues,
                                     TelegramClient telegramClient,
-                                    CurrentUserService currentUserService) {
+                                    CurrentUserService currentUserService,
+                                    GetProfilePhoto getProfilePhoto) {
         super(updatesQueues, telegramClient);
         this.currentUserService = currentUserService;
+        this.getProfilePhoto = getProfilePhoto;
     }
 
     @Override
@@ -49,13 +53,25 @@ public class ConvertToChatMessages extends AbstractUpdates implements Function<L
         TdApi.MessageSender senderId = message.senderId;
         String senderInfo = "";
         boolean isCurrentUser = false;
+        String senderPhoto = "";
         if (senderId instanceof TdApi.MessageSenderUser senderUser) {
             TdApi.User user = Caches.userIdToUserCache.get(senderUser.userId);
             senderInfo = String.join(" ", user.firstName, user.lastName).trim();
             isCurrentUser = currentUserService.isCurrentUserId(user.id);
+            senderPhoto = getProfilePhoto.apply(user.id);
         }
 
-        return new ChatMessage(message.id, message.chatId, isPrivate, messageText, dateStr, editDateStr, senderInfo, isCurrentUser);
+        return new ChatMessage(
+                message.id,
+                message.chatId,
+                isPrivate,
+                messageText,
+                dateStr,
+                editDateStr,
+                senderInfo,
+                senderPhoto,
+                isCurrentUser
+        );
     }
 
 }

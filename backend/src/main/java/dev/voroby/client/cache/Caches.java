@@ -24,6 +24,10 @@ public final class Caches {
 
     public final static Map<Integer, Long> photoIdToChatIdCache = new ConcurrentHashMap<>();
 
+    public final static Map<Integer, Long> profilePhotoIdToUserIdCache = new ConcurrentHashMap<>();
+
+    public final static Map<Long, String> userIdToProfilePhotoCache = new ConcurrentHashMap<>();
+
     private Caches() {}
 
 }
