@@ -13,7 +13,7 @@ public class Utils {
 
     private static final String MESSAGE_DISCLAIMER = "Unsupported message type.";
 
-    static String getMessageText(TdApi.Message message) {
+    public static String getMessageText(TdApi.Message message) {
         if (message == null) return "";
         TdApi.MessageContent content = message.content;
         String msgText = MESSAGE_DISCLAIMER;
@@ -32,7 +32,7 @@ public class Utils {
         return msgText.trim();
     }
 
-    static long mainChatListPositionOrder(TdApi.ChatPosition[] positions) {
+    public static long mainChatListPositionOrder(TdApi.ChatPosition[] positions) {
         for (TdApi.ChatPosition position: positions) {
             if (position.list instanceof TdApi.ChatListMain) {
                 return position.order;
