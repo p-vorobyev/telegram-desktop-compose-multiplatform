@@ -1,7 +1,8 @@
 package dev.voroby.client.api;
 
+import dev.voroby.client.api.util.Utils;
 import dev.voroby.client.cache.Caches;
-import dev.voroby.client.updates.UpdatesQueues;
+import dev.voroby.client.updates.queue.UpdatesQueues;
 import dev.voroby.springframework.telegram.client.TdApi;
 import dev.voroby.springframework.telegram.client.TelegramClient;
 import org.springframework.stereotype.Component;
@@ -25,6 +26,8 @@ public class GetProfilePhoto extends AbstractUpdates implements Function<Long, S
                 TdApi.ProfilePhoto profilePhoto = user.profilePhoto;
                 if (profilePhoto != null) {
                     TdApi.File photoFile = profilePhoto.small;
+                    //get consistent file info
+                    photoFile = telegramClient.sendSync(new TdApi.GetFile(photoFile.id));
                     if (photoFile.local.isDownloadingCompleted) {
                         String profilePhotoEncoded = Utils.fileBase64Encode(photoFile.local.path);
                         Caches.userIdToProfilePhotoCache.put(userId, profilePhotoEncoded);

@@ -1,5 +1,6 @@
 package dev.voroby.client.api;
 
+import dev.voroby.client.api.util.Utils;
 import dev.voroby.springframework.telegram.client.QueryResultHandler;
 import dev.voroby.springframework.telegram.client.TdApi;
 import dev.voroby.springframework.telegram.client.TelegramClient;

@@ -1,8 +1,9 @@
 package dev.voroby.client.api;
 
+import dev.voroby.client.api.util.Utils;
 import dev.voroby.client.cache.Caches;
 import dev.voroby.client.dto.ChatPhotoFile;
-import dev.voroby.client.updates.UpdatesQueues;
+import dev.voroby.client.updates.queue.UpdatesQueues;
 import dev.voroby.springframework.telegram.client.TdApi;
 import dev.voroby.springframework.telegram.client.TelegramClient;
 import org.springframework.context.annotation.Lazy;

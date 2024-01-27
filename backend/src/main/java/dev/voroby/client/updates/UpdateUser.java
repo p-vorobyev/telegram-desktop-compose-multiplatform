@@ -1,6 +1,6 @@
 package dev.voroby.client.updates;
 
-import dev.voroby.client.api.Utils;
+import dev.voroby.client.api.util.Utils;
 import dev.voroby.client.cache.Caches;
 import dev.voroby.springframework.telegram.client.TdApi;
 import dev.voroby.springframework.telegram.client.TelegramClient;

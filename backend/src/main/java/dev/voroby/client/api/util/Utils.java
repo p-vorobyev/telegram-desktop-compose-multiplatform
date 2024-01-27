@@ -1,4 +1,4 @@
-package dev.voroby.client.api;
+package dev.voroby.client.api.util;
 
 import dev.voroby.springframework.telegram.client.TdApi;
 import lombok.SneakyThrows;

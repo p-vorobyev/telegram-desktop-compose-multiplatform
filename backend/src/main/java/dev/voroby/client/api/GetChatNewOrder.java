@@ -1,7 +1,7 @@
 package dev.voroby.client.api;
 
 import dev.voroby.client.dto.ChatPreview;
-import dev.voroby.client.updates.UpdatesQueues;
+import dev.voroby.client.updates.queue.UpdatesQueues;
 import dev.voroby.springframework.telegram.client.TdApi;
 import dev.voroby.springframework.telegram.client.TelegramClient;
 import org.springframework.stereotype.Component;
