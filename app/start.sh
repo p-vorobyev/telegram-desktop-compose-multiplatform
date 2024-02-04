@@ -12,4 +12,4 @@ fi
 
 nohup java -Xms64m -Xmx64m -Djava.library.path=./macos_silicon -jar jars/backend.jar > backend.log &
 sleep 3
-nohup java -jar jars/TelegramComposeMultiplatform.jar 2>/dev/null &
+nohup java -jar jars/TelegramComposeMultiplatform.jar >/dev/null 2>&1 &

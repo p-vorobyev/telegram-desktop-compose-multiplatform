@@ -38,7 +38,7 @@ public class UpdateUser implements UpdateNotificationListener<TdApi.UpdateUser> 
         telegramClient.sendWithCallback(new TdApi.DownloadFile(smallPhotoFile.id, 32, 0, 0, false), (file, error) -> {
             if (error == null) {
                 cacheProfilePhotoIdToUserId(smallPhotoFile.id, updateUser.user.id);
-                log.info("Download user profile photo to local storage: [userId: {}, photoId: {}]", updateUser.user.id, smallPhotoFile.id);
+                log.debug("Download user profile photo to local storage: [userId: {}, photoId: {}]", updateUser.user.id, smallPhotoFile.id);
             } else {
                 Utils.logError(error);
             }
