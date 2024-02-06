@@ -38,7 +38,7 @@ fun ChatCard(chatListUpdateScope: CoroutineScope, chatPreview: ChatPreview, sele
 
                 Row {
                     val cleanedTitle = chatPreview.title.replace("\n", " ")
-                    ChatIcon(chatPreview.photo, cleanedTitle)
+                    ChatIcon(chatPreview.photo, cleanedTitle, circleSize = 60.dp)
 
                     Column(verticalArrangement = Arrangement.Center, modifier = Modifier.width(370.dp)) {
                         Text(fontWeight = FontWeight.Bold, text = if (cleanedTitle.length > 30) "${cleanedTitle.substring(0, 20)}..." else cleanedTitle)

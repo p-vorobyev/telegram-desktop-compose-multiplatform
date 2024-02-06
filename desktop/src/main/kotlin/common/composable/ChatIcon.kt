@@ -16,7 +16,7 @@ import androidx.compose.ui.graphics.asComposeImageBitmap
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.sp
 import org.jetbrains.skia.Bitmap
 import org.jetbrains.skia.Image
@@ -27,25 +27,28 @@ import java.util.stream.Collectors
 @Composable
 fun ChatIcon(
     encodedChatPhoto: String?,
-    chatTitle: String
+    chatTitle: String,
+    circleSize: Dp
 ) {
     var imageBitMap: ImageBitmap? = null
     encodedChatPhoto?.let {
-        val img: ByteArray = Base64.getDecoder().decode(it)
-        imageBitMap = Bitmap.makeFromImage(Image.makeFromEncoded(img)).asComposeImageBitmap()
+        if (it.isNotEmpty()) {
+            val img: ByteArray = Base64.getDecoder().decode(it)
+            imageBitMap = Bitmap.makeFromImage(Image.makeFromEncoded(img)).asComposeImageBitmap()
+        }
     }
     if (imageBitMap != null) {
         Image(
             bitmap = imageBitMap!!,
             contentScale = ContentScale.Crop,
-            modifier = Modifier.size(60.dp).clip(CircleShape),
+            modifier = Modifier.size(circleSize).clip(CircleShape),
             contentDescription = "",
             alignment = Alignment.Center
         )
     } else {
         Box(
             modifier = Modifier
-                .size(60.dp)
+                .size(circleSize)
                 .graphicsLayer {
                     clip = true
                     shape = CircleShape

@@ -47,7 +47,7 @@ public class ConvertToChatMessages extends AbstractUpdates implements Function<L
         LocalDateTime date = LocalDateTime.ofInstant(Instant.ofEpochMilli(message.date * 1000L), ZoneId.systemDefault());
         String dateStr = date.format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM, FormatStyle.SHORT));
         String editDateStr = "";
-        if (message.editDate >= 0) {
+        if (message.editDate > 0) {
             LocalDateTime editDate = LocalDateTime.ofInstant(Instant.ofEpochMilli(message.editDate * 1000L), ZoneId.systemDefault());
             editDateStr = editDate.format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM, FormatStyle.SHORT));
         }
@@ -60,6 +60,10 @@ public class ConvertToChatMessages extends AbstractUpdates implements Function<L
             senderInfo = String.join(" ", user.firstName, user.lastName).trim();
             isCurrentUser = currentUserService.isCurrentUserId(user.id);
             senderPhoto = getProfilePhoto.apply(user.id);
+        }
+        if (senderId instanceof TdApi.MessageSenderChat senderChat) {
+            senderInfo = Caches.initialChatCache.get(senderChat.chatId).title;
+            senderPhoto = Caches.chatIdToPhotoCache.getOrDefault(senderChat.chatId, "");
         }
 
         return new ChatMessage(

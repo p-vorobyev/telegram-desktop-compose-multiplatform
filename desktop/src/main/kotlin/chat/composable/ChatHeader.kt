@@ -33,7 +33,7 @@ fun ChatHeader(clientStates: ClientStates) {
 
                 Spacer(modifier = Modifier.width(10.dp))
 
-                ChatIcon(chatPreview.photo, cleanedTitle)
+                ChatIcon(chatPreview.photo, cleanedTitle, circleSize = 60.dp)
 
                 Spacer(modifier = Modifier.width(5.dp))
 

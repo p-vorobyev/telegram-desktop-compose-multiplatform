@@ -15,6 +15,7 @@ import common.state.ClientStates
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import scene.api.handleSidebarUpdates
+import scene.api.markAsRead
 import scene.dto.ChatPreview
 import terminatingApp
 
@@ -91,6 +92,9 @@ fun MainScene(clientStates: ClientStates) {
                     SelectChatOffer()
                 } else if (selectedIndex.value != -1) {
                     ChatWindow(selectedIndex = selectedIndex, chatListUpdateScope = chatListUpdateScope, clientStates = clientStates)
+                    chatListUpdateScope.launch {
+                        markAsRead(clientStates.chatPreviews[selectedIndex.value].id)
+                    }
                 }
             }
 
