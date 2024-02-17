@@ -5,12 +5,16 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material.*
+import androidx.compose.material.Divider
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Scaffold
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import chat.composable.ChatWindow
 import chat.composable.SelectChatOffer
+import common.composable.ScrollButton
+import common.composable.ScrollDirection
 import common.state.ClientStates
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -18,6 +22,9 @@ import scene.api.handleSidebarUpdates
 import scene.api.markAsRead
 import scene.dto.ChatPreview
 import terminatingApp
+
+
+val sidebarWidthModifier: Modifier = Modifier.width(450.dp)
 
 
 @Composable
@@ -56,45 +63,72 @@ fun MainScene(clientStates: ClientStates) {
     }
 
     Scaffold(
-        topBar = { ScaffoldTopBar(clientStates, lazyListState, chatSearchInput, filterUnreadChats) },
+        topBar = { ScaffoldTopBar(clientStates, chatSearchInput, filterUnreadChats) },
         backgroundColor = greyColor
     ) {
 
         Row {
 
-            LazyColumn(state = lazyListState, modifier = Modifier.width(450.dp).background(MaterialTheme.colors.surface).fillMaxHeight()) {
+            Box {
+                LazyColumn(state = lazyListState, modifier = sidebarWidthModifier.background(MaterialTheme.colors.surface).fillMaxHeight()) {
 
-                itemsIndexed(clientStates.chatPreviews, { _, v -> v}) { index, chatPreview ->
+                    itemsIndexed(clientStates.chatPreviews, { _, v -> v}) { index, chatPreview ->
 
-                    if (chatSearchInput.value.isBlank() || chatPreview.title.contains(chatSearchInput.value, ignoreCase = true)) {
-                        var hasUnread = false
-                        chatPreview.unreadCount?.let {
-                            if (it != 0) {
-                                hasUnread = true
+                        if (chatSearchInput.value.isBlank() || chatPreview.title.contains(chatSearchInput.value, ignoreCase = true)) {
+                            var hasUnread = false
+                            chatPreview.unreadCount?.let {
+                                if (it != 0) {
+                                    hasUnread = true
+                                }
                             }
-                        }
-                        if (filterUnreadChats.value && hasUnread) {
-                            ChatCard(chatListUpdateScope = chatListUpdateScope, chatPreview = chatPreview, selectedIndex = selectedIndex, index = index)
-                            Divider(modifier = Modifier.height(2.dp).width(450.dp), color = greyColor)
-                        } else if (!filterUnreadChats.value) {
-                            ChatCard(chatListUpdateScope = chatListUpdateScope, chatPreview = chatPreview, selectedIndex = selectedIndex, index = index)
-                            Divider(modifier = Modifier.height(2.dp).width(450.dp), color = greyColor)
+                            if (filterUnreadChats.value && hasUnread) {
+                                ChatCard(chatListUpdateScope = chatListUpdateScope, chatPreview = chatPreview, selectedIndex = selectedIndex, index = index)
+                                Divider(modifier = sidebarWidthModifier.height(2.dp), color = greyColor)
+                            } else if (!filterUnreadChats.value) {
+                                ChatCard(chatListUpdateScope = chatListUpdateScope, chatPreview = chatPreview, selectedIndex = selectedIndex, index = index)
+                                Divider(modifier = sidebarWidthModifier.height(2.dp), color = greyColor)
+                            }
+
                         }
 
                     }
 
                 }
 
+                if (lazyListState.firstVisibleItemIndex > 3) {
+                    Row(modifier = sidebarWidthModifier) {
+                        Row(modifier = Modifier.fillMaxSize().padding(top = 12.dp, end = 12.dp), horizontalArrangement = Arrangement.End) {
+                            ScrollButton(
+                                direction = ScrollDirection.UP,
+                                onClick = {
+                                    chatListUpdateScope.launch {
+                                        lazyListState.animateScrollToItem(0)
+                                    }
+                                }
+                            )
+                        }
+                    }
+                }
             }
 
             Column {
                 if (selectedIndex.value == -1 && clientStates.chatPreviews.isNotEmpty()) {
                     SelectChatOffer()
                 } else if (selectedIndex.value != -1) {
+
+                    var readChat by remember { mutableStateOf(-1L) }
+
                     ChatWindow(selectedIndex = selectedIndex, chatListUpdateScope = chatListUpdateScope, clientStates = clientStates)
                     chatListUpdateScope.launch {
-                        markAsRead(clientStates.chatPreviews[selectedIndex.value].id)
+                        val currentChat = clientStates.chatPreviews[selectedIndex.value]
+                        currentChat.unreadCount?.let {
+                            if (it > 0 && readChat != currentChat.id) {
+                                readChat = currentChat.id
+                                markAsRead(readChat)
+                            }
+                        }
                     }
+
                 }
             }
 

@@ -59,7 +59,7 @@ public class OpenChatService implements Consumer<Long> {
     private void closeCurrentChatIfOpened() {
         Long chatId = openedChat.get();
         if (chatId != null) {
-            telegramClient.sendSync(new TdApi.CloseChat(chatId));
+            telegramClient.sendAsync(new TdApi.CloseChat(chatId));
             incomingChatMessages.clear();
             updatedContentInMessages.clear();
             log.info("Chat closed: [chatId: {}]", chatId);
