@@ -8,7 +8,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.Deque;
+import java.util.List;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
@@ -49,6 +51,16 @@ public class OpenChatService implements Consumer<Long> {
     public void addIncomingMessage(TdApi.Message message) {
         log.info("Incoming message in opened chat: [chatId: {}, msgId: {}]", message.chatId, message.id);
         incomingChatMessages.addLast(message);
+    }
+
+    public List<TdApi.Message> getIncomingMessages() {
+        List<TdApi.Message> messages = new ArrayList<>();
+        for (int i = 0; i < 5; i++) {
+            TdApi.Message message = incomingChatMessages.pollFirst();
+            if (message == null) break;
+            messages.add(message);
+        }
+        return messages;
     }
 
     public void addUpdatedContent(TdApi.UpdateMessageContent updateMessageContent) {

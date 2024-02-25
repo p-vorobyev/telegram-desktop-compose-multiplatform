@@ -4,6 +4,7 @@ import dev.voroby.client.api.*;
 import dev.voroby.client.api.service.OpenChatService;
 import dev.voroby.client.dto.ChatHistoryRequest;
 import dev.voroby.client.dto.ChatMessage;
+import dev.voroby.springframework.telegram.client.TdApi;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -51,6 +52,13 @@ public class ChatController {
         return getChatHistory
                 .andThen(convertToChatMessages)
                 .apply(new ChatHistoryRequest(chatId, 0, 0));
+    }
+
+    @GetMapping(value = "/incoming")
+    public List<ChatMessage> getIncomingMessages() {
+        log.info("Call incoming");
+        List<TdApi.Message> messages = openChatService.getIncomingMessages();
+        return convertToChatMessages.apply(messages);
     }
 
     @GetMapping(value = "/members/{chatId}")

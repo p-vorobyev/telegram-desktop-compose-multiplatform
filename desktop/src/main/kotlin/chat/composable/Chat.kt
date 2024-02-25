@@ -15,6 +15,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import chat.api.incomingMessages
 import chat.api.openChat
 import chat.dto.ChatMessage
 import common.composable.ChatIcon
@@ -23,7 +24,9 @@ import common.composable.ScrollButton
 import common.composable.ScrollDirection
 import common.state.ClientStates
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import terminatingApp
 
 
 @Composable
@@ -42,27 +45,35 @@ fun SelectChatOffer() {
 
 
 @Composable
-fun ChatWindow(selectedIndex: MutableState<Int>,
+fun ChatWindow(chatId: Long,
                chatListUpdateScope: CoroutineScope = rememberCoroutineScope(),
                clientStates: ClientStates
 ) {
-    var openedIdx by remember { mutableStateOf(-1L) }
+    var openedId by remember { mutableStateOf(-1L) }
 
     val chatHistoryListState = rememberLazyListState()
 
     chatListUpdateScope.launch {
-        clientStates.selectedChatPreview.value = clientStates.chatPreviews[selectedIndex.value]
-        val chatId = clientStates.chatPreviews[selectedIndex.value].id
-        if (openedIdx != chatId) {
+
+        if (openedId != chatId) {
             clientStates.chatHistory.clear()
-            openedIdx = chatId
+            openedId = chatId
             val chatHistory: List<ChatMessage> = openChat(chatId)
             clientStates.chatHistory.addAll(chatHistory)
             if (clientStates.chatHistory.isNotEmpty()) {
                 //scroll to the end when open chat
                 chatHistoryListState.scrollToItem(clientStates.chatHistory.size - 1)
             }
+
+            delay(1000)
+
+            while (!terminatingApp.get() && openedId == chatId) {
+                val incomingMessages: List<ChatMessage> = incomingMessages()
+                clientStates.chatHistory.addAll(incomingMessages)
+                delay(2000)
+            }
         }
+
     }
 
     Box {

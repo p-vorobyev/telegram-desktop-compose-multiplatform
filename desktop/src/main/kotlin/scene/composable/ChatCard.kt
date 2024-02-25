@@ -29,7 +29,7 @@ import scene.dto.ChatType
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun ChatCard(chatListUpdateScope: CoroutineScope, chatPreview: ChatPreview, selectedIndex: MutableState<Int>, index: Int) {
-    val cardModifier = Modifier.width(width = 450.dp).height(60.dp)
+    val cardModifier = sidebarWidthModifier.height(60.dp)
 
     ContextMenuArea(items = { contextMenuItems(chatListUpdateScope, chatPreview) }) {
         Row (verticalAlignment = Alignment.CenterVertically) {

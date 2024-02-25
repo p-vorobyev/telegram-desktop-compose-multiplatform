@@ -10,3 +10,7 @@ import transport.httpClient
 suspend fun openChat(chatId: Long): List<ChatMessage> {
     return httpClient.post("$baseUrl/$clientUri/chat/open/${chatId}").body()
 }
+
+suspend fun incomingMessages(): List<ChatMessage> {
+    return httpClient.get("$baseUrl/$clientUri/chat/incoming").body()
+}

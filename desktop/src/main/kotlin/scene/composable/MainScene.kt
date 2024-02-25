@@ -118,7 +118,15 @@ fun MainScene(clientStates: ClientStates) {
 
                     var readChat by remember { mutableStateOf(-1L) }
 
-                    ChatWindow(selectedIndex = selectedIndex, chatListUpdateScope = chatListUpdateScope, clientStates = clientStates)
+                    clientStates.selectedChatPreview.value = clientStates.chatPreviews[selectedIndex.value]
+
+                    val chatId = clientStates.chatPreviews[selectedIndex.value].id
+
+                    Row {
+                        Divider(modifier = Modifier.fillMaxHeight().width(2.dp), color = greyColor)
+                        ChatWindow(chatId = chatId, chatListUpdateScope = chatListUpdateScope, clientStates = clientStates)
+                    }
+
                     chatListUpdateScope.launch {
                         val currentChat = clientStates.chatPreviews[selectedIndex.value]
                         currentChat.unreadCount?.let {
