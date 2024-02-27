@@ -54,11 +54,24 @@ public class ChatController {
                 .apply(new ChatHistoryRequest(chatId, 0, 0));
     }
 
-    @GetMapping(value = "/incoming")
+    @GetMapping(value = "/incoming", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<ChatMessage> getIncomingMessages() {
-        log.info("Call incoming");
+        log.debug("Poll incoming messages for chat");
         List<TdApi.Message> messages = openChatService.getIncomingMessages();
         return convertToChatMessages.apply(messages);
+    }
+
+    @GetMapping(value = "/edited", produces = MediaType.APPLICATION_JSON_VALUE)
+    public List<ChatMessage> getUpdatedMessages() {
+        log.debug("Poll edited messages for chat");
+        List<TdApi.Message> messages = openChatService.getEditedMessages();
+        return convertToChatMessages.apply(messages);
+    }
+
+    @GetMapping(value = "/deleted")
+    public List<Long> getDeletedMsgIds() {
+        log.debug("Poll deleted messages for chat");
+        return openChatService.getDeletedMsgIds();
     }
 
     @GetMapping(value = "/members/{chatId}")

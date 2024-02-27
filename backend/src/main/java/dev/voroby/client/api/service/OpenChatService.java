@@ -8,11 +8,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.Deque;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
 
 @Component @Slf4j
@@ -26,9 +26,11 @@ public class OpenChatService implements Consumer<Long> {
 
     private final Deque<TdApi.Message> incomingChatMessages = new ConcurrentLinkedDeque<>();
 
-    private final Deque<TdApi.UpdateMessageContent> updatedContentInMessages = new ConcurrentLinkedDeque<>();
+    private final Deque<TdApi.Message> updatedChatMessages = new ConcurrentLinkedDeque<>();
 
-    //TODO Handle deleted messages
+    private final Deque<Long> deletedMsgIds = new ConcurrentLinkedDeque<>();
+
+    private final Lock lock = new ReentrantLock();
 
     public OpenChatService(@Lazy TelegramClient telegramClient,
                            OpenChat openChat) {
@@ -37,11 +39,16 @@ public class OpenChatService implements Consumer<Long> {
     }
 
     @Override
-    public synchronized void accept(Long chatId) {
-        closeCurrentChatIfOpened();
-        openChatFunc.accept(chatId);
-        openedChat.set(chatId);
-        log.info("Chat opened: [chatId: {}]", chatId);
+    public void accept(Long chatId) {
+        lock.lock();
+        try {
+            closeCurrentChatIfOpened();
+            openChatFunc.accept(chatId);
+            openedChat.set(chatId);
+            log.info("Chat opened: [chatId: {}]", chatId);
+        } finally {
+            lock.unlock();
+        }
     }
 
     public Long openedChat() {
@@ -49,23 +56,67 @@ public class OpenChatService implements Consumer<Long> {
     }
 
     public void addIncomingMessage(TdApi.Message message) {
-        log.info("Incoming message in opened chat: [chatId: {}, msgId: {}]", message.chatId, message.id);
-        incomingChatMessages.addLast(message);
+        if (addMessageToQueue(incomingChatMessages, message)) {
+            log.info("Incoming message in opened chat: [chatId: {}, msgId: {}]", message.chatId, message.id);
+        }
+    }
+
+    public void addUpdatedMessage(TdApi.Message message) {
+        if (addMessageToQueue(updatedChatMessages, message)) {
+            log.info("Updated message content in opened chat: [chatId: {}, msgId: {}]", message.chatId, message.id);
+        }
+    }
+
+    private boolean addMessageToQueue(Deque<TdApi.Message> messageQueue, TdApi.Message message) {
+        lock.lock();
+        try {
+            if (message.chatId == openedChat.get()) {
+                messageQueue.addLast(message);
+                return true;
+            }
+            return false;
+        } finally {
+            lock.unlock();
+        }
     }
 
     public List<TdApi.Message> getIncomingMessages() {
+        return pollMessagesFromQueue(incomingChatMessages);
+    }
+
+    public List<TdApi.Message> getEditedMessages() {
+        return pollMessagesFromQueue(updatedChatMessages);
+    }
+
+    private List<TdApi.Message> pollMessagesFromQueue(Deque<TdApi.Message> messageQueue) {
         List<TdApi.Message> messages = new ArrayList<>();
-        for (int i = 0; i < 5; i++) {
-            TdApi.Message message = incomingChatMessages.pollFirst();
+        for (int i = 0; i < 10; i++) {
+            TdApi.Message message = messageQueue.pollFirst();
             if (message == null) break;
             messages.add(message);
         }
         return messages;
     }
 
-    public void addUpdatedContent(TdApi.UpdateMessageContent updateMessageContent) {
-        log.info("Updated message content in opened chat: [chatId: {}, msgId: {}]", updateMessageContent.chatId, updateMessageContent.messageId);
-        updatedContentInMessages.addLast(updateMessageContent);
+    public void addDeletedMsgIds(long chatId, Collection<Long> ids) {
+        lock.lock();
+        try {
+            if (openedChat.get() == chatId) {
+                deletedMsgIds.addAll(ids);
+            }
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    public List<Long> getDeletedMsgIds() {
+        List<Long> ids = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            Long id = deletedMsgIds.pollFirst();
+            if (id == null) break;
+            ids.add(id);
+        }
+        return ids;
     }
 
     private void closeCurrentChatIfOpened() {
@@ -73,7 +124,8 @@ public class OpenChatService implements Consumer<Long> {
         if (chatId != null) {
             telegramClient.sendAsync(new TdApi.CloseChat(chatId));
             incomingChatMessages.clear();
-            updatedContentInMessages.clear();
+            updatedChatMessages.clear();
+            deletedMsgIds.clear();
             log.info("Chat closed: [chatId: {}]", chatId);
         }
     }

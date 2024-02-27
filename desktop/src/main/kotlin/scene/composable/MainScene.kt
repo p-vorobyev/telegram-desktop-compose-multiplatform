@@ -30,7 +30,7 @@ val sidebarWidthModifier: Modifier = Modifier.width(450.dp)
 @Composable
 fun MainScene(clientStates: ClientStates) {
 
-    val selectedIndex: MutableState<Int> = remember { mutableStateOf(-1) }
+    val selectedChatId: MutableState<Long> = remember { mutableStateOf(-1) }
 
     var needToScrollUpSidebar by remember { mutableStateOf(false) }
 
@@ -81,11 +81,15 @@ fun MainScene(clientStates: ClientStates) {
                                     hasUnread = true
                                 }
                             }
+                            val onChatClick = {
+                                selectedChatId.value = chatPreview.id
+                                clientStates.selectedChatPreview.value = chatPreview
+                            }
                             if (filterUnreadChats.value && hasUnread) {
-                                ChatCard(chatListUpdateScope = chatListUpdateScope, chatPreview = chatPreview, selectedIndex = selectedIndex, index = index)
+                                ChatCard(chatListUpdateScope = chatListUpdateScope, chatPreview = chatPreview, selectedChatId = selectedChatId, onClick = onChatClick)
                                 Divider(modifier = sidebarWidthModifier.height(2.dp), color = greyColor)
                             } else if (!filterUnreadChats.value) {
-                                ChatCard(chatListUpdateScope = chatListUpdateScope, chatPreview = chatPreview, selectedIndex = selectedIndex, index = index)
+                                ChatCard(chatListUpdateScope = chatListUpdateScope, chatPreview = chatPreview, selectedChatId = selectedChatId, onClick = onChatClick)
                                 Divider(modifier = sidebarWidthModifier.height(2.dp), color = greyColor)
                             }
 
@@ -112,27 +116,26 @@ fun MainScene(clientStates: ClientStates) {
             }
 
             Column {
-                if (selectedIndex.value == -1 && clientStates.chatPreviews.isNotEmpty()) {
+                if (selectedChatId.value == -1L && clientStates.chatPreviews.isNotEmpty()) {
                     SelectChatOffer()
-                } else if (selectedIndex.value != -1) {
+                } else if (selectedChatId.value != -1L) {
 
                     var readChat by remember { mutableStateOf(-1L) }
 
-                    clientStates.selectedChatPreview.value = clientStates.chatPreviews[selectedIndex.value]
-
-                    val chatId = clientStates.chatPreviews[selectedIndex.value].id
-
                     Row {
                         Divider(modifier = Modifier.fillMaxHeight().width(2.dp), color = greyColor)
-                        ChatWindow(chatId = chatId, chatListUpdateScope = chatListUpdateScope, clientStates = clientStates)
+                        ChatWindow(chatId = selectedChatId.value, chatListUpdateScope = chatListUpdateScope, clientStates = clientStates)
                     }
 
                     chatListUpdateScope.launch {
-                        val currentChat = clientStates.chatPreviews[selectedIndex.value]
-                        currentChat.unreadCount?.let {
-                            if (it > 0 && readChat != currentChat.id) {
-                                readChat = currentChat.id
-                                markAsRead(readChat)
+                        clientStates.selectedChatPreview.let {
+                            it.value?.let { currentChat ->
+                                currentChat.unreadCount?.let {
+                                    if (it > 0 && readChat != currentChat.id) {
+                                        readChat = currentChat.id
+                                        markAsRead(readChat)
+                                    }
+                                }
                             }
                         }
                     }

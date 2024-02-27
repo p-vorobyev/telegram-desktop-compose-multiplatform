@@ -2,7 +2,9 @@ package dev.voroby.client.updates;
 
 import dev.voroby.client.api.service.OpenChatService;
 import dev.voroby.springframework.telegram.client.TdApi;
+import dev.voroby.springframework.telegram.client.TelegramClient;
 import dev.voroby.springframework.telegram.client.updates.UpdateNotificationListener;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -10,15 +12,20 @@ public class UpdateMessageContent implements UpdateNotificationListener<TdApi.Up
 
     private final OpenChatService openChatService;
 
-    public UpdateMessageContent(OpenChatService openChatService) {
+    private final TelegramClient telegramClient;
+
+    public UpdateMessageContent(OpenChatService openChatService,
+                                @Lazy TelegramClient telegramClient) {
         this.openChatService = openChatService;
+        this.telegramClient = telegramClient;
     }
 
     @Override
     public void handleNotification(TdApi.UpdateMessageContent updateMessageContent) {
         if (openChatService.openedChat() != null &&
             updateMessageContent.chatId == openChatService.openedChat()) {
-            openChatService.addUpdatedContent(updateMessageContent);
+            telegramClient.sendAsync(new TdApi.GetMessage(updateMessageContent.chatId, updateMessageContent.messageId))
+                    .thenAccept(openChatService::addUpdatedMessage);
         }
     }
 

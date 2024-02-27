@@ -14,3 +14,11 @@ suspend fun openChat(chatId: Long): List<ChatMessage> {
 suspend fun incomingMessages(): List<ChatMessage> {
     return httpClient.get("$baseUrl/$clientUri/chat/incoming").body()
 }
+
+suspend fun editedMessages(): List<ChatMessage> {
+    return httpClient.get("$baseUrl/$clientUri/chat/edited").body()
+}
+
+suspend fun deletedMsgIds(): List<Long> {
+    return httpClient.get("$baseUrl/$clientUri/chat/deleted").body()
+}

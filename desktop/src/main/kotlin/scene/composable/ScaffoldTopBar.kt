@@ -79,6 +79,8 @@ fun ScaffoldTopBar(
 
             }
 
+            Divider(modifier = Modifier.height(50.dp).width(2.dp), color = greyColor)
+
             Column {
                 clientStates.selectedChatPreview.value?.let {
                     ChatHeader(clientStates)

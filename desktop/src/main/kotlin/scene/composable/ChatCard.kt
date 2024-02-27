@@ -28,13 +28,16 @@ import scene.dto.ChatType
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun ChatCard(chatListUpdateScope: CoroutineScope, chatPreview: ChatPreview, selectedIndex: MutableState<Int>, index: Int) {
+fun ChatCard(chatListUpdateScope: CoroutineScope, chatPreview: ChatPreview, selectedChatId: MutableState<Long>, onClick: () -> Unit) {
     val cardModifier = sidebarWidthModifier.height(60.dp)
 
     ContextMenuArea(items = { contextMenuItems(chatListUpdateScope, chatPreview) }) {
+
         Row (verticalAlignment = Alignment.CenterVertically) {
-            val color = if (selectedIndex.value == index) Color.LightGray else MaterialTheme.colors.surface
-            Card(modifier = cardModifier, backgroundColor = color, onClick = { selectedIndex.value = index }) {
+
+            val color = if (selectedChatId.value == chatPreview.id) Color.LightGray else MaterialTheme.colors.surface
+
+            Card(modifier = cardModifier, backgroundColor = color, onClick = { onClick() }) {
 
                 Row {
                     val cleanedTitle = chatPreview.title.replace("\n", " ")

@@ -16,7 +16,7 @@ suspend fun getMemberCount(chatIds: List<Long>): MutableMap<Long, Long>  {
             header(HttpHeaders.ContentType, "application/json")
         }
         setBody(chatIds)
-    }.body<MutableMap<Long, Long>>()
+    }.body()
 }
 
 suspend fun refreshChatsMemberCount(clientStates: ClientStates) {
