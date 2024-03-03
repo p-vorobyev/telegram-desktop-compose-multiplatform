@@ -47,6 +47,7 @@ fun ChatHeader(clientStates: ClientStates) {
                                 delay(3000)
                             }
                         }
+                        Spacer(Modifier.height(8.dp))
                         val membersInfo = if ( memberCount < 200)
                             "$memberCount members"
                         else

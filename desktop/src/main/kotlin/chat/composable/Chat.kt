@@ -1,6 +1,6 @@
 package chat.composable
 
-import androidx.compose.foundation.background
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -15,10 +15,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import chat.api.deletedMsgIds
-import chat.api.editedMessages
-import chat.api.incomingMessages
-import chat.api.openChat
+import chat.api.*
 import chat.dto.ChatMessage
 import common.composable.ChatIcon
 import common.composable.CommonSelectionContainer
@@ -129,30 +126,19 @@ fun ChatWindow(chatId: Long,
     }
 
     Box {
-        LazyColumn(modifier = Modifier.background(Color.White).fillMaxSize().padding(start = 5.dp, end = 5.dp), verticalArrangement = Arrangement.Bottom, state = chatHistoryListState) {
+        LazyColumn(modifier = Modifier.background(Color.White).fillMaxSize().padding(start = 5.dp, end = 12.dp), verticalArrangement = Arrangement.Bottom, state = chatHistoryListState) {
             val messageCardColor = Color(0xFFF7F4F4)
             val selectionColor = Color(0xFF95C2F0)
 
             items(clientStates.chatHistory) { message ->
 
-                Row  {
-                    ChatIcon(encodedChatPhoto = message.senderPhoto, chatTitle = message.senderInfo, circleSize = 44.dp)
-                    Spacer(Modifier.width(4.dp))
-                    Card(shape = RoundedCornerShape(12.dp), backgroundColor = messageCardColor) {
-                        Column(modifier = Modifier.padding(4.dp)) {
-                            Text(text = message.senderInfo, fontWeight = FontWeight.Bold, fontSize = 12.sp, color = selectionColor)
-                            Spacer(Modifier.height(4.dp))
-                            //to enable text selection
-                            CommonSelectionContainer {
-                                Text(text = message.messageText, fontSize = 14.sp)
-                            }
-                            Spacer(Modifier.height(4.dp))
-                            Text(
-                                text = if (message.editDate.isNotEmpty()) "edited ${message.editDate}" else message.date,
-                                fontSize = 10.sp,
-                                color = Color.Gray,
-                                modifier = Modifier.align(Alignment.End)
-                            )
+                Row(modifier = Modifier.fillMaxWidth())  {
+                    ContextMenuDataProvider(items = { messageContextMenuItems(message, chatListUpdateScope) }) {
+                        ChatIcon(encodedChatPhoto = message.senderPhoto, chatTitle = message.senderInfo, circleSize = 44.dp)
+                        Spacer(Modifier.width(4.dp))
+                        //to enable text selection
+                        CommonSelectionContainer {
+                            MessageContent(message, messageCardColor, selectionColor)
                         }
                     }
                 }
@@ -161,6 +147,13 @@ fun ChatWindow(chatId: Long,
 
             }
         }
+
+        VerticalScrollbar(
+            modifier = Modifier.align(Alignment.CenterEnd).fillMaxHeight(),
+            adapter = rememberScrollbarAdapter(
+                scrollState = chatHistoryListState
+            )
+        )
 
         val firstVisibleIndex = chatHistoryListState.firstVisibleItemIndex
         val visibleItemsCount = chatHistoryListState.layoutInfo.visibleItemsInfo.size
@@ -191,4 +184,42 @@ fun ChatWindow(chatId: Long,
 
     }
 
+}
+
+
+@Composable
+fun MessageContent(
+    message: ChatMessage,
+    messageCardColor: Color,
+    selectionColor: Color
+) {
+    Card(shape = RoundedCornerShape(12.dp), backgroundColor = messageCardColor) {
+        Column(modifier = Modifier.padding(4.dp)) {
+            Text(text = message.senderInfo, fontWeight = FontWeight.Bold, fontSize = 12.sp, color = selectionColor)
+            Spacer(Modifier.height(4.dp))
+            Text(text = message.messageText, fontSize = 14.sp)
+            Spacer(Modifier.height(4.dp))
+            Text(
+                text = if (message.editDate.isNotEmpty()) "edited ${message.editDate}" else message.date,
+                fontSize = 10.sp,
+                color = Color.Gray,
+                modifier = Modifier.align(Alignment.End)
+            )
+        }
+    }
+}
+
+
+private fun messageContextMenuItems(message: ChatMessage,
+                                    chatListUpdateScope: CoroutineScope
+): List<ContextMenuItem> {
+    val items: MutableList<ContextMenuItem> = mutableListOf()
+    if (message.canBeDeletedForAllUsers || message.canBeDeletedOnlyForSelf) {
+        items.add(ContextMenuItem("Delete") {
+            chatListUpdateScope.launch {
+                deleteMessages(message.chatId, listOf(message.id))
+            }
+        })
+    }
+    return items
 }

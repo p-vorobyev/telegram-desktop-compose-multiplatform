@@ -4,6 +4,7 @@ import dev.voroby.client.api.*;
 import dev.voroby.client.api.service.OpenChatService;
 import dev.voroby.client.dto.ChatHistoryRequest;
 import dev.voroby.client.dto.ChatMessage;
+import dev.voroby.client.dto.DeleteMessagesDto;
 import dev.voroby.springframework.telegram.client.TdApi;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +36,9 @@ public class ChatController {
 
     @Autowired
     private ConvertToChatMessages convertToChatMessages;
+
+    @Autowired
+    private DeleteMessages deleteMessages;
 
     @PostMapping(value = "/markasread/{chatId}")
     public void markMessagesAsRead(@PathVariable("chatId") long chatId) {
@@ -92,6 +96,11 @@ public class ChatController {
         });
         log.debug("Refresh chat member count: [chatIdToMemberCount: {}]", chatIdToMemberCount);
         return chatIdToMemberCount;
+    }
+
+    @PostMapping(value = "/delete", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public void deleteMessages(@RequestBody DeleteMessagesDto deleteMessagesDto) {
+        deleteMessages.accept(deleteMessagesDto);
     }
 
 }

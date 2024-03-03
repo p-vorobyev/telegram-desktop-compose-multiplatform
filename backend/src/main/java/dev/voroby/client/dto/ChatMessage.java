@@ -9,5 +9,7 @@ public record ChatMessage(
         String editDate,
         String senderInfo,
         String senderPhoto,
-        boolean isCurrentUser
+        boolean isCurrentUser,
+        boolean canBeDeletedForAllUsers,
+        boolean canBeDeletedOnlyForSelf
 ) {}

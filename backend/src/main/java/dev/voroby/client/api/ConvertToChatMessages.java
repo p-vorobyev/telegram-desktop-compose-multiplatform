@@ -75,7 +75,9 @@ public class ConvertToChatMessages extends AbstractUpdates implements Function<L
                 editDateStr,
                 senderInfo,
                 senderPhoto,
-                isCurrentUser
+                isCurrentUser,
+                message.canBeDeletedForAllUsers,
+                message.canBeDeletedOnlyForSelf
         );
     }
 

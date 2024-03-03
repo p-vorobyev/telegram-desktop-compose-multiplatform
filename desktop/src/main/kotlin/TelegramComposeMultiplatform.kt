@@ -1,6 +1,5 @@
 import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.layout.Row
-import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
@@ -24,36 +23,34 @@ import java.util.concurrent.atomic.AtomicBoolean
 @Composable
 @Preview
 fun App() {
-    MaterialTheme {
-        Row {
-            var waitCode by remember { mutableStateOf(false) }
-            var waitPass by remember { mutableStateOf(false) }
-            var status by remember { mutableStateOf(Status.NOT_AUTHORIZED) }
+    Row {
+        var waitCode by remember { mutableStateOf(false) }
+        var waitPass by remember { mutableStateOf(false) }
+        var status by remember { mutableStateOf(Status.NOT_AUTHORIZED) }
 
-            LaunchedEffect(Unit) {
+        LaunchedEffect(Unit) {
+            status = authorizationStatus()
+        }
+
+        val mainScope = rememberCoroutineScope()
+
+        mainScope.launch {
+            while (!terminatingApp.get()) {
                 status = authorizationStatus()
+                if (status == Status.AUTHORIZED) break
+                waitCode = waitCode()
+                delay(300)
+                waitPass = waitPass()
+                delay(300)
             }
+        }
 
-            val mainScope = rememberCoroutineScope()
-
-            mainScope.launch {
-                while (!terminatingApp.get()) {
-                    status = authorizationStatus()
-                    if (status == Status.AUTHORIZED) break
-                    waitCode = waitCode()
-                    delay(300)
-                    waitPass = waitPass()
-                    delay(300)
-                }
-            }
-
-            if (status == Status.AUTHORIZED) {
-                InitialLoad()
-            } else if (waitCode) {
-                AuthForm(AuthType.CODE, mainScope)
-            } else if (waitPass) {
-                AuthForm(AuthType.PASSWORD, mainScope)
-            }
+        if (status == Status.AUTHORIZED) {
+            InitialLoad()
+        } else if (waitCode) {
+            AuthForm(AuthType.CODE, mainScope)
+        } else if (waitPass) {
+            AuthForm(AuthType.PASSWORD, mainScope)
         }
     }
 }

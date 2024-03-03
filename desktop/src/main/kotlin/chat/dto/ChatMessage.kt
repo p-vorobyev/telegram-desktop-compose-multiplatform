@@ -9,5 +9,7 @@ data class ChatMessage(
     val editDate: String,
     val senderInfo: String,
     val senderPhoto: String,
-    val isCurrentUser: Boolean
+    val isCurrentUser: Boolean,
+    val canBeDeletedForAllUsers: Boolean,
+    val canBeDeletedOnlyForSelf: Boolean
 )
