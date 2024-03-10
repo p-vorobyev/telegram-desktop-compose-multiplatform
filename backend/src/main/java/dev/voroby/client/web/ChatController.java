@@ -50,12 +50,19 @@ public class ChatController {
         deleteChat.accept(chatId);
     }
 
-    @PostMapping(value = "/open/{chatId}")
+    @PostMapping(value = "/open/{chatId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<ChatMessage> openChat(@PathVariable("chatId") long chatId) {
         openChatService.accept(chatId);
         return getChatHistory
                 .andThen(convertToChatMessages)
                 .apply(new ChatHistoryRequest(chatId, 0, 0));
+    }
+
+    @PostMapping(value = "/history", produces = MediaType.APPLICATION_JSON_VALUE)
+    public List<ChatMessage> loadChatHistory(@RequestBody ChatHistoryRequest chatHistoryRequest) {
+        return getChatHistory
+                .andThen(convertToChatMessages)
+                .apply(chatHistoryRequest);
     }
 
     @GetMapping(value = "/incoming", produces = MediaType.APPLICATION_JSON_VALUE)
