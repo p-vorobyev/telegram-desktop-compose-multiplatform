@@ -1,5 +1,6 @@
 package chat.api
 
+import chat.dto.ChatHistoryRequest
 import chat.dto.ChatMessage
 import chat.dto.DeleteMessages
 import io.ktor.client.call.*
@@ -11,6 +12,16 @@ import transport.httpClient
 
 suspend fun openChat(chatId: Long): List<ChatMessage> {
     return httpClient.post("$baseUrl/$clientUri/chat/open/${chatId}").body()
+}
+
+suspend fun loadChatHistory(chatHistoryRequest: ChatHistoryRequest): List<ChatMessage> {
+    return httpClient.post {
+        url("$baseUrl/$clientUri/chat/history")
+        headers {
+            header(HttpHeaders.ContentType, "application/json")
+        }
+        setBody(chatHistoryRequest)
+    }.body()
 }
 
 suspend fun incomingMessages(): List<ChatMessage> {

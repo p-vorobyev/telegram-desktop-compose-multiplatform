@@ -8,7 +8,10 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.material.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -25,54 +28,8 @@ import common.state.ClientStates
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import scene.api.markAsRead
 import terminatingApp
-
-
-private suspend fun getIncomingMessages(chatId: Long, clientStates: ClientStates, hasIncomingMessages: MutableState<Boolean>) {
-    val incomingMessages: List<ChatMessage> = incomingMessages()
-    if (incomingMessages.isNotEmpty()) {
-        clientStates.chatHistory.addAll(incomingMessages)
-        hasIncomingMessages.value = true
-        markAsRead(chatId) // mark as read incoming messages
-    }
-}
-
-
-private suspend fun getEditedMessages(clientStates: ClientStates) {
-    val editedMessages: List<ChatMessage> = editedMessages()
-    editedMessages.forEach { edited ->
-        var idx: Int? = null
-        clientStates.chatHistory.forEachIndexed { index, chatMessage ->
-            if (edited.id == chatMessage.id) {
-                idx = index
-                return@forEachIndexed
-            }
-        }
-        idx?.let {
-            clientStates.chatHistory.removeAt(it)
-            clientStates.chatHistory.add(it, edited)
-        }
-    }
-}
-
-
-private suspend fun handleDeletedMessages(clientStates: ClientStates) {
-    val deletedMsgIds: List<Long> = deletedMsgIds()
-    deletedMsgIds.forEach { deletedMsgId ->
-        var idx: Int? = null
-        clientStates.chatHistory.forEachIndexed { index, chatMessage ->
-            if (deletedMsgId == chatMessage.id) {
-                idx = index
-                return@forEachIndexed
-            }
-        }
-        idx?.let {
-            clientStates.chatHistory.removeAt(it)
-        }
-    }
-}
-
+import java.util.concurrent.locks.ReentrantLock
 
 
 @Composable
@@ -89,37 +46,61 @@ fun SelectChatOffer() {
 }
 
 
+// lock to separate initial load operation and an updates for chat (when open new chat we need to avoid updates from previous window)
+val chatLock = ReentrantLock()
+
 
 @Composable
 fun ChatWindow(chatId: Long,
                chatListUpdateScope: CoroutineScope = rememberCoroutineScope(),
                clientStates: ClientStates
 ) {
-    var openedId by remember { mutableStateOf(-1L) }
+    val openedId = remember { mutableStateOf(-1L) }
 
     val hasIncomingMessages = remember { mutableStateOf(false) }
+
+    val fullHistoryLoaded = remember { mutableStateOf(false) } // flag tells that all messages are loaded int this chat
 
     val chatHistoryListState = rememberLazyListState()
 
     chatListUpdateScope.launch {
-
-        if (openedId != chatId) {
-            clientStates.chatHistory.clear()
-            openedId = chatId
-            val chatHistory: List<ChatMessage> = openChat(chatId)
-            clientStates.chatHistory.addAll(chatHistory)
-            if (clientStates.chatHistory.isNotEmpty()) {
-                //scroll to the end when open chat
-                chatHistoryListState.scrollToItem(clientStates.chatHistory.size - 1)
+        if (openedId.value != chatId) {
+            chatLock.lock()
+            try {
+                loadOpenedChatMessages(chatId = chatId, openedId = openedId, clientStates = clientStates) {
+                    //scroll to the end when open chat
+                    chatListUpdateScope.launch {
+                        chatHistoryListState.scrollToItem(clientStates.chatHistory.size - 1)
+                    }
+                    fullHistoryLoaded.value = false // turn off flag when open new chat if it was activated
+                }
+            } finally {
+                chatLock.unlock()
             }
 
             delay(1000)
 
-            while (!terminatingApp.get() && openedId == chatId) {
-                getIncomingMessages(chatId, clientStates, hasIncomingMessages)
-                getEditedMessages(clientStates)
-                handleDeletedMessages(clientStates)
-                delay(2000)
+            while (!terminatingApp.get() && openedId.value == chatId) {
+                chatLock.lock()
+                try {
+                    if (!fullHistoryLoaded.value && chatHistoryListState.firstVisibleItemIndex == 0) {
+                        preloadChatHistory(
+                            chatId = chatId,
+                            fullHistoryLoaded = fullHistoryLoaded,
+                            clientStates = clientStates,
+                            chatHistoryListState = chatHistoryListState
+                        )
+                    }
+                    delay(500)
+                    getIncomingMessages(chatId, clientStates, hasIncomingMessages)
+                    delay(500)
+                    getEditedMessages(clientStates)
+                    delay(500)
+                    handleDeletedMessages(clientStates)
+                } finally {
+                    chatLock.unlock()
+                }
+                delay(500)
             }
         }
 
@@ -174,7 +155,7 @@ fun ChatWindow(chatId: Long,
 
 
         val scrollOnTheFloor = (clientStates.chatHistory.size - (firstVisibleIndex + visibleItemsCount)) <= 2
-        if (hasIncomingMessages.value && scrollOnTheFloor) {
+        if (hasIncomingMessages.value && scrollOnTheFloor && clientStates.chatHistory.isNotEmpty()) {
             chatListUpdateScope.launch {
                 //scroll to the end when new messages come with condition to scroll
                 chatHistoryListState.scrollToItem(clientStates.chatHistory.size - 1)

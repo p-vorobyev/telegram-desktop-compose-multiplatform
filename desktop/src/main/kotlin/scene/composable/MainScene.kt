@@ -72,7 +72,7 @@ fun MainScene(clientStates: ClientStates) {
             Box {
                 LazyColumn(state = lazyListState, modifier = sidebarWidthModifier.background(MaterialTheme.colors.surface).fillMaxHeight()) {
 
-                    itemsIndexed(clientStates.chatPreviews, { _, v -> v}) { index, chatPreview ->
+                    itemsIndexed(clientStates.chatPreviews, { _, v -> v}) { _, chatPreview ->
 
                         if (chatSearchInput.value.isBlank() || chatPreview.title.contains(chatSearchInput.value, ignoreCase = true)) {
                             var hasUnread = false

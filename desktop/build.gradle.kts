@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "dev.voroby"
-version = "1.0-SNAPSHOT"
+version = "0.0.1"
 
 repositories {
     mavenCentral()
@@ -32,6 +32,11 @@ dependencies {
 
 kotlin {
     jvmToolchain(17)
+}
+
+tasks.register<Copy>("copyTelegramBackend") {
+    from("../backend/build/libs")
+    into("resources/common")
 }
 
 compose.desktop {
