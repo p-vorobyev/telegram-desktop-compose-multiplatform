@@ -5,6 +5,7 @@ import dev.voroby.client.cache.Caches;
 import dev.voroby.client.dto.ChatPhotoFile;
 import dev.voroby.client.dto.ChatPreview;
 import dev.voroby.client.dto.ChatType;
+import dev.voroby.client.dto.MessageId;
 import dev.voroby.client.updates.queue.UpdatesQueues;
 import dev.voroby.springframework.telegram.client.TdApi;
 import dev.voroby.springframework.telegram.client.TelegramClient;
@@ -22,6 +23,9 @@ abstract public class AbstractUpdates {
 
     @Autowired @Lazy
     private NotifyChatPhotoCached notifyChatPhotoCached;
+
+    @Autowired @Lazy
+    private DownloadPhotoPreview downloadPhotoPreview;
 
     protected AbstractUpdates(UpdatesQueues updatesQueues, TelegramClient telegramClient) {
         this.updatesQueues = updatesQueues;
@@ -85,6 +89,16 @@ abstract public class AbstractUpdates {
                     Caches.photoIdToChatIdCache.put(file.id, chatId);
                 }
             });
+        }
+    }
+
+    void loadMessagePhotoPreviewIfExist(TdApi.Message message) {
+        if (message.content instanceof TdApi.MessagePhoto messagePhoto) {
+            Integer photoPreviewId = downloadPhotoPreview.apply(messagePhoto);
+            if (photoPreviewId != null) {
+                Caches.messageIdToPhotoPreviewIdCache.put(message.id, photoPreviewId);
+                Caches.photoPreviewIdToMessageIdCache.put(photoPreviewId, new MessageId(message.chatId, message.id));
+            }
         }
     }
 

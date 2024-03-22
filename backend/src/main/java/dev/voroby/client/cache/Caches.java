@@ -1,6 +1,7 @@
 package dev.voroby.client.cache;
 
 import dev.voroby.client.dto.ChatGroupInfo;
+import dev.voroby.client.dto.MessageId;
 import dev.voroby.springframework.telegram.client.TdApi;
 
 import java.util.Map;
@@ -27,6 +28,10 @@ public final class Caches {
     public final static Map<Integer, Long> profilePhotoIdToUserIdCache = new ConcurrentHashMap<>();
 
     public final static Map<Long, String> userIdToProfilePhotoCache = new ConcurrentHashMap<>();
+
+    public final static Map<Long, Integer> messageIdToPhotoPreviewIdCache = new ConcurrentHashMap<>();
+
+    public final static Map<Integer, MessageId> photoPreviewIdToMessageIdCache = new ConcurrentHashMap<>();
 
     private Caches() {}
 

@@ -7,6 +7,7 @@ import dev.voroby.client.dto.ChatMessage;
 import dev.voroby.client.updates.queue.UpdatesQueues;
 import dev.voroby.springframework.telegram.client.TdApi;
 import dev.voroby.springframework.telegram.client.TelegramClient;
+import lombok.SneakyThrows;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
@@ -25,13 +26,17 @@ public class ConvertToChatMessages extends AbstractUpdates implements Function<L
 
     private final GetProfilePhoto getProfilePhoto;
 
+    private final GetPhotoPreview getPhotoPreview;
+
     protected ConvertToChatMessages(UpdatesQueues updatesQueues,
                                     TelegramClient telegramClient,
                                     CurrentUserService currentUserService,
-                                    GetProfilePhoto getProfilePhoto) {
+                                    GetProfilePhoto getProfilePhoto,
+                                    GetPhotoPreview getPhotoPreview) {
         super(updatesQueues, telegramClient);
         this.currentUserService = currentUserService;
         this.getProfilePhoto = getProfilePhoto;
+        this.getPhotoPreview = getPhotoPreview;
     }
 
     @Override
@@ -41,6 +46,7 @@ public class ConvertToChatMessages extends AbstractUpdates implements Function<L
         return chatMessages;
     }
 
+    @SneakyThrows
     private ChatMessage convertToChatMessage(TdApi.Message message) {
         boolean isPrivate = !Caches.chatIdToGroupIdCache.containsKey(message.chatId);
         String messageText = Utils.getMessageText(message);
@@ -66,11 +72,23 @@ public class ConvertToChatMessages extends AbstractUpdates implements Function<L
             senderPhoto = Caches.chatIdToPhotoCache.getOrDefault(senderChat.chatId, "");
         }
 
+        String photoPreview = null;
+        if (message.content instanceof TdApi.MessagePhoto) {
+            Integer photoPreviewId = Caches.messageIdToPhotoPreviewIdCache.get(message.id);
+            photoPreview = "";
+            if (photoPreviewId != null) {
+                photoPreview = getPhotoPreview.apply(photoPreviewId);
+            } else {
+                loadMessagePhotoPreviewIfExist(message);
+            }
+        }
+
         return new ChatMessage(
                 message.id,
                 message.chatId,
                 isPrivate,
                 messageText,
+                photoPreview,
                 dateStr,
                 editDateStr,
                 senderInfo,

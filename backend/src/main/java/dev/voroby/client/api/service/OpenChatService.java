@@ -1,6 +1,7 @@
 package dev.voroby.client.api.service;
 
 import dev.voroby.client.api.OpenChat;
+import dev.voroby.client.cache.Caches;
 import dev.voroby.springframework.telegram.client.TdApi;
 import dev.voroby.springframework.telegram.client.TelegramClient;
 import jakarta.annotation.PreDestroy;
@@ -126,6 +127,8 @@ public class OpenChatService implements Consumer<Long> {
             incomingChatMessages.clear();
             updatedChatMessages.clear();
             deletedMsgIds.clear();
+            Caches.photoPreviewIdToMessageIdCache.clear();
+            Caches.messageIdToPhotoPreviewIdCache.clear();
             log.info("Chat closed: [chatId: {}]", chatId);
         }
     }

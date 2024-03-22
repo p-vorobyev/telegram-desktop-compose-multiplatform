@@ -36,7 +36,9 @@ public class GetChatHistory extends AbstractUpdates implements Function<ChatHist
             }
             List<TdApi.Message> messagesBatch = new ArrayList<>();
             for (int i = messages.messages.length - 1; i >= 0; i--) {
-                messagesBatch.add(messages.messages[i]);
+                TdApi.Message message = messages.messages[i];
+                loadMessagePhotoPreviewIfExist(message);
+                messagesBatch.add(message);
             }
             messageList.addAll(0, messagesBatch);
         } while (messageList.size() < 100);

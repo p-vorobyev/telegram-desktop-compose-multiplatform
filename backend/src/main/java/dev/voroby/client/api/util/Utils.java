@@ -16,20 +16,33 @@ public class Utils {
     public static String getMessageText(TdApi.Message message) {
         if (message == null) return "";
         TdApi.MessageContent content = message.content;
-        String msgText = MESSAGE_DISCLAIMER;
+        String msgText;
         switch (content.getConstructor()) {
             case TdApi.MessageText.CONSTRUCTOR -> msgText = ((TdApi.MessageText) content).text.text;
             case TdApi.MessagePhoto.CONSTRUCTOR -> msgText = ((TdApi.MessagePhoto) content).caption.text;
-            case TdApi.MessageVideo.CONSTRUCTOR -> msgText = ((TdApi.MessageVideo) content).caption.text;
-            case TdApi.MessageAnimation.CONSTRUCTOR -> msgText = ((TdApi.MessageAnimation) content).caption.text;
-            case TdApi.MessageDocument.CONSTRUCTOR -> msgText = ((TdApi.MessageDocument) content).caption.text;
-            default -> {}
-        }
-        if (msgText.isBlank()) {
-            msgText = MESSAGE_DISCLAIMER;
+            case TdApi.MessageVideo.CONSTRUCTOR -> {
+                msgText = ((TdApi.MessageVideo) content).caption.text;
+                msgText = checkForDisclaimer(msgText);
+            }
+            case TdApi.MessageAnimation.CONSTRUCTOR -> {
+                msgText = ((TdApi.MessageAnimation) content).caption.text;
+                msgText = checkForDisclaimer(msgText);
+            }
+            case TdApi.MessageDocument.CONSTRUCTOR -> {
+                msgText = ((TdApi.MessageDocument) content).caption.text;
+                msgText = checkForDisclaimer(msgText);
+            }
+            default -> msgText = MESSAGE_DISCLAIMER;
         }
 
         return msgText.trim();
+    }
+
+    private static String checkForDisclaimer(String msgText) {
+        if (msgText.isBlank()) {
+            msgText = MESSAGE_DISCLAIMER;
+        }
+        return msgText;
     }
 
     public static long mainChatListPositionOrder(TdApi.ChatPosition[] positions) {

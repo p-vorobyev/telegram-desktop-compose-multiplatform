@@ -5,6 +5,7 @@ public record ChatMessage(
         long chatId,
         boolean privateChat,
         String messageText,
+        String photoPreview,
         String date,
         String editDate,
         String senderInfo,
