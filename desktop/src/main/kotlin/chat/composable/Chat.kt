@@ -5,8 +5,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Card
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -20,6 +18,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import chat.api.*
 import chat.dto.ChatMessage
+import common.Resources
 import common.composable.ChatIcon
 import common.composable.CommonSelectionContainer
 import common.composable.ScrollButton
@@ -28,22 +27,12 @@ import common.state.ClientStates
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.jetbrains.skia.Codec
+import org.jetbrains.skia.Data
 import terminatingApp
+import java.io.File
+import java.nio.file.Files
 import java.util.concurrent.locks.ReentrantLock
-
-
-@Composable
-fun SelectChatOffer() {
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Card(backgroundColor = Color.White, shape = RoundedCornerShape(12.dp)) {
-            Text("Select chat to start messaging", modifier = Modifier.padding(12.dp))
-        }
-    }
-}
 
 
 // lock to separate initial load operation and an updates for chat (when open new chat we need to avoid updates from previous window)
@@ -111,15 +100,25 @@ fun ChatWindow(chatId: Long,
             val messageCardColor = Color(0xFFF7F4F4)
             val selectionColor = Color(0xFF95C2F0)
 
+            val contentLoaderCodec: Codec = contentLoaderCodec()
+
             items(clientStates.chatHistory) { message ->
 
                 Row(modifier = Modifier.fillMaxWidth())  {
+                    //Adds items to the hierarchy of context menu items
                     ContextMenuDataProvider(items = { messageContextMenuItems(message, chatListUpdateScope) }) {
                         ChatIcon(encodedChatPhoto = message.senderPhoto, chatTitle = message.senderInfo, circleSize = 44.dp)
                         Spacer(Modifier.width(4.dp))
-                        //to enable text selection
-                        CommonSelectionContainer {
-                            MessageContent(message, messageCardColor, selectionColor)
+                        Column {
+                            Text(text = message.senderInfo, fontWeight = FontWeight.Bold, fontSize = 12.sp, color = selectionColor)
+                            Spacer(Modifier.height(4.dp))
+                            message.photoPreview?.let {
+                                MessagePhoto(it, contentLoaderCodec)
+                            }
+                            //to enable text selection
+                            CommonSelectionContainer {
+                                MessageTextCard(message, messageCardColor)
+                            }
                         }
                     }
                 }
@@ -168,29 +167,6 @@ fun ChatWindow(chatId: Long,
 }
 
 
-@Composable
-fun MessageContent(
-    message: ChatMessage,
-    messageCardColor: Color,
-    selectionColor: Color
-) {
-    Card(shape = RoundedCornerShape(12.dp), backgroundColor = messageCardColor) {
-        Column(modifier = Modifier.padding(4.dp)) {
-            Text(text = message.senderInfo, fontWeight = FontWeight.Bold, fontSize = 12.sp, color = selectionColor)
-            Spacer(Modifier.height(4.dp))
-            Text(text = message.messageText, fontSize = 14.sp)
-            Spacer(Modifier.height(4.dp))
-            Text(
-                text = if (message.editDate.isNotEmpty()) "edited ${message.editDate}" else message.date,
-                fontSize = 10.sp,
-                color = Color.Gray,
-                modifier = Modifier.align(Alignment.End)
-            )
-        }
-    }
-}
-
-
 private fun messageContextMenuItems(message: ChatMessage,
                                     chatListUpdateScope: CoroutineScope
 ): List<ContextMenuItem> {
@@ -203,4 +179,12 @@ private fun messageContextMenuItems(message: ChatMessage,
         })
     }
     return items
+}
+
+
+private fun contentLoaderCodec(): Codec {
+    val loaderFile = Resources.resolve("content_loader.gif")
+    val loaderGifBytes: ByteArray = Files.readAllBytes(loaderFile.toPath())
+    val codec: Codec = Codec.makeFromData(Data.makeFromBytes(loaderGifBytes))
+    return codec
 }

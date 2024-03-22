@@ -68,11 +68,13 @@ suspend fun preloadChatHistory(chatId: Long,
                                clientStates: ClientStates,
                                chatHistoryListState: LazyListState
 ) {
-    val messageId = clientStates.chatHistory[0].id
-    val newChatHistory: List<ChatMessage> = loadChatHistory(ChatHistoryRequest(chatId = chatId, fromMessageId = messageId))
-    if (newChatHistory.isEmpty()) {
-        fullHistoryLoaded.value = true
+    if (clientStates.chatHistory.isNotEmpty()) {
+        val messageId = clientStates.chatHistory[0].id
+        val newChatHistory: List<ChatMessage> = loadChatHistory(ChatHistoryRequest(chatId = chatId, fromMessageId = messageId))
+        if (newChatHistory.isEmpty()) {
+            fullHistoryLoaded.value = true
+        }
+        clientStates.chatHistory.addAll(0, newChatHistory)
+        chatHistoryListState.scrollToItem(newChatHistory.size)
     }
-    clientStates.chatHistory.addAll(0, newChatHistory)
-    chatHistoryListState.scrollToItem(newChatHistory.size)
 }

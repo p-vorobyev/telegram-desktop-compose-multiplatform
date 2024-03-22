@@ -10,6 +10,7 @@ import auth.api.waitCode
 import auth.api.waitPass
 import auth.composable.AuthForm
 import auth.composable.AuthType
+import common.Resources
 import io.ktor.client.request.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -17,7 +18,6 @@ import scene.composable.InitialLoad
 import transport.baseUrl
 import transport.clientUri
 import transport.httpClient
-import java.io.File
 import java.util.*
 import java.util.concurrent.atomic.AtomicBoolean
 
@@ -61,11 +61,10 @@ fun App() {
 
 
 suspend fun startBackend(backendStarted: MutableState<Boolean>) {
-    val resourcesDirectory = File(System.getProperty("compose.application.resources.dir"))
     val os: String = System.getProperty("os.name")
 
-    val nativeLibPath = resourcesDirectory.absolutePath
-    val backendJar = resourcesDirectory.resolve("backend-0.0.1.jar").absolutePath
+    val nativeLibPath = Resources.resourcesDirectory().absolutePath
+    val backendJar = Resources.resolve("backend-0.0.1.jar").absolutePath
     val backendExecCommand = if (os.lowercase(Locale.getDefault()).startsWith("windows")) {
         "javaw -Xms64m -Xmx256m -Djava.library.path=$nativeLibPath -jar $backendJar"
     } else {
