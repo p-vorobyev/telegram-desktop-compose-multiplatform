@@ -6,7 +6,7 @@ import dev.voroby.client.dto.ChatPhotoFile;
 import dev.voroby.client.dto.ChatPreview;
 import dev.voroby.client.dto.ChatType;
 import dev.voroby.client.dto.MessageId;
-import dev.voroby.client.updates.queue.UpdatesQueues;
+import dev.voroby.client.tdlib.queue.UpdatesQueues;
 import dev.voroby.springframework.telegram.client.TdApi;
 import dev.voroby.springframework.telegram.client.TelegramClient;
 import org.springframework.beans.factory.annotation.Autowired;

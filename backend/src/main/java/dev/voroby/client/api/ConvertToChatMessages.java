@@ -4,7 +4,7 @@ import dev.voroby.client.service.CurrentUserService;
 import dev.voroby.client.api.util.Utils;
 import dev.voroby.client.cache.Caches;
 import dev.voroby.client.dto.ChatMessage;
-import dev.voroby.client.updates.queue.UpdatesQueues;
+import dev.voroby.client.tdlib.queue.UpdatesQueues;
 import dev.voroby.springframework.telegram.client.TdApi;
 import dev.voroby.springframework.telegram.client.TelegramClient;
 import lombok.SneakyThrows;

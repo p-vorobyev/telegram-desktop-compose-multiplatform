@@ -1,4 +1,4 @@
-package dev.voroby.client.updates;
+package dev.voroby.client.tdlib;
 
 import dev.voroby.client.api.util.Utils;
 import dev.voroby.client.cache.Caches;

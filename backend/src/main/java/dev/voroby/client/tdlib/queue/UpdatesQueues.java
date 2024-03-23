@@ -1,4 +1,4 @@
-package dev.voroby.client.updates.queue;
+package dev.voroby.client.tdlib.queue;
 
 import dev.voroby.springframework.telegram.client.TdApi;
 import org.springframework.stereotype.Component;

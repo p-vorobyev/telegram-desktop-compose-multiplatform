@@ -1,7 +1,7 @@
 package dev.voroby.client.api;
 
 import dev.voroby.client.dto.ChatHistoryRequest;
-import dev.voroby.client.updates.queue.UpdatesQueues;
+import dev.voroby.client.tdlib.queue.UpdatesQueues;
 import dev.voroby.springframework.telegram.client.TdApi;
 import dev.voroby.springframework.telegram.client.TelegramClient;
 import lombok.extern.slf4j.Slf4j;

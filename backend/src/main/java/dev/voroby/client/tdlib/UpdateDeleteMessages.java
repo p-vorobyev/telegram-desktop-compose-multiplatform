@@ -1,4 +1,4 @@
-package dev.voroby.client.updates;
+package dev.voroby.client.tdlib;
 
 import dev.voroby.client.service.OpenChatService;
 import dev.voroby.springframework.telegram.client.TdApi;

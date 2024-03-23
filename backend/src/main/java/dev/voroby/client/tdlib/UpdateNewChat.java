@@ -1,8 +1,8 @@
-package dev.voroby.client.updates;
+package dev.voroby.client.tdlib;
 
 import dev.voroby.client.cache.Caches;
 import dev.voroby.client.dto.ChatGroupInfo;
-import dev.voroby.client.updates.queue.UpdatesQueues;
+import dev.voroby.client.tdlib.queue.UpdatesQueues;
 import dev.voroby.springframework.telegram.client.TdApi;
 import dev.voroby.springframework.telegram.client.updates.UpdateNotificationListener;
 import org.springframework.stereotype.Service;
