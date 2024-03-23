@@ -8,8 +8,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.concurrent.atomic.AtomicLong;
 
 public final class Caches {
+
+    public final static AtomicLong requestsCount = new AtomicLong();
 
     public final static Set<Long> mainListChatIds = new CopyOnWriteArraySet<>();
 

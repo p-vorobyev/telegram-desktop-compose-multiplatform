@@ -3,7 +3,6 @@ package dev.voroby.client.web;
 import dev.voroby.client.api.LoadChats;
 import dev.voroby.client.api.service.GetSidebarUpdates;
 import dev.voroby.client.dto.ChatPreview;
-import dev.voroby.springframework.telegram.client.TelegramClient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
@@ -26,9 +25,6 @@ public class ClientController {
 
     @Autowired
     private LoadChats loadChats;
-
-    @Autowired
-    private TelegramClient telegramClient;
 
     @Autowired
     private GetSidebarUpdates getSidebarUpdates;
