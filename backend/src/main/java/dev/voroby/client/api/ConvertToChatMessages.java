@@ -1,6 +1,6 @@
 package dev.voroby.client.api;
 
-import dev.voroby.client.api.service.CurrentUserService;
+import dev.voroby.client.service.CurrentUserService;
 import dev.voroby.client.api.util.Utils;
 import dev.voroby.client.cache.Caches;
 import dev.voroby.client.dto.ChatMessage;

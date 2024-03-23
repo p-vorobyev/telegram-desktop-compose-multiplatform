@@ -1,4 +1,4 @@
-package dev.voroby.client.api.service;
+package dev.voroby.client.service;
 
 import dev.voroby.client.api.GetCurrentUser;
 import dev.voroby.springframework.telegram.client.TdApi;

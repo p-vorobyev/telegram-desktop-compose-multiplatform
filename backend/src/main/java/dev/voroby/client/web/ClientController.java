@@ -1,7 +1,7 @@
 package dev.voroby.client.web;
 
 import dev.voroby.client.api.LoadChats;
-import dev.voroby.client.api.service.GetSidebarUpdates;
+import dev.voroby.client.service.GetSidebarUpdates;
 import dev.voroby.client.dto.ChatPreview;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

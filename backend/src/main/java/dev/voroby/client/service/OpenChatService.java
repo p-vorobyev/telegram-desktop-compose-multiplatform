@@ -1,4 +1,4 @@
-package dev.voroby.client.api.service;
+package dev.voroby.client.service;
 
 import dev.voroby.client.api.OpenChat;
 import dev.voroby.client.cache.Caches;

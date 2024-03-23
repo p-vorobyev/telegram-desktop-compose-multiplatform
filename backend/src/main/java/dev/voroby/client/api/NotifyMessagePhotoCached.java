@@ -1,6 +1,6 @@
 package dev.voroby.client.api;
 
-import dev.voroby.client.api.service.OpenChatService;
+import dev.voroby.client.service.OpenChatService;
 import dev.voroby.client.dto.MessageId;
 import dev.voroby.springframework.telegram.client.TdApi;
 import dev.voroby.springframework.telegram.client.TelegramClient;

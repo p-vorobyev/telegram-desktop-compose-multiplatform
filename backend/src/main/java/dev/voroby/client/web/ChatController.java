@@ -1,7 +1,7 @@
 package dev.voroby.client.web;
 
 import dev.voroby.client.api.*;
-import dev.voroby.client.api.service.OpenChatService;
+import dev.voroby.client.service.OpenChatService;
 import dev.voroby.client.dto.ChatHistoryRequest;
 import dev.voroby.client.dto.ChatMessage;
 import dev.voroby.client.dto.DeleteMessagesDto;
