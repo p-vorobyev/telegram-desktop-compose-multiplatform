@@ -24,6 +24,8 @@ public class TerminationCheckScheduler {
 
     private final AtomicLong requestCountCheckPoint = new AtomicLong();
 
+    private final AtomicLong awaitCount = new AtomicLong();
+
     public TerminationCheckScheduler(ClientAuthorizationState authorizationState,
                                      ApplicationContext ctx,
                                      LoadChats loadChats) {
@@ -33,13 +35,16 @@ public class TerminationCheckScheduler {
     }
 
     @SneakyThrows
-    @Scheduled(initialDelay = 10, fixedDelay = 5, timeUnit = TimeUnit.SECONDS)
+    @Scheduled(fixedDelay = 5, timeUnit = TimeUnit.SECONDS)
     void checkForTermination() {
         if (authorizationState.haveAuthorization() && loadChats.chatsLoaded()) {
             if (Caches.requestsCount.get() == requestCountCheckPoint.get()) {
-                CompletableFuture.runAsync(() -> SpringApplication.exit(ctx, () -> 0));
+                if (awaitCount.incrementAndGet() > 3) {
+                    CompletableFuture.runAsync(() -> SpringApplication.exit(ctx, () -> 0));
+                }
             } else {
                 requestCountCheckPoint.set(Caches.requestsCount.get());
+                awaitCount.set(0);
             }
         }
     }
