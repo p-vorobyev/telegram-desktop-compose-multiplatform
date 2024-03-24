@@ -20,14 +20,15 @@ public class GetChatHistory extends AbstractUpdates implements Function<ChatHist
 
     @Override
     public List<TdApi.Message> apply(ChatHistoryRequest chatHistoryRequest) {
+        int pageSizeLimit = 50;
         List<TdApi.Message> messageList = new ArrayList<>();
         long fromMsgId = chatHistoryRequest.fromMessageId();
         do {
-            int limit = 100 - messageList.size();
+            int queryLimit = pageSizeLimit - messageList.size();
             if (!messageList.isEmpty()) {
                 fromMsgId = messageList.get(0).id;
             }
-            var getChatHistory = new TdApi.GetChatHistory(chatHistoryRequest.chatId(), fromMsgId, chatHistoryRequest.offset(), limit, false);
+            var getChatHistory = new TdApi.GetChatHistory(chatHistoryRequest.chatId(), fromMsgId, chatHistoryRequest.offset(), queryLimit, false);
             TdApi.Messages messages = telegramClient.sendSync(getChatHistory);
             log.info("Load chat history [chatId: {}, fromMsgId: {}, offset: {}]",
                     chatHistoryRequest.chatId(), fromMsgId, chatHistoryRequest.offset());
@@ -41,7 +42,7 @@ public class GetChatHistory extends AbstractUpdates implements Function<ChatHist
                 messagesBatch.add(message);
             }
             messageList.addAll(0, messagesBatch);
-        } while (messageList.size() < 100);
+        } while (messageList.size() < pageSizeLimit);
 
         return messageList;
     }
