@@ -77,6 +77,23 @@ suspend fun startBackend() {
     delay(2000)
 }
 
+
+private suspend fun awaitReadiness(backendStarted: MutableState<Boolean>) {
+    var status: Status? = null
+    var startUpReadinessCheckCount = 0
+    do {
+        try {
+            status = authorizationStatus()
+            backendStarted.value = true
+        } catch (ex: IOException) {
+            /*igonre*/
+        }
+        delay(1000)
+        startUpReadinessCheckCount++
+    } while (status == null && startUpReadinessCheckCount <= 20)
+}
+
+
 fun main() = application {
 
     val backendStarted = remember { mutableStateOf(false) }
@@ -85,18 +102,7 @@ fun main() = application {
 
     appScope.launch {
         startBackend()
-        var status: Status? = null
-        var startUpReadinessCheckCount = 0
-        do {
-            try {
-                status = authorizationStatus()
-                backendStarted.value = true
-            } catch (ex: IOException) {
-                /*igonre*/
-            }
-            delay(1000)
-            startUpReadinessCheckCount++
-        } while (status == null && startUpReadinessCheckCount <= 20)
+        awaitReadiness(backendStarted)
     }
 
     Window(
