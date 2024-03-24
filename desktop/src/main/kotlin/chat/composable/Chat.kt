@@ -30,7 +30,6 @@ import kotlinx.coroutines.launch
 import org.jetbrains.skia.Codec
 import org.jetbrains.skia.Data
 import terminatingApp
-import java.io.File
 import java.nio.file.Files
 import java.util.concurrent.locks.ReentrantLock
 
@@ -96,35 +95,36 @@ fun ChatWindow(chatId: Long,
     }
 
     Box {
-        LazyColumn(modifier = Modifier.background(Color.White).fillMaxSize().padding(start = 5.dp, end = 12.dp), verticalArrangement = Arrangement.Bottom, state = chatHistoryListState) {
-            val messageCardColor = Color(0xFFF7F4F4)
-            val selectionColor = Color(0xFF95C2F0)
+        if (openedId.value == chatId) {
+            LazyColumn(modifier = Modifier.background(Color.White).fillMaxSize().padding(start = 5.dp, end = 12.dp), verticalArrangement = Arrangement.Bottom, state = chatHistoryListState) {
+                val messageCardColor = Color(0xFFF7F4F4)
+                val headerColor = Color(0xFF95C2F0)
 
-            val contentLoaderCodec: Codec = contentLoaderCodec()
+                val contentLoaderCodec: Codec = contentLoaderCodec()
 
-            items(clientStates.chatHistory) { message ->
+                items(clientStates.chatHistory, key = {it.id}) { message ->
 
-                Row(modifier = Modifier.fillMaxWidth())  {
-                    //Adds items to the hierarchy of context menu items
-                    ContextMenuDataProvider(items = { messageContextMenuItems(message, chatListUpdateScope) }) {
-                        ChatIcon(encodedChatPhoto = message.senderPhoto, chatTitle = message.senderInfo, circleSize = 44.dp)
-                        Spacer(Modifier.width(4.dp))
-                        Column {
-                            Text(text = message.senderInfo, fontWeight = FontWeight.Bold, fontSize = 12.sp, color = selectionColor)
-                            Spacer(Modifier.height(4.dp))
-                            message.photoPreview?.let {
-                                MessagePhoto(it, contentLoaderCodec)
-                            }
-                            //to enable text selection
+                    Row(modifier = Modifier.fillMaxWidth())  {
+                        //Adds items to the hierarchy of context menu items
+                        ContextMenuDataProvider(items = { messageContextMenuItems(message, chatListUpdateScope) }) {
+                            ChatIcon(encodedChatPhoto = message.senderPhoto, chatTitle = message.senderInfo, circleSize = 44.dp)
+                            Spacer(Modifier.width(4.dp))
                             CommonSelectionContainer {
-                                MessageTextCard(message, messageCardColor)
+                                Column {
+                                    Text(text = message.senderInfo, fontWeight = FontWeight.Bold, fontSize = 12.sp, color = headerColor)
+                                    Spacer(Modifier.height(4.dp))
+                                    message.photoPreview?.let {
+                                        MessagePhoto(it, contentLoaderCodec)
+                                    }
+                                    MessageTextCard(message, messageCardColor)
+                                }
                             }
                         }
                     }
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
                 }
-
-                Spacer(modifier = Modifier.height(12.dp))
-
             }
         }
 
