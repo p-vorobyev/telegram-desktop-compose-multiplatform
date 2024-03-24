@@ -10,12 +10,12 @@ import androidx.compose.ui.Modifier
 
 
 @Composable
-fun ChatsLoadingDisclaimer() {
+fun LoadingDisclaimer(disclaimer: String) {
     Column(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.fillMaxSize()
     ) {
-        Text("Loading chats...")
+        Text(disclaimer)
     }
 }

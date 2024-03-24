@@ -15,9 +15,11 @@ import io.ktor.client.request.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import scene.composable.InitialLoad
+import scene.composable.LoadingDisclaimer
 import transport.baseUrl
 import transport.clientUri
 import transport.httpClient
+import java.io.IOException
 import java.util.*
 import java.util.concurrent.atomic.AtomicBoolean
 
@@ -60,7 +62,7 @@ fun App() {
 }
 
 
-suspend fun startBackend(backendStarted: MutableState<Boolean>) {
+suspend fun startBackend() {
     val os: String = System.getProperty("os.name")
 
     val nativeLibPath = Resources.resourcesDirectory().absolutePath
@@ -71,11 +73,8 @@ suspend fun startBackend(backendStarted: MutableState<Boolean>) {
         "nohup java -Xms64m -Xmx256m -Djava.library.path=$nativeLibPath -jar $backendJar >/dev/null 2>&1 &"
     }
 
-    if (!backendStarted.value) {
-        Runtime.getRuntime().exec(backendExecCommand)
-        delay(3000)
-        backendStarted.value = true
-    }
+    Runtime.getRuntime().exec(backendExecCommand)
+    delay(2000)
 }
 
 fun main() = application {
@@ -84,26 +83,40 @@ fun main() = application {
 
     val appScope = rememberCoroutineScope()
 
-    LaunchedEffect(Unit) {
-        startBackend(backendStarted)
+    appScope.launch {
+        startBackend()
+        var status: Status? = null
+        var startUpReadinessCheckCount = 0
+        do {
+            try {
+                status = authorizationStatus()
+                backendStarted.value = true
+            } catch (ex: IOException) {
+                /*igonre*/
+            }
+            delay(1000)
+            startUpReadinessCheckCount++
+        } while (status == null && startUpReadinessCheckCount <= 20)
     }
 
-    if (backendStarted.value) {
-        Window(
-            title = "Telegram Compose Multiplatform",
-            state = WindowState(width = 1200.dp, height = 800.dp),
-            onCloseRequest = {
-                terminatingApp.set(true)
-                appScope.launch {
-                    delay(300)
-                    httpClient.post("${baseUrl}/${clientUri}/shutdown")
-                }.invokeOnCompletion {
-                    exitApplication()
-                    httpClient.close()
-                }
+    Window(
+        title = "Telegram Compose Multiplatform",
+        state = WindowState(width = 1200.dp, height = 800.dp),
+        onCloseRequest = {
+            terminatingApp.set(true)
+            appScope.launch {
+                delay(300)
+                httpClient.post("${baseUrl}/${clientUri}/shutdown")
+            }.invokeOnCompletion {
+                exitApplication()
+                httpClient.close()
             }
-        ) {
+        }
+    ) {
+        if (backendStarted.value) {
             App()
+        } else {
+            LoadingDisclaimer("Starting...")
         }
     }
 

@@ -46,7 +46,7 @@ fun InitialLoad() {
 
     clientStates.chatPreviews = chatPreviews
     if (!initChatsCompleted) {
-        ChatsLoadingDisclaimer()
+        LoadingDisclaimer("Loading chats...")
     } else {
         MainScene(clientStates)
     }
