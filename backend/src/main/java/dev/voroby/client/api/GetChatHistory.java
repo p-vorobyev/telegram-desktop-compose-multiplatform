@@ -20,7 +20,7 @@ public class GetChatHistory extends AbstractUpdates implements Function<ChatHist
 
     @Override
     public List<TdApi.Message> apply(ChatHistoryRequest chatHistoryRequest) {
-        int pageSizeLimit = 50;
+        int pageSizeLimit = 30;
         List<TdApi.Message> messageList = new ArrayList<>();
         long fromMsgId = chatHistoryRequest.fromMessageId();
         do {
