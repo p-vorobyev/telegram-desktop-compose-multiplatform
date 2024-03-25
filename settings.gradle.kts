@@ -10,4 +10,6 @@ pluginManagement {
     }
 }
 
-rootProject.name = "desktop"
+rootProject.name = "root"
+include("desktop")
+include("backend")
