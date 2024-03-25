@@ -74,7 +74,7 @@ suspend fun startBackend() {
     }
 
     Runtime.getRuntime().exec(backendExecCommand)
-    delay(2000)
+    delay(1000)
 }
 
 
@@ -91,6 +91,9 @@ private suspend fun awaitReadiness(backendStarted: MutableState<Boolean>) {
         delay(1000)
         startUpReadinessCheckCount++
     } while (status == null && startUpReadinessCheckCount <= 20)
+    if (!backendStarted.value) {
+        throw RuntimeException("Backend is not started. Check log file.")
+    }
 }
 
 
