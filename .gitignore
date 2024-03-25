@@ -4,6 +4,6 @@
 **/build
 **/target
 **/database
-**/*.jar
+desktop/resources/**/*.jar
 **/*.log
 **/*.out
