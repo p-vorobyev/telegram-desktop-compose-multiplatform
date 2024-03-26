@@ -22,7 +22,7 @@ repositories {
     maven {
         url = uri("https://maven.pkg.github.com/p-vorobyev/*")
         credentials {
-            username = "p-vorobyev"
+            username = System.getenv("GIT_HUB_LOGIN")
             password = System.getenv("GIT_HUB_TOKEN")
         }
     }

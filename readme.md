@@ -43,8 +43,22 @@ Windows (x64)
 ```shell
 git clone https://github.com/p-vorobyev/telegram-desktop-compose-multiplatform.git
 ```
+2) Specify environment variables(`GIT_HUB_LOGIN`, `GIT_HUB_TOKEN`) with your GitHub credentials or write them directly to
+`backend/build.gradle.kts` file. We need them to download some dependencies from GitHub packages.
+```kotlin
+repositories {
+    mavenCentral()
+    maven {
+        url = uri("https://maven.pkg.github.com/p-vorobyev/*")
+        credentials {
+            username = System.getenv("GIT_HUB_LOGIN")
+            password = System.getenv("GIT_HUB_TOKEN")
+        }
+    }
+}
+```
 
-2) Go to directory `backend/src/main/resources` and fill in the `application.properties` with your Telegram credentials:
+3) Go to directory `backend/src/main/resources` and fill in the `application.properties` with your Telegram credentials:
 ```shell
 spring.telegram.client.api-id=
 spring.telegram.client.api-hash=
@@ -53,7 +67,7 @@ spring.telegram.client.database-encryption-key=
 spring.telegram.client.database-directory=<directory_for_telegram_data>
 ```
 
-3) Run the build script in the project root directory:
+4) Run the build script in the project root directory:
 ```shell
 ./build.sh
 ```
