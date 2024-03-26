@@ -15,14 +15,14 @@ val httpClient = HttpClient(CIO) {
         jackson ()
     }
     engine {
-        requestTimeout = 90000
+        requestTimeout = 60000
         https {
             trustManager = TrustAllManager()
         }
     }
 }
 
-const val baseUrl = "http://localhost:8080"
+const val baseUrl = "http://localhost:5050"
 
 const val clientUri = "client"
 
