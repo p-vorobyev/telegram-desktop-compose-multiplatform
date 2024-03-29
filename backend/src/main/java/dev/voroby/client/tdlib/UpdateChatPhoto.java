@@ -18,10 +18,12 @@ public class UpdateChatPhoto implements UpdateNotificationListener<TdApi.UpdateC
     @Override
     public void handleNotification(TdApi.UpdateChatPhoto updateChatPhoto) {
         TdApi.Chat chat = Caches.initialChatCache.get(updateChatPhoto.chatId);
-        synchronized (chat) {
-            chat.photo = updateChatPhoto.photo;
+        if (chat != null) {
+            synchronized (chat) {
+                chat.photo = updateChatPhoto.photo;
+            }
+            updatesQueues.addIncomingSidebarUpdate(updateChatPhoto);
         }
-        updatesQueues.addIncomingSidebarUpdate(updateChatPhoto);
     }
 
     @Override
