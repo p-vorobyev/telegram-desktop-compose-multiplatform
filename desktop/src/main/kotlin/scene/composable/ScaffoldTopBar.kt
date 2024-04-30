@@ -40,7 +40,6 @@ fun ScaffoldTopBar(
                             value = chatSearchInput.value,
                             onValueChange = { chatSearchInput.value = it },
                             shape = MaterialTheme.shapes.medium,
-                            placeholder = { Text("Search") },
                             modifier = Modifier.fillMaxWidth().padding(start = 5.dp, end = 5.dp),
                             colors = TextFieldDefaults.outlinedTextFieldColors(
                                 focusedBorderColor = blueColor

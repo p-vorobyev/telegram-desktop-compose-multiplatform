@@ -14,6 +14,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import chat.dto.ChatMessage
+import common.composable.CommonSelectionContainer
 
 
 @Composable
@@ -24,7 +25,9 @@ fun MessageTextCard(
     Card(shape = RoundedCornerShape(12.dp), backgroundColor = messageCardColor) {
         Column(modifier = Modifier.padding(4.dp)) {
             if (message.messageText.isNotBlank()) {
-                Text(text = message.messageText, fontSize = 14.sp)
+                CommonSelectionContainer {
+                    Text(text = message.messageText, fontSize = 14.sp)
+                }
                 Spacer(Modifier.height(4.dp))
             }
             Text(

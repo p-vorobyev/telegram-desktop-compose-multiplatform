@@ -12,8 +12,7 @@ import auth.composable.AuthForm
 import auth.composable.AuthType
 import common.Resources
 import io.ktor.client.request.*
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import scene.composable.InitialLoad
 import scene.composable.LoadingDisclaimer
 import transport.baseUrl
@@ -62,7 +61,7 @@ fun App() {
 }
 
 
-suspend fun startBackend() {
+suspend fun startBackend() = withContext(Dispatchers.IO) {
     val os: String = System.getProperty("os.name")
 
     val nativeLibPath = Resources.resourcesDirectory().absolutePath

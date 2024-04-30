@@ -20,7 +20,6 @@ import chat.api.*
 import chat.dto.ChatMessage
 import common.Resources
 import common.composable.ChatIcon
-import common.composable.CommonSelectionContainer
 import common.composable.ScrollButton
 import common.composable.ScrollDirection
 import common.state.ClientStates
@@ -104,20 +103,18 @@ fun ChatWindow(chatId: Long,
 
                 items(clientStates.chatHistory, key = {it.id}) { message ->
 
-                    Row(modifier = Modifier.fillMaxWidth())  {
-                        //Adds items to the hierarchy of context menu items
-                        ContextMenuDataProvider(items = { messageContextMenuItems(message, chatListUpdateScope) }) {
+                    ContextMenuArea(items = { messageContextMenuItems(message, chatListUpdateScope) } ) {
+                        Row(modifier = Modifier.fillMaxWidth())  {
+                            //Adds items to the hierarchy of context menu items
                             ChatIcon(encodedChatPhoto = message.senderPhoto, chatTitle = message.senderInfo, circleSize = 44.dp)
                             Spacer(Modifier.width(4.dp))
-                            CommonSelectionContainer {
-                                Column {
-                                    Text(text = message.senderInfo, fontWeight = FontWeight.Bold, fontSize = 12.sp, color = headerColor)
-                                    Spacer(Modifier.height(4.dp))
-                                    message.photoPreview?.let {
-                                        MessagePhoto(it, contentLoaderCodec)
-                                    }
-                                    MessageTextCard(message, messageCardColor)
+                            Column {
+                                Text(text = message.senderInfo, fontWeight = FontWeight.Bold, fontSize = 12.sp, color = headerColor)
+                                Spacer(Modifier.height(4.dp))
+                                message.photoPreview?.let {
+                                    MessagePhoto(it, contentLoaderCodec)
                                 }
+                                MessageTextCard(message, messageCardColor)
                             }
                         }
                     }

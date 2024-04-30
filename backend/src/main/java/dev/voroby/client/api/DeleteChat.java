@@ -9,6 +9,8 @@ import org.springframework.stereotype.Component;
 
 import java.util.function.Consumer;
 
+import static dev.voroby.client.api.util.Utils.objectOrThrow;
+
 @Component @Slf4j
 public class DeleteChat implements Consumer<Long> {
 
@@ -22,19 +24,22 @@ public class DeleteChat implements Consumer<Long> {
     public void accept(Long chatId) {
         telegramClient.sendAsync(new TdApi.GetChat(chatId))
                 .thenAccept(chat -> {
-                    TdApi.ChatType type = chat.type;
-                    QueryResultHandler<TdApi.Ok> okQueryResultHandler = (obj, error) -> {
-                        if (error == null) {
-                            log.info("Delete chat: [chatId: {}]", chatId);
-                        } else {
-                            Utils.logError(error);
-                        }
-                    };
+                    TdApi.ChatType type = objectOrThrow(chat).type;
                     if (type instanceof TdApi.ChatTypePrivate || type instanceof TdApi.ChatTypeSecret) {
-                        telegramClient.sendWithCallback(new TdApi.DeleteChat(chatId), okQueryResultHandler);
+                        telegramClient.sendWithCallback(new TdApi.DeleteChat(chatId), deleteChatHandler(chatId));
                     } else {
-                        telegramClient.sendWithCallback(new TdApi.LeaveChat(chatId), okQueryResultHandler);
+                        telegramClient.sendWithCallback(new TdApi.LeaveChat(chatId), deleteChatHandler(chatId));
                     }
                 });
+    }
+
+    private QueryResultHandler<TdApi.Ok> deleteChatHandler(Long chatId) {
+        return (obj, error) -> {
+            if (error == null) {
+                log.info("Chat deleted: [chatId: {}]", chatId);
+            } else {
+                Utils.logError(error);
+            }
+        };
     }
 }

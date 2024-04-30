@@ -1,6 +1,8 @@
 package dev.voroby.client.api.util;
 
 import dev.voroby.springframework.telegram.client.TdApi;
+import dev.voroby.springframework.telegram.client.templates.response.Response;
+import dev.voroby.springframework.telegram.exception.TelegramClientTdApiException;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
@@ -59,10 +61,18 @@ public class Utils {
         log.error(errorLogString);
     }
 
-    @SneakyThrows()
+    @SneakyThrows
     public static String fileBase64Encode(String path) {
         byte[] bytes = Files.readAllBytes(Path.of(path));
         return Base64.getEncoder().encodeToString(bytes);
+    }
+
+    public static <T extends TdApi.Object> T objectOrThrow(Response<T> response) {
+        if (response.error() != null) {
+            logError(response.error());
+            throw new TelegramClientTdApiException(response.error().message);
+        }
+        return response.object();
     }
 
 }
