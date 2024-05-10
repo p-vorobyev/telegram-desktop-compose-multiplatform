@@ -1,6 +1,6 @@
 plugins {
     java
-    id("org.springframework.boot") version "3.1.0"
+    id("org.springframework.boot") version "3.2.5"
     id("io.spring.dependency-management") version "1.1.4"
 }
 
@@ -8,7 +8,7 @@ group = "dev.voroby"
 version = "0.0.1"
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_17
+    sourceCompatibility = JavaVersion.VERSION_21
 }
 
 configurations {
@@ -29,10 +29,11 @@ repositories {
 }
 
 dependencies {
+    val lombokVersion = "1.18.30"
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("dev.voroby:spring-boot-starter-telegram:1.10.1")
-    compileOnly("org.projectlombok:lombok")
-    annotationProcessor("org.projectlombok:lombok")
+    compileOnly("org.projectlombok:lombok:$lombokVersion")
+    annotationProcessor("org.projectlombok:lombok:$lombokVersion")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
 }
 

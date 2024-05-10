@@ -11,9 +11,9 @@
 
 <a name="requirements"></a>
 ## Requirements
-|   | Version     |
-|-------------|-------------|
-| jdk         | `>=` 17.0.4 |
+|   | Version |
+|-------------|----|
+| jdk         | 21 |
 
 
 
