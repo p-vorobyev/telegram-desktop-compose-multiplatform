@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -24,6 +25,7 @@ import common.composable.ScrollButton
 import common.composable.ScrollDirection
 import common.state.ClientStates
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.jetbrains.skia.Codec
@@ -50,22 +52,32 @@ fun ChatWindow(chatId: Long,
 
     val chatHistoryListState = rememberLazyListState()
 
+    val inputTextDraft = remember { mutableStateOf("") }
+
+    val isChannelAdmin = remember { mutableStateOf(false) }
+
     chatListUpdateScope.launch {
         if (openedId.value != chatId) {
             chatLock.lock()
+            val isChannelAdminCheck = async {
+                isChannelAdmin.value = isChannelAdmin(chatId)
+            }
             try {
-                loadOpenedChatMessages(chatId = chatId, openedId = openedId, clientStates = clientStates) {
+                loadOpenedChatMessages(chatId = chatId, clientStates = clientStates) {
                     //scroll to the end when open chat
                     chatListUpdateScope.launch {
                         chatHistoryListState.scrollToItem(clientStates.chatHistory.size - 1)
                     }
                     fullHistoryLoaded.value = false // turn off flag when open new chat if it was activated
                 }
+                isChannelAdminCheck.await()
+                inputTextDraft.value = ""
+                openedId.value = chatId
             } finally {
                 chatLock.unlock()
             }
 
-            delay(1000)
+            delay(500)
 
             while (!terminatingApp.get() && openedId.value == chatId) {
                 chatLock.lock()
@@ -87,78 +99,94 @@ fun ChatWindow(chatId: Long,
                 } finally {
                     chatLock.unlock()
                 }
-                delay(500)
             }
         }
 
     }
 
-    Box {
-        if (openedId.value == chatId) {
-            LazyColumn(modifier = Modifier.background(Color.White).fillMaxSize().padding(start = 5.dp, end = 12.dp), verticalArrangement = Arrangement.Bottom, state = chatHistoryListState) {
-                val messageCardColor = Color(0xFFF7F4F4)
-                val headerColor = Color(0xFF95C2F0)
-
-                val contentLoaderCodec: Codec = contentLoaderCodec()
-
-                items(clientStates.chatHistory, key = {it.id}) { message ->
-
-                    ContextMenuArea(items = { messageContextMenuItems(message, chatListUpdateScope) } ) {
-                        Row(modifier = Modifier.fillMaxWidth())  {
-                            //Adds items to the hierarchy of context menu items
-                            ChatIcon(encodedChatPhoto = message.senderPhoto, chatTitle = message.senderInfo, circleSize = 44.dp)
-                            Spacer(Modifier.width(4.dp))
-                            Column {
-                                Text(text = message.senderInfo, fontWeight = FontWeight.Bold, fontSize = 12.sp, color = headerColor)
-                                Spacer(Modifier.height(4.dp))
-                                message.photoPreview?.let {
-                                    MessagePhoto(it, contentLoaderCodec)
-                                }
-                                MessageTextCard(message, messageCardColor)
-                            }
-                        }
-                    }
-
-                    Spacer(modifier = Modifier.height(12.dp))
-
+    Scaffold(
+        modifier = Modifier.fillMaxSize(),
+        bottomBar = {
+            clientStates.selectedChatPreview.value?.let {
+                if (it.canSendTextMessage || isChannelAdmin.value) {
+                    NewMessageBox(chatId = chatId, inputTextDraft = inputTextDraft)
                 }
             }
         }
+    ) {
+        var chatMessagesBoxModifier: Modifier = Modifier
+        clientStates.selectedChatPreview.value?.let {
+            if (it.canSendTextMessage || isChannelAdmin.value) {
+                chatMessagesBoxModifier = Modifier.padding(bottom = 60.dp)
+            }
+        }
+        Box(modifier = chatMessagesBoxModifier) {
+            if (openedId.value == chatId) {
+                LazyColumn(modifier = Modifier.background(Color.White).fillMaxSize().padding(start = 5.dp, end = 12.dp), verticalArrangement = Arrangement.Bottom, state = chatHistoryListState) {
+                    val messageCardColor = Color(0xFFF7F4F4)
+                    val headerColor = Color(0xFF95C2F0)
 
-        VerticalScrollbar(
-            modifier = Modifier.align(Alignment.CenterEnd).fillMaxHeight(),
-            adapter = rememberScrollbarAdapter(
-                scrollState = chatHistoryListState
-            )
-        )
+                    val contentLoaderCodec: Codec = contentLoaderCodec()
 
-        val firstVisibleIndex = chatHistoryListState.firstVisibleItemIndex
-        val visibleItemsCount = chatHistoryListState.layoutInfo.visibleItemsInfo.size
-        if ((firstVisibleIndex + visibleItemsCount) < clientStates.chatHistory.size - 3) {
-            Row(modifier = Modifier.align(Alignment.BottomEnd).padding(bottom = 12.dp, end = 12.dp)) {
-                ScrollButton(
-                    direction = ScrollDirection.DOWN,
-                    onClick = {
-                        chatListUpdateScope.launch {
-                            chatHistoryListState.animateScrollToItem(clientStates.chatHistory.size - 1)
-                            hasIncomingMessages.value = false
+                    items(clientStates.chatHistory, key = {it.id}) { message ->
+
+                        ContextMenuArea(items = { messageContextMenuItems(message, chatListUpdateScope) } ) {
+                            Row(modifier = Modifier.fillMaxWidth())  {
+                                //Adds items to the hierarchy of context menu items
+                                ChatIcon(encodedChatPhoto = message.senderPhoto, chatTitle = message.senderInfo, circleSize = 44.dp)
+                                Spacer(Modifier.width(4.dp))
+                                Column {
+                                    Text(text = message.senderInfo, fontWeight = FontWeight.Bold, fontSize = 12.sp, color = headerColor)
+                                    Spacer(Modifier.height(4.dp))
+                                    message.photoPreview?.let {
+                                        MessagePhoto(it, contentLoaderCodec)
+                                    }
+                                    MessageTextCard(message, messageCardColor)
+                                }
+                            }
                         }
+
+                        Spacer(modifier = Modifier.height(12.dp))
+
                     }
+                }
+            }
+
+            VerticalScrollbar(
+                modifier = Modifier.align(Alignment.CenterEnd).fillMaxHeight(),
+                adapter = rememberScrollbarAdapter(
+                    scrollState = chatHistoryListState
                 )
+            )
+
+            val firstVisibleIndex = chatHistoryListState.firstVisibleItemIndex
+            val visibleItemsCount = chatHistoryListState.layoutInfo.visibleItemsInfo.size
+            if ((firstVisibleIndex + visibleItemsCount) < clientStates.chatHistory.size) {
+                Row(modifier = Modifier.align(Alignment.BottomEnd).padding(bottom = 12.dp, end = 12.dp)) {
+                    ScrollButton(
+                        direction = ScrollDirection.DOWN,
+                        onClick = {
+                            chatListUpdateScope.launch {
+                                chatHistoryListState.animateScrollToItem(clientStates.chatHistory.size - 1)
+                                hasIncomingMessages.value = false
+                            }
+                        }
+                    )
+                }
+
+            }
+
+
+            val scrollOnTheFloor = (clientStates.chatHistory.size - (firstVisibleIndex + visibleItemsCount)) <= 2
+            if (hasIncomingMessages.value && scrollOnTheFloor && clientStates.chatHistory.isNotEmpty()) {
+                chatListUpdateScope.launch {
+                    //scroll to the end when new messages come with condition to scroll
+                    chatHistoryListState.scrollToItem(clientStates.chatHistory.size - 1)
+                    hasIncomingMessages.value = false
+                }
             }
 
         }
-
-
-        val scrollOnTheFloor = (clientStates.chatHistory.size - (firstVisibleIndex + visibleItemsCount)) <= 2
-        if (hasIncomingMessages.value && scrollOnTheFloor && clientStates.chatHistory.isNotEmpty()) {
-            chatListUpdateScope.launch {
-                //scroll to the end when new messages come with condition to scroll
-                chatHistoryListState.scrollToItem(clientStates.chatHistory.size - 1)
-                hasIncomingMessages.value = false
-            }
-        }
-
     }
 
 }

@@ -1,11 +1,13 @@
 package scene.dto
 
 data class ChatPreview(
-    var id: Long = -1,
-    var title: String,
-    var photo: String?,
-    var lastMessage: String,
-    var unreadCount: Int?,
-    var order: Long,
-    var chatType: ChatType
+    val id: Long = -1,
+    val title: String,
+    val photo: String?,
+    val lastMessage: String,
+    val unreadCount: Int?,
+    val order: Long,
+    val chatType: ChatType,
+    val isChannel: Boolean = false,
+    val canSendTextMessage: Boolean = false
 )

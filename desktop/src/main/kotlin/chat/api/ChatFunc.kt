@@ -52,9 +52,8 @@ suspend fun handleDeletedMessages(clientStates: ClientStates) {
 }
 
 
-suspend fun loadOpenedChatMessages(chatId: Long, openedId: MutableState<Long>, clientStates: ClientStates, openActions: () -> Unit) {
+suspend fun loadOpenedChatMessages(chatId: Long, clientStates: ClientStates, openActions: () -> Unit) {
     clientStates.chatHistory.clear()
-    openedId.value = chatId
     val chatHistory: List<ChatMessage> = openChat(chatId)
     clientStates.chatHistory.addAll(chatHistory)
     if (clientStates.chatHistory.isNotEmpty()) {
