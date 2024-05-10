@@ -10,5 +10,7 @@ public record ChatPreview(
         String lastMessage,
         long unreadCount,
         long order,
-        ChatType chatType
+        ChatType chatType,
+        boolean isChannel,
+        boolean canSendTextMessage
 ) {}

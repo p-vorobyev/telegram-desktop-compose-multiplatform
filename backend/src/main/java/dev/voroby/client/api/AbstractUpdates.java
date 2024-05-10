@@ -62,11 +62,15 @@ abstract public class AbstractUpdates {
         long order = Utils.mainChatListPositionOrder(chat.positions);
 
         ChatType chatType = null;
+        boolean isChannel = false;
         switch (chat.type.getConstructor()) {
             case TdApi.ChatTypePrivate.CONSTRUCTOR -> chatType = ChatType.Private;
             case TdApi.ChatTypeSecret.CONSTRUCTOR -> chatType = ChatType.Secret;
             case TdApi.ChatTypeBasicGroup.CONSTRUCTOR -> chatType = ChatType.BasicGroup;
-            case TdApi.ChatTypeSupergroup.CONSTRUCTOR -> chatType = ChatType.Supergroup;
+            case TdApi.ChatTypeSupergroup.CONSTRUCTOR -> {
+                chatType = ChatType.Supergroup;
+                isChannel = ((TdApi.ChatTypeSupergroup) chat.type).isChannel;
+            }
         }
 
         long unreadCount = chat.unreadCount;
@@ -75,7 +79,7 @@ abstract public class AbstractUpdates {
             unreadCount = 0;
         }
 
-        return new ChatPreview(chat.id, chat.title, photoBase64, msgText, unreadCount, order, chatType);
+        return new ChatPreview(chat.id, chat.title, photoBase64, msgText, unreadCount, order, chatType, isChannel, chat.permissions.canSendBasicMessages);
     }
 
     void cacheChatPhoto(TdApi.ChatPhotoInfo photo, long chatId) {

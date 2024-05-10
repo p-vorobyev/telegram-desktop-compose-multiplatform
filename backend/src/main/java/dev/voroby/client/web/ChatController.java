@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController @Slf4j
-@RequestMapping(value = "/client/chat")
+@RequestMapping(value = "/chat")
 public class ChatController {
 
     @Autowired
@@ -39,6 +39,9 @@ public class ChatController {
 
     @Autowired
     private DeleteMessages deleteMessages;
+
+    @Autowired
+    private IsAdminInChannel isAdminInChannel;
 
     @PostMapping(value = "/markasread/{chatId}")
     public void markMessagesAsRead(@PathVariable("chatId") long chatId) {
@@ -108,6 +111,11 @@ public class ChatController {
     @PostMapping(value = "/delete", consumes = MediaType.APPLICATION_JSON_VALUE)
     public void deleteMessages(@RequestBody DeleteMessagesDto deleteMessagesDto) {
         deleteMessages.accept(deleteMessagesDto);
+    }
+
+    @GetMapping("/channel/isAdmin/{chatId}")
+    public boolean isChannelAdmin(@PathVariable("chatId") long chatId) {
+        return isAdminInChannel.apply(chatId);
     }
 
 }
