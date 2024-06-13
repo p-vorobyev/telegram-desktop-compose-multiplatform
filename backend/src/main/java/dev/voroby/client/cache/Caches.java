@@ -1,18 +1,24 @@
 package dev.voroby.client.cache;
 
-import dev.voroby.client.dto.ChatGroupInfo;
-import dev.voroby.client.dto.MessageId;
+import dev.voroby.client.chatList.dto.ChatGroupInfo;
+import dev.voroby.client.chat.common.dto.MessageId;
 import dev.voroby.springframework.telegram.client.TdApi;
 
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.AtomicReference;
 
 public final class Caches {
 
     public final static AtomicLong requestsCount = new AtomicLong();
+
+    public final static AtomicReference<Long> openedChat = new AtomicReference<>(null);
+
+    public final static AtomicBoolean initialApplicationLoadDone = new AtomicBoolean(false);
 
     public final static Set<Long> mainListChatIds = new CopyOnWriteArraySet<>();
 
