@@ -18,7 +18,7 @@ import common.composable.ScrollDirection
 import common.state.ClientStates
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import scene.api.handleSidebarUpdates
+import scene.api.handleChatListUpdates
 import scene.api.markAsRead
 import scene.dto.ChatPreview
 import terminatingApp
@@ -44,16 +44,16 @@ fun MainScene(clientStates: ClientStates) {
 
     chatListUpdateScope.launch {
         while (!terminatingApp.get()) {
-            val chatsSizeBeforeUpdates = clientStates.chatPreviews.size
+            val chatsSizeBeforeUpdates = clientStates.chatList.size
             var firstChatPreviewBeforeUpdates: ChatPreview? = null
-            if (clientStates.chatPreviews.isNotEmpty()) {
-                firstChatPreviewBeforeUpdates = clientStates.chatPreviews[0]
+            if (clientStates.chatList.isNotEmpty()) {
+                firstChatPreviewBeforeUpdates = clientStates.chatList[0]
             }
 
-            handleSidebarUpdates(clientStates.chatPreviews)
+            handleChatListUpdates(clientStates.chatList)
 
-            needToScrollUpSidebar = (clientStates.chatPreviews.size > chatsSizeBeforeUpdates) ||
-                    (clientStates.chatPreviews.isNotEmpty() && lazyListState.firstVisibleItemIndex < 3 && firstChatPreviewBeforeUpdates != clientStates.chatPreviews[0])
+            needToScrollUpSidebar = (clientStates.chatList.size > chatsSizeBeforeUpdates) ||
+                    (clientStates.chatList.isNotEmpty() && lazyListState.firstVisibleItemIndex < 3 && firstChatPreviewBeforeUpdates != clientStates.chatList[0])
             if (needToScrollUpSidebar) {
                 lazyListState.scrollToItem(0)
             }
@@ -72,7 +72,7 @@ fun MainScene(clientStates: ClientStates) {
             Box {
                 LazyColumn(state = lazyListState, modifier = sidebarWidthModifier.background(MaterialTheme.colors.surface).fillMaxHeight()) {
 
-                    itemsIndexed(clientStates.chatPreviews, { _, v -> v}) { _, chatPreview ->
+                    itemsIndexed(clientStates.chatList, { _, v -> v}) { _, chatPreview ->
 
                         if (chatSearchInput.value.isBlank() || chatPreview.title.contains(chatSearchInput.value, ignoreCase = true)) {
                             var hasUnread = false
@@ -116,7 +116,7 @@ fun MainScene(clientStates: ClientStates) {
             }
 
             Column {
-                if (selectedChatId.value == -1L && clientStates.chatPreviews.isNotEmpty()) {
+                if (selectedChatId.value == -1L && clientStates.chatList.isNotEmpty()) {
                     SelectChatOffer()
                 } else if (selectedChatId.value != -1L) {
 

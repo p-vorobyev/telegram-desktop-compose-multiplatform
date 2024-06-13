@@ -21,7 +21,7 @@ suspend fun getMemberCount(chatIds: List<Long>): MutableMap<Long, Long>  {
 
 suspend fun refreshChatsMemberCount(clientStates: ClientStates) {
     while (true) {
-        val chatIds = clientStates.chatPreviews.map { it.id }.toList()
+        val chatIds = clientStates.chatList.map { it.id }.toList()
         val memberCount: MutableMap<Long, Long> = getMemberCount(chatIds)
         memberCount.forEach { (k, v) ->
             clientStates.chatsMemberCount[k] = v

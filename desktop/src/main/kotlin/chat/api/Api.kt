@@ -30,15 +30,6 @@ suspend fun editedMessages(): List<ChatMessage> =
 suspend fun deletedMsgIds(): List<Long> =
     httpClient.get("$baseUrl/$clientUri/chat/deleted").body()
 
-suspend fun deleteMessages(chatId: Long, ids: Collection<Long>) =
-    httpClient.post {
-        url("$baseUrl/$clientUri/chat/delete")
-        headers {
-            header(HttpHeaders.ContentType, "application/json")
-        }
-        setBody(DeleteMessages(chatId, ids))
-    }
-
 suspend fun isChannelAdmin(chatId: Long): Boolean =
     httpClient.get("$baseUrl/$clientUri/chat/channel/isAdmin/$chatId")
         .bodyAsText()
@@ -46,9 +37,18 @@ suspend fun isChannelAdmin(chatId: Long): Boolean =
 
 suspend fun sendMessage(newMessage: NewMessage) =
     httpClient.post {
-        url("$baseUrl/$clientUri/message/send")
+        url("$baseUrl/$clientUri/messages/send")
         headers {
             header(HttpHeaders.ContentType, "application/json")
         }
         setBody(newMessage)
+    }
+
+suspend fun deleteMessages(chatId: Long, ids: Collection<Long>) =
+    httpClient.post {
+        url("$baseUrl/$clientUri/messages/delete")
+        headers {
+            header(HttpHeaders.ContentType, "application/json")
+        }
+        setBody(DeleteMessages(chatId, ids))
     }

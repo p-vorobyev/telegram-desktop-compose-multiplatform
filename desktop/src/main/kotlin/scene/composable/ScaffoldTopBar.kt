@@ -25,7 +25,7 @@ fun ScaffoldTopBar(
     filterUnreadChats: MutableState<Boolean> = mutableStateOf(false)
 ) {
 
-    if (clientStates.chatPreviews.isNotEmpty()) {
+    if (clientStates.chatList.isNotEmpty()) {
         Row {
             val topHeaderModifier = sidebarWidthModifier.height(50.dp).background(MaterialTheme.colors.surface)
 

@@ -27,7 +27,7 @@ fun InitialLoad() {
     var initChatsCompleted by remember { mutableStateOf(false) }
 
     val clientStates = ClientStates(
-        chatPreviews = remember {  mutableStateListOf()},
+        chatList = remember {  mutableStateListOf()},
         chatsMemberCount = remember { mutableMapOf() },
         chatHistory = remember { mutableStateListOf()}
     )
@@ -44,7 +44,7 @@ fun InitialLoad() {
         }
     }
 
-    clientStates.chatPreviews = chatPreviews
+    clientStates.chatList = chatPreviews
     if (!initChatsCompleted) {
         LoadingDisclaimer("Loading chats...")
     } else {

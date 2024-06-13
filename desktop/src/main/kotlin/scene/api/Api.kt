@@ -10,8 +10,8 @@ import transport.clientUri
 import transport.httpClient
 import transport.mapper
 
-suspend fun handleSidebarUpdates(chats: SnapshotStateList<ChatPreview>) {
-    val updatedPreviews: List<ChatPreview> = updatedPreviews()
+suspend fun handleChatListUpdates(chats: SnapshotStateList<ChatPreview>) {
+    val updatedPreviews: List<ChatPreview> = getChatListUpdates()
     updatedPreviews.forEach { updated ->
         var idx: Int? = null
         chats.forEachIndexed { index, chatPreview ->
@@ -34,8 +34,8 @@ suspend fun handleSidebarUpdates(chats: SnapshotStateList<ChatPreview>) {
     chats.sortByDescending { it.order }
 }
 
-private suspend fun updatedPreviews(): List<ChatPreview> {
-    val json = httpClient.get("${baseUrl}/${clientUri}/updateSidebar").bodyAsText()
+private suspend fun getChatListUpdates(): List<ChatPreview> {
+    val json = httpClient.get("${baseUrl}/${clientUri}/chatListUpdates").bodyAsText()
     return mapper.readValue(json, object : TypeReference<List<ChatPreview>>(){})
 }
 

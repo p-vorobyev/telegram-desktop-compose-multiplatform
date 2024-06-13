@@ -7,7 +7,7 @@ import chat.dto.ChatMessage
 import scene.dto.ChatPreview
 
 data class ClientStates (
-    var chatPreviews: SnapshotStateList<ChatPreview>,
+    var chatList: SnapshotStateList<ChatPreview>,
 
     var chatHistory: SnapshotStateList<ChatMessage>,
 
