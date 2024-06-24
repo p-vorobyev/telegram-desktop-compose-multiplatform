@@ -2,6 +2,7 @@ package dev.voroby.client.shutdown.application;
 
 import dev.voroby.client.cache.Caches;
 import dev.voroby.client.shutdown.application.api.ShutdownApplication;
+import dev.voroby.client.shutdown.dto.ExitCode;
 import dev.voroby.springframework.telegram.client.updates.ClientAuthorizationState;
 import lombok.SneakyThrows;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -33,7 +34,7 @@ public class TerminationCheckScheduler {
         if (authorizationState.haveAuthorization() && Caches.initialApplicationLoadDone.get()) {
             if (Caches.requestsCount.get() == requestCountCheckPoint.get()) {
                 if (awaitCount.incrementAndGet() > 3) {
-                    shutdownApplication.get();
+                    shutdownApplication.accept(new ExitCode(0));
                 }
             } else {
                 requestCountCheckPoint.set(Caches.requestsCount.get());

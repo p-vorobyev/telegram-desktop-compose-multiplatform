@@ -1,6 +1,7 @@
 package dev.voroby.client.shutdown.presentation;
 
 import dev.voroby.client.shutdown.application.api.ShutdownApplication;
+import dev.voroby.client.shutdown.dto.ExitCode;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -16,7 +17,7 @@ public class ShutdownController {
     }
 
     @PostMapping(value = "/shutdown")
-    public void shutDownApp() {
-        shutdownApplication.get();
+    public void shutdownApp() {
+        shutdownApplication.accept(new ExitCode(0));
     }
 }

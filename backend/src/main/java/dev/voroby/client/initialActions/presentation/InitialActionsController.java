@@ -9,8 +9,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping
 public class InitialActionsController {
 
-    @GetMapping(value = "/chatsLoaded")
-    public boolean chatsLoaded() {
+    @GetMapping(value = "/isChatsLoaded")
+    public boolean isChatsLoaded() {
         return Caches.initialApplicationLoadDone.get();
     }
 }
