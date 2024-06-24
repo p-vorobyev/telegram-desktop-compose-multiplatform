@@ -73,7 +73,7 @@ suspend fun startBackend() = withContext(Dispatchers.IO) {
     }
 
     Runtime.getRuntime().exec(backendExecCommand)
-    delay(1000)
+    delay(500)
 }
 
 

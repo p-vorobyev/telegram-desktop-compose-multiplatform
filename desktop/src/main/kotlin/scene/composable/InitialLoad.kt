@@ -7,7 +7,7 @@ import common.api.refreshChatsMemberCount
 import common.state.ClientStates
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
-import scene.api.chatsLoaded
+import scene.api.isChatsLoaded
 import scene.api.loadChats
 import scene.dto.ChatPreview
 import terminatingApp
@@ -22,9 +22,7 @@ val greyColor = Color(red = 230, green = 230, blue = 230)
 fun InitialLoad() {
     val chatPreviews = remember {  mutableStateListOf<ChatPreview>() }
 
-    var chatLoading by remember { mutableStateOf(true) }
-
-    var initChatsCompleted by remember { mutableStateOf(false) }
+    var initialLoad by remember { mutableStateOf(false) }
 
     val clientStates = ClientStates(
         chatList = remember {  mutableStateListOf()},
@@ -33,19 +31,18 @@ fun InitialLoad() {
     )
 
     LaunchedEffect(Unit) {
-        while (chatLoading && !terminatingApp.get()) {
-            chatLoading = !chatsLoaded()
+        while (!initialLoad && !terminatingApp.get()) {
+            initialLoad = isChatsLoaded()
             delay(500)
         }
         chatPreviews.addAll(loadChats())
-        initChatsCompleted = true
         async {
             refreshChatsMemberCount(clientStates)
         }
     }
 
     clientStates.chatList = chatPreviews
-    if (!initChatsCompleted) {
+    if (!initialLoad) {
         LoadingDisclaimer("Loading chats...")
     } else {
         MainScene(clientStates)

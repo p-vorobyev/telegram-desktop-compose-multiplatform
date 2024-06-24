@@ -52,6 +52,6 @@ suspend fun loadChats(): List<ChatPreview> {
     return mapper.readValue(json, object : TypeReference<List<ChatPreview>>() {})
 }
 
-suspend fun chatsLoaded(): Boolean {
-    return httpClient.get("${baseUrl}/${clientUri}/chatsLoaded").bodyAsText().toBoolean()
+suspend fun isChatsLoaded(): Boolean {
+    return httpClient.get("${baseUrl}/${clientUri}/isChatsLoaded").bodyAsText().toBoolean()
 }

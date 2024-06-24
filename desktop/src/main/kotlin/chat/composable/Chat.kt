@@ -77,7 +77,7 @@ fun ChatWindow(chatId: Long,
                 chatLock.unlock()
             }
 
-            delay(500)
+            delay(100)
 
             while (!terminatingApp.get() && openedId.value == chatId) {
                 chatLock.lock()
@@ -90,11 +90,11 @@ fun ChatWindow(chatId: Long,
                             chatHistoryListState = chatHistoryListState
                         )
                     }
-                    delay(500)
+                    delay(100)
                     getIncomingMessages(chatId, clientStates, hasIncomingMessages)
-                    delay(500)
+                    delay(100)
                     getEditedMessages(clientStates)
-                    delay(500)
+                    delay(100)
                     handleDeletedMessages(clientStates)
                 } finally {
                     chatLock.unlock()

@@ -58,7 +58,7 @@ fun MainScene(clientStates: ClientStates) {
                 lazyListState.scrollToItem(0)
             }
 
-            delay(1000)
+            delay(500)
         }
     }
 
