@@ -18,13 +18,13 @@ import common.state.ClientStates
 import scene.dto.ChatType
 
 @Composable
-fun ChatHeader(clientStates: ClientStates) {
+fun ChatHeader() {
 
     var memberCount by remember { mutableStateOf(-1L) }
 
     val chatHeaderScope = rememberCoroutineScope()
 
-    clientStates.selectedChatPreview.value?.let { chatPreview ->
+    ClientStates.selectedChatPreview.value?.let { chatPreview ->
         Card(modifier = Modifier.fillMaxWidth().height(85.dp).background(MaterialTheme.colors.surface)) {
 
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -40,10 +40,10 @@ fun ChatHeader(clientStates: ClientStates) {
                 Column(verticalArrangement = Arrangement.Center) {
                     Text(fontWeight = FontWeight.Bold, text = cleanedTitle)
                     if ((chatPreview.chatType == ChatType.BasicGroup || chatPreview.chatType == ChatType.Supergroup)) {
-                        memberCount = clientStates.chatsMemberCount[chatPreview.id]!!
+                        memberCount = ClientStates.chatsMemberCount[chatPreview.id]!!
                         chatHeaderScope.launch {
                             while (true) {
-                                memberCount = clientStates.chatsMemberCount[chatPreview.id]!!
+                                memberCount = ClientStates.chatsMemberCount[chatPreview.id]!!
                                 delay(3000)
                             }
                         }

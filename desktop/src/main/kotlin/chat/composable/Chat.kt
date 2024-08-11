@@ -40,9 +40,9 @@ val chatLock = ReentrantLock()
 
 
 @Composable
-fun ChatWindow(chatId: Long,
-               chatListUpdateScope: CoroutineScope = rememberCoroutineScope(),
-               clientStates: ClientStates
+fun ChatWindow(
+    chatId: Long,
+    chatListUpdateScope: CoroutineScope = rememberCoroutineScope()
 ) {
     val openedId = remember { mutableStateOf(-1L) }
 
@@ -63,10 +63,10 @@ fun ChatWindow(chatId: Long,
                 isChannelAdmin.value = isChannelAdmin(chatId)
             }
             try {
-                loadOpenedChatMessages(chatId = chatId, clientStates = clientStates) {
+                loadOpenedChatMessages(chatId = chatId) {
                     //scroll to the end when open chat
                     chatListUpdateScope.launch {
-                        chatHistoryListState.scrollToItem(clientStates.chatHistory.size - 1)
+                        chatHistoryListState.scrollToItem(ClientStates.chatHistory.size - 1)
                     }
                     fullHistoryLoaded.value = false // turn off flag when open new chat if it was activated
                 }
@@ -86,16 +86,15 @@ fun ChatWindow(chatId: Long,
                         preloadChatHistory(
                             chatId = chatId,
                             fullHistoryLoaded = fullHistoryLoaded,
-                            clientStates = clientStates,
                             chatHistoryListState = chatHistoryListState
                         )
                     }
                     delay(100)
-                    getIncomingMessages(chatId, clientStates, hasIncomingMessages)
+                    getIncomingMessages(chatId, hasIncomingMessages)
                     delay(100)
-                    getEditedMessages(clientStates)
+                    getEditedMessages()
                     delay(100)
-                    handleDeletedMessages(clientStates)
+                    handleDeletedMessages()
                 } finally {
                     chatLock.unlock()
                 }
@@ -107,7 +106,7 @@ fun ChatWindow(chatId: Long,
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         bottomBar = {
-            clientStates.selectedChatPreview.value?.let {
+            ClientStates.selectedChatPreview.value?.let {
                 if (it.canSendTextMessage || isChannelAdmin.value) {
                     NewMessageBox(chatId = chatId, inputTextDraft = inputTextDraft)
                 }
@@ -115,7 +114,7 @@ fun ChatWindow(chatId: Long,
         }
     ) {
         var chatMessagesBoxModifier: Modifier = Modifier
-        clientStates.selectedChatPreview.value?.let {
+        ClientStates.selectedChatPreview.value?.let {
             if (it.canSendTextMessage || isChannelAdmin.value) {
                 chatMessagesBoxModifier = Modifier.padding(bottom = 60.dp)
             }
@@ -128,7 +127,7 @@ fun ChatWindow(chatId: Long,
 
                     val contentLoaderCodec: Codec = contentLoaderCodec()
 
-                    items(clientStates.chatHistory, key = {it.id}) { message ->
+                    items(ClientStates.chatHistory, key = {it.id}) { message ->
 
                         ContextMenuArea(items = { messageContextMenuItems(message, chatListUpdateScope) } ) {
                             Row(modifier = Modifier.fillMaxWidth())  {
@@ -161,13 +160,13 @@ fun ChatWindow(chatId: Long,
 
             val firstVisibleIndex = chatHistoryListState.firstVisibleItemIndex
             val visibleItemsCount = chatHistoryListState.layoutInfo.visibleItemsInfo.size
-            if ((firstVisibleIndex + visibleItemsCount) < clientStates.chatHistory.size) {
+            if ((firstVisibleIndex + visibleItemsCount) < ClientStates.chatHistory.size) {
                 Row(modifier = Modifier.align(Alignment.BottomEnd).padding(bottom = 12.dp, end = 12.dp)) {
                     ScrollButton(
                         direction = ScrollDirection.DOWN,
                         onClick = {
                             chatListUpdateScope.launch {
-                                chatHistoryListState.animateScrollToItem(clientStates.chatHistory.size - 1)
+                                chatHistoryListState.animateScrollToItem(ClientStates.chatHistory.size - 1)
                                 hasIncomingMessages.value = false
                             }
                         }
@@ -177,11 +176,11 @@ fun ChatWindow(chatId: Long,
             }
 
 
-            val scrollOnTheFloor = (clientStates.chatHistory.size - (firstVisibleIndex + visibleItemsCount)) <= 2
-            if (hasIncomingMessages.value && scrollOnTheFloor && clientStates.chatHistory.isNotEmpty()) {
+            val scrollOnTheFloor = (ClientStates.chatHistory.size - (firstVisibleIndex + visibleItemsCount)) <= 2
+            if (hasIncomingMessages.value && scrollOnTheFloor && ClientStates.chatHistory.isNotEmpty()) {
                 chatListUpdateScope.launch {
                     //scroll to the end when new messages come with condition to scroll
-                    chatHistoryListState.scrollToItem(clientStates.chatHistory.size - 1)
+                    chatHistoryListState.scrollToItem(ClientStates.chatHistory.size - 1)
                     hasIncomingMessages.value = false
                 }
             }

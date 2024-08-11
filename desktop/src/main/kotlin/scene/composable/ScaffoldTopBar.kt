@@ -20,12 +20,11 @@ import common.state.ClientStates
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ScaffoldTopBar(
-    clientStates: ClientStates,
     chatSearchInput: MutableState<String> = mutableStateOf(""),
     filterUnreadChats: MutableState<Boolean> = mutableStateOf(false)
 ) {
 
-    if (clientStates.chatList.isNotEmpty()) {
+    if (ClientStates.chatList.isNotEmpty()) {
         Row {
             val topHeaderModifier = sidebarWidthModifier.height(50.dp).background(MaterialTheme.colors.surface)
 
@@ -81,8 +80,8 @@ fun ScaffoldTopBar(
             Divider(modifier = Modifier.height(50.dp).width(2.dp), color = greyColor)
 
             Column {
-                clientStates.selectedChatPreview.value?.let {
-                    ChatHeader(clientStates)
+                ClientStates.selectedChatPreview.value?.let {
+                    ChatHeader()
                 }
             }
 

@@ -7,56 +7,47 @@ import chat.dto.ChatMessage
 import common.state.ClientStates
 import scene.api.markAsRead
 
-suspend fun getIncomingMessages(chatId: Long, clientStates: ClientStates, hasIncomingMessages: MutableState<Boolean>) {
+suspend fun getIncomingMessages(chatId: Long, hasIncomingMessages: MutableState<Boolean>) {
     val incomingMessages: List<ChatMessage> = incomingMessages()
     if (incomingMessages.isNotEmpty()) {
-        clientStates.chatHistory.addAll(incomingMessages)
+        ClientStates.chatHistory.addAll(incomingMessages)
         hasIncomingMessages.value = true
         markAsRead(chatId) // mark as read incoming messages
     }
 }
 
 
-suspend fun getEditedMessages(clientStates: ClientStates) {
+suspend fun getEditedMessages() {
     val editedMessages: List<ChatMessage> = editedMessages()
     editedMessages.forEach { edited ->
         var idx: Int? = null
-        clientStates.chatHistory.forEachIndexed { index, chatMessage ->
+        ClientStates.chatHistory.forEachIndexed { index, chatMessage ->
             if (edited.id == chatMessage.id) {
                 idx = index
                 return@forEachIndexed
             }
         }
         idx?.let {
-            clientStates.chatHistory.removeAt(it)
-            clientStates.chatHistory.add(it, edited)
+            ClientStates.chatHistory.removeAt(it)
+            ClientStates.chatHistory.add(it, edited)
         }
     }
 }
 
 
-suspend fun handleDeletedMessages(clientStates: ClientStates) {
+suspend fun handleDeletedMessages() {
     val deletedMsgIds: List<Long> = deletedMsgIds()
     deletedMsgIds.forEach { deletedMsgId ->
-        var idx: Int? = null
-        clientStates.chatHistory.forEachIndexed { index, chatMessage ->
-            if (deletedMsgId == chatMessage.id) {
-                idx = index
-                return@forEachIndexed
-            }
-        }
-        idx?.let {
-            clientStates.chatHistory.removeAt(it)
-        }
+        ClientStates.chatHistory.removeIf { it.id == deletedMsgId }
     }
 }
 
 
-suspend fun loadOpenedChatMessages(chatId: Long, clientStates: ClientStates, openActions: () -> Unit) {
-    clientStates.chatHistory.clear()
+suspend fun loadOpenedChatMessages(chatId: Long, openActions: () -> Unit) {
+    ClientStates.chatHistory.clear()
     val chatHistory: List<ChatMessage> = openChat(chatId)
-    clientStates.chatHistory.addAll(chatHistory)
-    if (clientStates.chatHistory.isNotEmpty()) {
+    ClientStates.chatHistory.addAll(chatHistory)
+    if (ClientStates.chatHistory.isNotEmpty()) {
         openActions()
     }
 }
@@ -64,16 +55,15 @@ suspend fun loadOpenedChatMessages(chatId: Long, clientStates: ClientStates, ope
 
 suspend fun preloadChatHistory(chatId: Long,
                                fullHistoryLoaded: MutableState<Boolean>,
-                               clientStates: ClientStates,
                                chatHistoryListState: LazyListState
 ) {
-    if (clientStates.chatHistory.isNotEmpty()) {
-        val messageId = clientStates.chatHistory[0].id
-        val newChatHistory: List<ChatMessage> = loadChatHistory(ChatHistoryRequest(chatId = chatId, fromMessageId = messageId))
+    if (ClientStates.chatHistory.isNotEmpty()) {
+        val lastMessageId = ClientStates.chatHistory[0].id
+        val newChatHistory: List<ChatMessage> = loadChatHistory(ChatHistoryRequest(chatId = chatId, fromMessageId = lastMessageId))
         if (newChatHistory.isEmpty()) {
             fullHistoryLoaded.value = true
         }
-        clientStates.chatHistory.addAll(0, newChatHistory)
+        ClientStates.chatHistory.addAll(0, newChatHistory)
         chatHistoryListState.scrollToItem(newChatHistory.size)
     }
 }

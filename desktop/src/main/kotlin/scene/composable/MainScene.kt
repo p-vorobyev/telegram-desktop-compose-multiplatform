@@ -28,7 +28,7 @@ val sidebarWidthModifier: Modifier = Modifier.width(450.dp)
 
 
 @Composable
-fun MainScene(clientStates: ClientStates) {
+fun MainScene() {
 
     val selectedChatId: MutableState<Long> = remember { mutableStateOf(-1) }
 
@@ -44,16 +44,18 @@ fun MainScene(clientStates: ClientStates) {
 
     chatListUpdateScope.launch {
         while (!terminatingApp.get()) {
-            val chatsSizeBeforeUpdates = clientStates.chatList.size
+            val chatsSizeBeforeUpdates = ClientStates.chatList.size
             var firstChatPreviewBeforeUpdates: ChatPreview? = null
-            if (clientStates.chatList.isNotEmpty()) {
-                firstChatPreviewBeforeUpdates = clientStates.chatList[0]
+            if (ClientStates.chatList.isNotEmpty()) {
+                firstChatPreviewBeforeUpdates = ClientStates.chatList[0]
             }
 
-            handleChatListUpdates(clientStates.chatList)
+            handleChatListUpdates(ClientStates.chatList)
 
-            needToScrollUpSidebar = (clientStates.chatList.size > chatsSizeBeforeUpdates) ||
-                    (clientStates.chatList.isNotEmpty() && lazyListState.firstVisibleItemIndex < 3 && firstChatPreviewBeforeUpdates != clientStates.chatList[0])
+            needToScrollUpSidebar = (ClientStates.chatList.size > chatsSizeBeforeUpdates) ||
+                    (ClientStates.chatList.isNotEmpty() &&
+                            lazyListState.firstVisibleItemIndex < 3 &&
+                            firstChatPreviewBeforeUpdates != ClientStates.chatList[0])
             if (needToScrollUpSidebar) {
                 lazyListState.scrollToItem(0)
             }
@@ -63,7 +65,7 @@ fun MainScene(clientStates: ClientStates) {
     }
 
     Scaffold(
-        topBar = { ScaffoldTopBar(clientStates, chatSearchInput, filterUnreadChats) },
+        topBar = { ScaffoldTopBar(chatSearchInput, filterUnreadChats) },
         backgroundColor = greyColor
     ) {
 
@@ -72,7 +74,7 @@ fun MainScene(clientStates: ClientStates) {
             Box {
                 LazyColumn(state = lazyListState, modifier = sidebarWidthModifier.background(MaterialTheme.colors.surface).fillMaxHeight()) {
 
-                    itemsIndexed(clientStates.chatList, { _, v -> v}) { _, chatPreview ->
+                    itemsIndexed(ClientStates.chatList, { _, v -> v}) { _, chatPreview ->
 
                         if (chatSearchInput.value.isBlank() || chatPreview.title.contains(chatSearchInput.value, ignoreCase = true)) {
                             var hasUnread = false
@@ -83,7 +85,7 @@ fun MainScene(clientStates: ClientStates) {
                             }
                             val onChatClick = {
                                 selectedChatId.value = chatPreview.id
-                                clientStates.selectedChatPreview.value = chatPreview
+                                ClientStates.selectedChatPreview.value = chatPreview
                             }
                             if (filterUnreadChats.value && hasUnread) {
                                 ChatCard(chatListUpdateScope = chatListUpdateScope, chatPreview = chatPreview, selectedChatId = selectedChatId, onClick = onChatClick)
@@ -116,7 +118,7 @@ fun MainScene(clientStates: ClientStates) {
             }
 
             Column {
-                if (selectedChatId.value == -1L && clientStates.chatList.isNotEmpty()) {
+                if (selectedChatId.value == -1L && ClientStates.chatList.isNotEmpty()) {
                     SelectChatOffer()
                 } else if (selectedChatId.value != -1L) {
 
@@ -124,11 +126,11 @@ fun MainScene(clientStates: ClientStates) {
 
                     Row {
                         Divider(modifier = Modifier.fillMaxHeight().width(2.dp), color = greyColor)
-                        ChatWindow(chatId = selectedChatId.value, chatListUpdateScope = chatListUpdateScope, clientStates = clientStates)
+                        ChatWindow(chatId = selectedChatId.value, chatListUpdateScope = chatListUpdateScope)
                     }
 
                     chatListUpdateScope.launch {
-                        clientStates.selectedChatPreview.let {
+                        ClientStates.selectedChatPreview.let {
                             it.value?.let { currentChat ->
                                 currentChat.unreadCount?.let {
                                     if (it > 0 && readChat != currentChat.id) {

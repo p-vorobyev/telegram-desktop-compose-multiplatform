@@ -6,12 +6,14 @@ import androidx.compose.runtime.snapshots.SnapshotStateList
 import chat.dto.ChatMessage
 import scene.dto.ChatPreview
 
-data class ClientStates (
-    var chatList: SnapshotStateList<ChatPreview>,
+object ClientStates {
 
-    var chatHistory: SnapshotStateList<ChatMessage>,
+    var chatList: SnapshotStateList<ChatPreview> = SnapshotStateList()
 
-    var selectedChatPreview: MutableState<ChatPreview?> = mutableStateOf(null),
+    var chatHistory: SnapshotStateList<ChatMessage> = SnapshotStateList()
 
-    var chatsMemberCount: MutableMap<Long, Long>
-)
+    var selectedChatPreview: MutableState<ChatPreview?> = mutableStateOf(null)
+
+    var chatsMemberCount: MutableMap<Long, Long> = mutableMapOf()
+
+}
