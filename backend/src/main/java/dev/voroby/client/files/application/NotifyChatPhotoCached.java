@@ -1,4 +1,4 @@
-package dev.voroby.client.common.file.application;
+package dev.voroby.client.files.application;
 
 import dev.voroby.client.cache.Caches;
 import dev.voroby.client.chatList.application.ChatListUpdatesQueue;

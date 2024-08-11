@@ -1,6 +1,6 @@
 package dev.voroby.client.files.infrastructure.tdlib;
 
-import dev.voroby.client.common.file.application.NotifyChatPhotoCached;
+import dev.voroby.client.files.application.NotifyChatPhotoCached;
 import dev.voroby.client.files.application.NotifyMessagePhotoCached;
 import dev.voroby.client.cache.Caches;
 import dev.voroby.client.chatList.dto.ChatPhotoFile;

@@ -1,14 +1,15 @@
 package dev.voroby.client.chatList.application.api;
 
-import dev.voroby.client.common.file.application.NotifyChatPhotoCached;
-import dev.voroby.client.common.file.application.api.StartDownloadFile;
-import dev.voroby.client.util.Utils;
 import dev.voroby.client.cache.Caches;
 import dev.voroby.client.chatList.dto.ChatPhotoFile;
 import dev.voroby.client.chatList.dto.ChatPreview;
 import dev.voroby.client.chatList.dto.ChatType;
+import dev.voroby.client.files.application.NotifyChatPhotoCached;
+import dev.voroby.client.files.application.api.StartDownloadFile;
+import dev.voroby.client.util.Utils;
 import dev.voroby.springframework.telegram.client.TdApi;
 import dev.voroby.springframework.telegram.client.TelegramClient;
+import dev.voroby.springframework.telegram.client.templates.response.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import static dev.voroby.client.cache.Caches.chatIdToPhotoCache;
@@ -40,12 +41,29 @@ abstract public class AbstractChatListApi {
     }
 
     public ChatPreview getCurrentChatPreview(long chatId) {
-        TdApi.Chat chat = telegramClient.sendSync(new TdApi.GetChat(chatId));
-        initialChatCache.put(chat.id, chat);
-        return getCurrentChatPreview(chat);
+        Response<TdApi.Chat> chatResponse = telegramClient.send(new TdApi.GetChat(chatId));
+        if (chatResponse.error() == null) {
+            TdApi.Chat chat = chatResponse.object();
+            if (!hasChatList(chat)) return null; // chat is not listed
+            initialChatCache.put(chat.id, chat);
+            return getCurrentChatPreview(chat);
+        } else throw new RuntimeException(chatResponse.error().message);
     }
 
-    public ChatPreview getCurrentChatPreview(TdApi.Chat chat) {
+    private boolean hasChatList(TdApi.Chat chat) {
+        if (chat.chatLists.length == 0) {
+            removeFromCache(chat.id);
+            return false;
+        }
+        return true;
+    }
+
+    private void removeFromCache(long chatId) {
+        Caches.mainListChatIds.remove(chatId);
+        initialChatCache.remove(chatId);
+    }
+
+    private ChatPreview getCurrentChatPreview(TdApi.Chat chat) {
         String msgText = Utils.getMessageText(chat.lastMessage);
         String photoBase64 = null;
 

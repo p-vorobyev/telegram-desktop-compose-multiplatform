@@ -10,9 +10,9 @@ import java.util.List;
 import java.util.function.Supplier;
 
 @Component
-public class LoadChats extends AbstractChatListApi implements Supplier<List<ChatPreview>> {
+public class GetChatList extends AbstractChatListApi implements Supplier<List<ChatPreview>> {
 
-    protected LoadChats(TelegramClient telegramClient) {
+    protected GetChatList(TelegramClient telegramClient) {
         super(telegramClient);
     }
 
@@ -21,7 +21,10 @@ public class LoadChats extends AbstractChatListApi implements Supplier<List<Chat
         List<ChatPreview> previews = new ArrayList<>();
         Caches.initialChatCache.values().forEach(chat -> {
             if (Caches.mainListChatIds.contains(chat.id)) {
-                previews.add(getCurrentChatPreview(chat));
+                ChatPreview chatPreview = getCurrentChatPreview(chat.id);
+                if (chatPreview != null) {
+                    previews.add(chatPreview);
+                }
             }
         });
 

@@ -57,6 +57,7 @@ public class ConvertToChatMessagesService implements Function<List<TdApi.Message
             var messagePhotoInfo = new MessagePhotoInfo(message.id, message.chatId, messagePhoto);
             photoPreview = getPhotoPreviewService.apply(messagePhotoInfo);
         }
+        TdApi.Chat chat = Caches.initialChatCache.get(message.chatId);
         return new ChatMessage(
                 message.id,
                 message.chatId,
@@ -68,8 +69,8 @@ public class ConvertToChatMessagesService implements Function<List<TdApi.Message
                 senderInfo.senderDescription,
                 senderInfo.senderPhoto,
                 senderInfo.isCurrentUser,
-                message.canBeDeletedForAllUsers,
-                message.canBeDeletedOnlyForSelf
+                chat != null && chat.canBeDeletedForAllUsers,
+                chat != null && chat.canBeDeletedOnlyForSelf
         );
     }
 

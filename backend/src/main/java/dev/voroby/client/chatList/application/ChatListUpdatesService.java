@@ -3,7 +3,6 @@ package dev.voroby.client.chatList.application;
 import dev.voroby.client.chatList.application.api.*;
 import dev.voroby.client.chatList.dto.ChatPreview;
 import dev.voroby.springframework.telegram.client.TdApi;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -14,26 +13,29 @@ import java.util.function.Supplier;
 @Component
 public class ChatListUpdatesService implements Supplier<List<ChatPreview>> {
 
-    @Autowired
-    private GetChatLastMessage getChatLastMessage;
+    private final GetChatLastMessage getChatLastMessage;
 
-    @Autowired
-    private GetChatNewTitle getChatNewTitle;
+    private final GetChatNewTitle getChatNewTitle;
 
-    @Autowired
-    private GetChatNewOrder getChatNewOrder;
+    private final GetChatNewOrder getChatNewOrder;
 
-    @Autowired
-    private GetChatReadInbox getChatReadInbox;
+    private final GetChatReadInbox getChatReadInbox;
 
-    @Autowired
-    private GetNewChat getNewChat;
+    private final GetNewChat getNewChat;
 
-    @Autowired
-    private GetNewChatPhoto getNewChatPhoto;
+    private final GetNewChatPhoto getNewChatPhoto;
 
-    @Autowired
-    private ChatListUpdatesQueue chatListUpdatesQueue;
+    private final ChatListUpdatesQueue chatListUpdatesQueue;
+
+    public ChatListUpdatesService(GetChatLastMessage getChatLastMessage, GetChatNewTitle getChatNewTitle, GetChatNewOrder getChatNewOrder, GetChatReadInbox getChatReadInbox, GetNewChat getNewChat, GetNewChatPhoto getNewChatPhoto, ChatListUpdatesQueue chatListUpdatesQueue) {
+        this.getChatLastMessage = getChatLastMessage;
+        this.getChatNewTitle = getChatNewTitle;
+        this.getChatNewOrder = getChatNewOrder;
+        this.getChatReadInbox = getChatReadInbox;
+        this.getNewChat = getNewChat;
+        this.getNewChatPhoto = getNewChatPhoto;
+        this.chatListUpdatesQueue = chatListUpdatesQueue;
+    }
 
     @Override
     public List<ChatPreview> get() {

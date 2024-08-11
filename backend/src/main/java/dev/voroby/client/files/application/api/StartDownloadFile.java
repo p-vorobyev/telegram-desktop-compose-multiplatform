@@ -1,4 +1,4 @@
-package dev.voroby.client.common.file.application.api;
+package dev.voroby.client.files.application.api;
 
 import dev.voroby.springframework.telegram.client.TdApi;
 import dev.voroby.springframework.telegram.client.TelegramClient;

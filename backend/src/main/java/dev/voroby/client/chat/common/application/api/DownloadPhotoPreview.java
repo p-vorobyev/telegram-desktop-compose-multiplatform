@@ -1,6 +1,6 @@
 package dev.voroby.client.chat.common.application.api;
 
-import dev.voroby.client.common.file.application.api.StartDownloadFile;
+import dev.voroby.client.files.application.api.StartDownloadFile;
 import dev.voroby.springframework.telegram.client.TdApi;
 import org.springframework.stereotype.Component;
 

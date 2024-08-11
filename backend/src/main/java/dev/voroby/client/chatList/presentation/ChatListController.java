@@ -1,6 +1,6 @@
 package dev.voroby.client.chatList.presentation;
 
-import dev.voroby.client.chatList.application.api.LoadChats;
+import dev.voroby.client.chatList.application.api.GetChatList;
 import dev.voroby.client.chatList.dto.ChatPreview;
 import dev.voroby.client.chatList.application.ChatListUpdatesService;
 import org.springframework.http.MediaType;
@@ -14,18 +14,18 @@ import java.util.List;
 @RequestMapping
 public class ChatListController {
 
-    private final LoadChats loadChats;
+    private final GetChatList getChatList;
 
     private final ChatListUpdatesService chatListUpdatesService;
 
-    public ChatListController(LoadChats loadChats, ChatListUpdatesService chatListUpdatesService) {
-        this.loadChats = loadChats;
+    public ChatListController(GetChatList getChatList, ChatListUpdatesService chatListUpdatesService) {
+        this.getChatList = getChatList;
         this.chatListUpdatesService = chatListUpdatesService;
     }
 
     @GetMapping(value = "/loadChats", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<ChatPreview> loadChats() {
-        return loadChats.get();
+        return getChatList.get();
     }
 
     @GetMapping(value = "/chatListUpdates", produces = MediaType.APPLICATION_JSON_VALUE)
