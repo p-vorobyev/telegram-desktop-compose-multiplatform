@@ -26,11 +26,11 @@ public class GetChatHistoryService implements Function<ChatHistoryRequest, List<
     @Override
     public List<TdApi.Message> apply(ChatHistoryRequest chatHistoryRequest) {
         List<TdApi.Message> messages = getChatHistory.apply(chatHistoryRequest);
-        checkAndcacheMessagePhotos(messages);
+        checkAndCacheMessagePhotos(messages);
         return messages;
     }
 
-    private void checkAndcacheMessagePhotos(List<TdApi.Message> messages) {
+    private void checkAndCacheMessagePhotos(List<TdApi.Message> messages) {
         messages.stream()
                 .filter(message -> message.content instanceof TdApi.MessagePhoto)
                 .map(message -> new MessagePhotoInfo(message.id, message.chatId, (TdApi.MessagePhoto) message.content))
