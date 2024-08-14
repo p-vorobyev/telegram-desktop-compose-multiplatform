@@ -14,19 +14,24 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import chat.dto.ChatMessage
+import chat.dto.Content
+import common.Colors.messageCardColor
 import common.composable.CommonSelectionContainer
 
 
 @Composable
-fun MessageTextCard(
-    message: ChatMessage,
-    messageCardColor: Color
-) {
+fun MessageTextCard(message: ChatMessage) {
     Card(shape = RoundedCornerShape(12.dp), backgroundColor = messageCardColor) {
         Column(modifier = Modifier.padding(4.dp)) {
-            if (message.messageText.isNotBlank()) {
+            val messageText = message.textContent.text
+            val textEntities: Collection<Content.TextEntity> = message.textContent.entities
+            if (messageText.isNotBlank()) {
                 CommonSelectionContainer {
-                    Text(text = message.messageText, fontSize = 14.sp)
+                    if (textEntities.isEmpty()) {
+                        Text(text = messageText, fontSize = 14.sp)
+                    } else {
+                        AnnotatedMessageText(messageText = messageText, textEntities = textEntities)
+                    }
                 }
                 Spacer(Modifier.height(4.dp))
             }
