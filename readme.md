@@ -21,7 +21,7 @@
 ## Current versions
 |                       | Version |
 |-----------------------|---------|
-| Compose Multiplatform | 1.6.2   |
+| Compose Multiplatform | 1.6.11  |
 | TDLib                 | 1.8.34  |
 
 
