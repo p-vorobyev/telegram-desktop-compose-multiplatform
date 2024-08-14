@@ -2,19 +2,14 @@ package scene.composable
 
 import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.runtime.*
-import androidx.compose.ui.graphics.Color
 import common.api.refreshChatsMemberCount
-import common.state.ClientStates
+import common.States
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import scene.api.isChatsLoaded
 import scene.api.loadChats
 import scene.dto.ChatPreview
 import terminatingApp
-
-val blueColor = Color(51, 182, 255)
-
-val greyColor = Color(red = 230, green = 230, blue = 230)
 
 
 @Composable
@@ -35,7 +30,7 @@ fun InitialLoad() {
         }
     }
 
-    ClientStates.chatList = chatPreviews
+    States.chatList = chatPreviews
     if (!initialLoad) {
         LoadingDisclaimer("Loading chats...")
     } else {

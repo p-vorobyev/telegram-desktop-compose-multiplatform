@@ -2,7 +2,7 @@ package scene.api
 
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import com.fasterxml.jackson.core.type.TypeReference
-import common.state.ClientStates
+import common.States
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import scene.dto.ChatPreview
@@ -46,7 +46,7 @@ suspend fun markAsRead(chatId: Long) {
 
 suspend fun deleteChat(chatId: Long) {
     httpClient.post("${baseUrl}/${clientUri}/chat/delete/${chatId}")
-    ClientStates.chatList.removeIf { it.id == chatId }
+    States.chatList.removeIf { it.id == chatId }
 }
 
 suspend fun loadChats(): List<ChatPreview> {

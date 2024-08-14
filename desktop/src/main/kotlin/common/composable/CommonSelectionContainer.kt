@@ -5,12 +5,11 @@ import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.text.selection.TextSelectionColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.ui.graphics.Color
+import common.Colors.textSelectionColor
 
 @Composable
 fun CommonSelectionContainer(content: @Composable () -> Unit) {
-    val selectionColor = Color(0xFF95C2F0)
-    val textSelectionColors = TextSelectionColors(handleColor = selectionColor, backgroundColor = selectionColor)
+    val textSelectionColors = TextSelectionColors(handleColor = textSelectionColor, backgroundColor = textSelectionColor)
     CompositionLocalProvider(LocalTextSelectionColors provides textSelectionColors) {
         SelectionContainer {
             content()

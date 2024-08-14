@@ -10,7 +10,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asComposeImageBitmap
 import androidx.compose.ui.graphics.graphicsLayer
@@ -18,9 +17,10 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.sp
+import common.Colors.blueColor
+import common.Colors.surfaceColor
 import org.jetbrains.skia.Bitmap
 import org.jetbrains.skia.Image
-import scene.composable.blueColor
 import java.util.*
 import java.util.stream.Collectors
 
@@ -62,7 +62,7 @@ fun ChatIcon(
                     .collect(Collectors.joining())
             Text(
                 iconText,
-                style = TextStyle(color = Color.White, fontSize = 20.sp),
+                style = TextStyle(color = surfaceColor, fontSize = 20.sp),
                 modifier = Modifier.align(Alignment.Center)
             )
         }

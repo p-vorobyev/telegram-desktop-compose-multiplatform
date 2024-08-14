@@ -6,16 +6,17 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.Divider
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import chat.composable.ChatWindow
 import chat.composable.SelectChatOffer
+import common.Colors.greyColor
+import common.Colors.surfaceColor
+import common.States
 import common.composable.ScrollButton
 import common.composable.ScrollDirection
-import common.state.ClientStates
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import scene.api.handleChatListUpdates
@@ -44,18 +45,18 @@ fun MainScene() {
 
     chatListUpdateScope.launch {
         while (!terminatingApp.get()) {
-            val chatsSizeBeforeUpdates = ClientStates.chatList.size
+            val chatsSizeBeforeUpdates = States.chatList.size
             var firstChatPreviewBeforeUpdates: ChatPreview? = null
-            if (ClientStates.chatList.isNotEmpty()) {
-                firstChatPreviewBeforeUpdates = ClientStates.chatList[0]
+            if (States.chatList.isNotEmpty()) {
+                firstChatPreviewBeforeUpdates = States.chatList[0]
             }
 
-            handleChatListUpdates(ClientStates.chatList)
+            handleChatListUpdates(States.chatList)
 
-            needToScrollUpSidebar = (ClientStates.chatList.size > chatsSizeBeforeUpdates) ||
-                    (ClientStates.chatList.isNotEmpty() &&
+            needToScrollUpSidebar = (States.chatList.size > chatsSizeBeforeUpdates) ||
+                    (States.chatList.isNotEmpty() &&
                             lazyListState.firstVisibleItemIndex < 3 &&
-                            firstChatPreviewBeforeUpdates != ClientStates.chatList[0])
+                            firstChatPreviewBeforeUpdates != States.chatList[0])
             if (needToScrollUpSidebar) {
                 lazyListState.scrollToItem(0)
             }
@@ -72,9 +73,9 @@ fun MainScene() {
         Row {
 
             Box {
-                LazyColumn(state = lazyListState, modifier = sidebarWidthModifier.background(MaterialTheme.colors.surface).fillMaxHeight()) {
+                LazyColumn(state = lazyListState, modifier = sidebarWidthModifier.background(surfaceColor).fillMaxHeight()) {
 
-                    itemsIndexed(ClientStates.chatList, { _, v -> v}) { _, chatPreview ->
+                    itemsIndexed(States.chatList, { _, v -> v}) { _, chatPreview ->
 
                         if (chatSearchInput.value.isBlank() || chatPreview.title.contains(chatSearchInput.value, ignoreCase = true)) {
                             var hasUnread = false
@@ -85,13 +86,13 @@ fun MainScene() {
                             }
                             val onChatClick = {
                                 selectedChatId.value = chatPreview.id
-                                ClientStates.selectedChatPreview.value = chatPreview
+                                States.selectedChatPreview.value = chatPreview
                             }
                             if (filterUnreadChats.value && hasUnread) {
-                                ChatCard(chatListUpdateScope = chatListUpdateScope, chatPreview = chatPreview, selectedChatId = selectedChatId, onClick = onChatClick)
+                                ChatCard(chatPreview = chatPreview, selectedChatId = selectedChatId, onClick = onChatClick)
                                 Divider(modifier = sidebarWidthModifier.height(2.dp), color = greyColor)
                             } else if (!filterUnreadChats.value) {
-                                ChatCard(chatListUpdateScope = chatListUpdateScope, chatPreview = chatPreview, selectedChatId = selectedChatId, onClick = onChatClick)
+                                ChatCard(chatPreview = chatPreview, selectedChatId = selectedChatId, onClick = onChatClick)
                                 Divider(modifier = sidebarWidthModifier.height(2.dp), color = greyColor)
                             }
 
@@ -103,7 +104,10 @@ fun MainScene() {
 
                 if (lazyListState.firstVisibleItemIndex > 3) {
                     Row(modifier = sidebarWidthModifier) {
-                        Row(modifier = Modifier.fillMaxSize().padding(top = 12.dp, end = 12.dp), horizontalArrangement = Arrangement.End) {
+                        Row(
+                            modifier = Modifier.fillMaxSize().padding(top = 12.dp, end = 12.dp),
+                            horizontalArrangement = Arrangement.End
+                        ) {
                             ScrollButton(
                                 direction = ScrollDirection.UP,
                                 onClick = {
@@ -118,7 +122,7 @@ fun MainScene() {
             }
 
             Column {
-                if (selectedChatId.value == -1L && ClientStates.chatList.isNotEmpty()) {
+                if (selectedChatId.value == -1L && States.chatList.isNotEmpty()) {
                     SelectChatOffer()
                 } else if (selectedChatId.value != -1L) {
 
@@ -129,19 +133,17 @@ fun MainScene() {
                         ChatWindow(chatId = selectedChatId.value, chatListUpdateScope = chatListUpdateScope)
                     }
 
-                    chatListUpdateScope.launch {
-                        ClientStates.selectedChatPreview.let {
-                            it.value?.let { currentChat ->
-                                currentChat.unreadCount?.let {
-                                    if (it > 0 && readChat != currentChat.id) {
-                                        readChat = currentChat.id
-                                        markAsRead(readChat)
-                                    }
+
+                    States.selectedChatPreview.let {
+                        it.value?.let { currentChat ->
+                            currentChat.unreadCount?.let {
+                                if (it > 0 && readChat != currentChat.id) {
+                                    readChat = currentChat.id
+                                    chatListUpdateScope.launch { markAsRead(readChat) }
                                 }
                             }
                         }
                     }
-
                 }
             }
 

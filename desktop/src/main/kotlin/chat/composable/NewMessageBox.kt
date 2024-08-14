@@ -10,7 +10,6 @@ import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.isCtrlPressed
 import androidx.compose.ui.input.key.key
@@ -20,11 +19,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import chat.api.sendMessage
 import chat.dto.NewMessage
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import scene.composable.blueColor
-import scene.composable.greyColor
+import common.Colors
+import common.Colors.blueColor
+import common.Colors.chatBackgroundColor
+import common.Colors.greyColor
+import common.Colors.redWarningColor
+import util.blockingIO
 import java.time.Instant
 
 private const val MESSAGE_MAX_LENGTH = 2000
@@ -39,10 +39,14 @@ fun NewMessageBox(chatId: Long, inputTextDraft: MutableState<String>) {
     }
 
     Box(modifier = Modifier.fillMaxWidth().background(greyColor)) {
+        val inputMessageTextModifier = Modifier.padding(start = 2.dp, end = 72.dp, bottom = 2.dp, top = 2.dp)
+            .fillMaxWidth()
+            .align(Alignment.Center)
+            .background(chatBackgroundColor)
         OutlinedTextField(
             value = inputTextDraft.value,
             onValueChange = { inputTextDraft.value = it },
-            modifier = Modifier.padding(start = 2.dp, end = 72.dp, bottom = 2.dp, top = 2.dp).fillMaxWidth().align(Alignment.Center).background(Color.White)
+            modifier = inputMessageTextModifier
                 .onPreviewKeyEvent {
                     when {
                         (inputTextDraft.value.isNotBlank() &&
@@ -55,7 +59,10 @@ fun NewMessageBox(chatId: Long, inputTextDraft: MutableState<String>) {
                     }
                 },
             colors = TextFieldDefaults.outlinedTextFieldColors(
-                focusedBorderColor = if (inputTextDraft.value.length < MESSAGE_MAX_LENGTH) blueColor else Color.Red
+                focusedBorderColor = when {
+                    (inputTextDraft.value.length < MESSAGE_MAX_LENGTH) -> blueColor
+                    else -> redWarningColor
+                }
             ),
             textStyle = TextStyle(fontSize = 14.sp)
         )
@@ -91,7 +98,7 @@ private fun executeSendMessage(
     inputTextDraft.value = ""
 }
 
-private fun sendMessageApiCall(chatId: Long, inputText: String) = CoroutineScope(Dispatchers.IO).launch {
+private fun sendMessageApiCall(chatId: Long, inputText: String) = blockingIO {
     NewMessage.TextMessage(
         chatId = chatId,
         text = inputText

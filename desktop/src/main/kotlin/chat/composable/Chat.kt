@@ -13,24 +13,22 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import chat.api.*
 import chat.dto.ChatMessage
+import common.Colors
 import common.Resources
 import common.composable.ChatIcon
 import common.composable.ScrollButton
 import common.composable.ScrollDirection
-import common.state.ClientStates
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.async
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import common.States
+import kotlinx.coroutines.*
 import org.jetbrains.skia.Codec
 import org.jetbrains.skia.Data
 import terminatingApp
+import util.blockingIO
 import java.nio.file.Files
 import java.util.concurrent.locks.ReentrantLock
 
@@ -66,7 +64,7 @@ fun ChatWindow(
                 loadOpenedChatMessages(chatId = chatId) {
                     //scroll to the end when open chat
                     chatListUpdateScope.launch {
-                        chatHistoryListState.scrollToItem(ClientStates.chatHistory.size - 1)
+                        chatHistoryListState.scrollToItem(States.chatHistory.size - 1)
                     }
                     fullHistoryLoaded.value = false // turn off flag when open new chat if it was activated
                 }
@@ -106,7 +104,7 @@ fun ChatWindow(
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         bottomBar = {
-            ClientStates.selectedChatPreview.value?.let {
+            States.selectedChatPreview.value?.let {
                 if (it.canSendTextMessage || isChannelAdmin.value) {
                     NewMessageBox(chatId = chatId, inputTextDraft = inputTextDraft)
                 }
@@ -114,33 +112,35 @@ fun ChatWindow(
         }
     ) {
         var chatMessagesBoxModifier: Modifier = Modifier
-        ClientStates.selectedChatPreview.value?.let {
+        States.selectedChatPreview.value?.let {
             if (it.canSendTextMessage || isChannelAdmin.value) {
                 chatMessagesBoxModifier = Modifier.padding(bottom = 60.dp)
             }
         }
         Box(modifier = chatMessagesBoxModifier) {
             if (openedId.value == chatId) {
-                LazyColumn(modifier = Modifier.background(Color.White).fillMaxSize().padding(start = 5.dp, end = 12.dp), verticalArrangement = Arrangement.Bottom, state = chatHistoryListState) {
-                    val messageCardColor = Color(0xFFF7F4F4)
-                    val headerColor = Color(0xFF95C2F0)
+                LazyColumn(
+                    modifier = Modifier.background(Colors.chatBackgroundColor).fillMaxSize().padding(start = 5.dp, end = 12.dp),
+                    verticalArrangement = Arrangement.Bottom,
+                    state = chatHistoryListState
+                ) {
 
                     val contentLoaderCodec: Codec = contentLoaderCodec()
 
-                    items(ClientStates.chatHistory, key = {it.id}) { message ->
+                    items(States.chatHistory, key = {it.id}) { message ->
 
-                        ContextMenuArea(items = { messageContextMenuItems(message, chatListUpdateScope) } ) {
+                        ContextMenuArea(items = { messageContextMenuItems(message) } ) {
                             Row(modifier = Modifier.fillMaxWidth())  {
                                 //Adds items to the hierarchy of context menu items
                                 ChatIcon(encodedChatPhoto = message.senderPhoto, chatTitle = message.senderInfo, circleSize = 44.dp)
                                 Spacer(Modifier.width(4.dp))
                                 Column {
-                                    Text(text = message.senderInfo, fontWeight = FontWeight.Bold, fontSize = 12.sp, color = headerColor)
+                                    Text(text = message.senderInfo, fontWeight = FontWeight.Bold, fontSize = 12.sp, color = Colors.messageHeaderColor)
                                     Spacer(Modifier.height(4.dp))
                                     message.photoPreview?.let {
                                         MessagePhoto(it, contentLoaderCodec)
                                     }
-                                    MessageTextCard(message, messageCardColor)
+                                    MessageTextCard(message)
                                 }
                             }
                         }
@@ -160,13 +160,13 @@ fun ChatWindow(
 
             val firstVisibleIndex = chatHistoryListState.firstVisibleItemIndex
             val visibleItemsCount = chatHistoryListState.layoutInfo.visibleItemsInfo.size
-            if ((firstVisibleIndex + visibleItemsCount) < ClientStates.chatHistory.size) {
+            if ((firstVisibleIndex + visibleItemsCount) < States.chatHistory.size) {
                 Row(modifier = Modifier.align(Alignment.BottomEnd).padding(bottom = 12.dp, end = 12.dp)) {
                     ScrollButton(
                         direction = ScrollDirection.DOWN,
                         onClick = {
                             chatListUpdateScope.launch {
-                                chatHistoryListState.animateScrollToItem(ClientStates.chatHistory.size - 1)
+                                chatHistoryListState.animateScrollToItem(States.chatHistory.size - 1)
                                 hasIncomingMessages.value = false
                             }
                         }
@@ -176,11 +176,11 @@ fun ChatWindow(
             }
 
 
-            val scrollOnTheFloor = (ClientStates.chatHistory.size - (firstVisibleIndex + visibleItemsCount)) <= 2
-            if (hasIncomingMessages.value && scrollOnTheFloor && ClientStates.chatHistory.isNotEmpty()) {
+            val scrollOnTheFloor = (States.chatHistory.size - (firstVisibleIndex + visibleItemsCount)) <= 2
+            if (hasIncomingMessages.value && scrollOnTheFloor && States.chatHistory.isNotEmpty()) {
                 chatListUpdateScope.launch {
                     //scroll to the end when new messages come with condition to scroll
-                    chatHistoryListState.scrollToItem(ClientStates.chatHistory.size - 1)
+                    chatHistoryListState.scrollToItem(States.chatHistory.size - 1)
                     hasIncomingMessages.value = false
                 }
             }
@@ -191,15 +191,11 @@ fun ChatWindow(
 }
 
 
-private fun messageContextMenuItems(message: ChatMessage,
-                                    chatListUpdateScope: CoroutineScope
-): List<ContextMenuItem> {
+private fun messageContextMenuItems(message: ChatMessage): List<ContextMenuItem> {
     val items: MutableList<ContextMenuItem> = mutableListOf()
     if (message.canBeDeletedForAllUsers || message.canBeDeletedOnlyForSelf) {
         items.add(ContextMenuItem("Delete") {
-            chatListUpdateScope.launch {
-                deleteMessages(message.chatId, listOf(message.id))
-            }
+            blockingIO { deleteMessages(message.chatId, listOf(message.id)) }
         })
     }
     return items

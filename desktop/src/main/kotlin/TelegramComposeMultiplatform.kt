@@ -71,9 +71,8 @@ suspend fun startBackend() = withContext(Dispatchers.IO) {
     } else {
         "nohup java -Xms64m -Xmx256m -Djava.library.path=$nativeLibPath -jar $backendJar >/dev/null 2>&1 &"
     }
-
     Runtime.getRuntime().exec(backendExecCommand)
-    delay(500)
+    delay(100)
 }
 
 
@@ -87,9 +86,9 @@ private suspend fun awaitReadiness(backendStarted: MutableState<Boolean>) {
         } catch (ex: IOException) {
             /*igonre*/
         }
-        delay(1000)
+        delay(300)
         startUpReadinessCheckCount++
-    } while (status == null && startUpReadinessCheckCount <= 20)
+    } while (status == null && startUpReadinessCheckCount <= 60)
     if (!backendStarted.value) {
         throw RuntimeException("Backend is not started. Check log file.")
     }
@@ -113,7 +112,7 @@ fun main() = application {
         onCloseRequest = {
             terminatingApp.set(true)
             appScope.launch {
-                delay(300)
+                delay(100)
                 httpClient.post("${baseUrl}/${clientUri}/shutdown")
             }.invokeOnCompletion {
                 exitApplication()

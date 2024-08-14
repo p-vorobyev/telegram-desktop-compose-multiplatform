@@ -13,9 +13,9 @@ import androidx.compose.ui.text.input.TransformedText
 import androidx.compose.ui.unit.dp
 import auth.api.sendCode
 import auth.api.sendPass
+import common.Colors.blueColor
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import scene.composable.blueColor
 
 enum class AuthType {
     CODE, PASSWORD

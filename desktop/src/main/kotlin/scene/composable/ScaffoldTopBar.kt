@@ -13,8 +13,11 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import chat.composable.ChatHeader
+import common.Colors.blueColor
+import common.Colors.greyColor
+import common.Colors.surfaceColor
+import common.States
 import common.composable.CommonSelectionContainer
-import common.state.ClientStates
 
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -24,13 +27,13 @@ fun ScaffoldTopBar(
     filterUnreadChats: MutableState<Boolean> = mutableStateOf(false)
 ) {
 
-    if (ClientStates.chatList.isNotEmpty()) {
+    if (States.chatList.isNotEmpty()) {
         Row {
-            val topHeaderModifier = sidebarWidthModifier.height(50.dp).background(MaterialTheme.colors.surface)
+            val topHeaderModifier = sidebarWidthModifier.height(50.dp).background(surfaceColor)
 
             Column {
 
-                Spacer(modifier = sidebarWidthModifier.height(5.dp).background(MaterialTheme.colors.surface))
+                Spacer(modifier = sidebarWidthModifier.height(5.dp).background(surfaceColor))
 
                 Row (modifier = topHeaderModifier) {
                     // to enable text selection
@@ -40,9 +43,7 @@ fun ScaffoldTopBar(
                             onValueChange = { chatSearchInput.value = it },
                             shape = MaterialTheme.shapes.medium,
                             modifier = Modifier.fillMaxWidth().padding(start = 5.dp, end = 5.dp),
-                            colors = TextFieldDefaults.outlinedTextFieldColors(
-                                focusedBorderColor = blueColor
-                            ),
+                            colors = TextFieldDefaults.outlinedTextFieldColors(focusedBorderColor = blueColor),
                             textStyle = TextStyle(fontSize = 14.sp),
                             singleLine = true
                         )
@@ -50,7 +51,7 @@ fun ScaffoldTopBar(
                 }
 
                 Row(
-                    modifier = sidebarWidthModifier.height(30.dp).background(MaterialTheme.colors.surface),
+                    modifier = sidebarWidthModifier.height(30.dp).background(surfaceColor),
                     horizontalArrangement = Arrangement.Center,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -80,7 +81,7 @@ fun ScaffoldTopBar(
             Divider(modifier = Modifier.height(50.dp).width(2.dp), color = greyColor)
 
             Column {
-                ClientStates.selectedChatPreview.value?.let {
+                States.selectedChatPreview.value?.let {
                     ChatHeader()
                 }
             }
