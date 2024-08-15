@@ -22,7 +22,7 @@ fun InitialLoad() {
     LaunchedEffect(Unit) {
         while (!initialLoad && !terminatingApp.get()) {
             initialLoad = isChatsLoaded()
-            delay(500)
+            delay(100)
         }
         chatPreviews.addAll(loadChats())
         launch {

@@ -72,7 +72,7 @@ suspend fun startBackend() = withContext(Dispatchers.IO) {
         "nohup java -Xms64m -Xmx256m -Djava.library.path=$nativeLibPath -jar $backendJar >/dev/null 2>&1 &"
     }
     Runtime.getRuntime().exec(backendExecCommand)
-    delay(100)
+    delay(500)
 }
 
 
@@ -83,10 +83,11 @@ private suspend fun awaitReadiness(backendStarted: MutableState<Boolean>) {
         try {
             status = authorizationStatus()
             backendStarted.value = true
+            break
         } catch (ex: IOException) {
             /*igonre*/
         }
-        delay(300)
+        delay(200)
         startUpReadinessCheckCount++
     } while (status == null && startUpReadinessCheckCount <= 60)
     if (!backendStarted.value) {
