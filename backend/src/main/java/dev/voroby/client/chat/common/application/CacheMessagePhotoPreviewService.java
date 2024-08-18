@@ -21,11 +21,15 @@ public class CacheMessagePhotoPreviewService implements Consumer<MessagePhotoInf
     public void accept(MessagePhotoInfo messagePhotoInfo) {
         Integer photoPreviewId = downloadPhotoPreview.apply(messagePhotoInfo.content());
         if (photoPreviewId != null) {
-            Caches.messageIdToPhotoPreviewIdCache.put(messagePhotoInfo.messageId(), photoPreviewId);
-            Caches.photoPreviewIdToMessageIdCache.put(
-                    photoPreviewId,
-                    new MessageId(messagePhotoInfo.chatId(), messagePhotoInfo.messageId())
-            );
+            cacheMessagePhotoIdentifiers(messagePhotoInfo, photoPreviewId);
         }
+    }
+
+    private static void cacheMessagePhotoIdentifiers(MessagePhotoInfo messagePhotoInfo, Integer photoPreviewId) {
+        Caches.messageIdToPhotoPreviewIdCache.put(messagePhotoInfo.messageId(), photoPreviewId);
+        Caches.photoPreviewIdToMessageIdCache.put(
+                photoPreviewId,
+                new MessageId(messagePhotoInfo.chatId(), messagePhotoInfo.messageId())
+        );
     }
 }
