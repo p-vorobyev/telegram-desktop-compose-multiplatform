@@ -48,6 +48,9 @@ public class FillTextContent implements Function<ConvertChatMessageContext, Conv
                     new TextContent(textOrDisclaimerIfBlank(msgVideo.caption), convertTextEntities(msgVideo.caption.entities));
             case TdApi.MessageDocument msgDocument ->
                     new TextContent(textOrDisclaimerIfBlank(msgDocument.caption), convertTextEntities(msgDocument.caption.entities));
+            case TdApi.MessageAnimatedEmoji emoji -> new TextContent(emoji.emoji, emptyList());
+            case TdApi.MessageAnimation messageAnimation ->
+                    new TextContent(messageAnimation.caption.text, convertTextEntities(messageAnimation.caption.entities));
             default -> new TextContent(UNSUPPORTED_MESSAGE_DISCLAIMER, emptyList());
         };
     }
