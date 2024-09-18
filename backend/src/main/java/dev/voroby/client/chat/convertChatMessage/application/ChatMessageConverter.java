@@ -1,11 +1,8 @@
 package dev.voroby.client.chat.convertChatMessage.application;
 
-import dev.voroby.client.chat.convertChatMessage.application.api.FillMetaInfo;
-import dev.voroby.client.chat.convertChatMessage.application.api.FillPhotoContent;
-import dev.voroby.client.chat.convertChatMessage.application.api.FillSenderInfo;
-import dev.voroby.client.chat.convertChatMessage.application.api.FillTextContent;
-import dev.voroby.client.chat.convertChatMessage.dto.ConvertChatMessageContext;
 import dev.voroby.client.chat.common.dto.ChatMessage;
+import dev.voroby.client.chat.convertChatMessage.application.api.*;
+import dev.voroby.client.chat.convertChatMessage.dto.ConvertChatMessageContext;
 import dev.voroby.springframework.telegram.client.TdApi;
 import org.springframework.stereotype.Component;
 
@@ -20,24 +17,29 @@ public class ChatMessageConverter implements Function<TdApi.Message, ChatMessage
 
     private final FillTextContent fillTextContent;
 
-    private final FillPhotoContent fillPhotoContent;
+    private final FillEncodedContent fillEncodedContent;
+
+    private final FillUrlContent fillUrlContent;
 
     public ChatMessageConverter(FillMetaInfo fillMetaInfo,
                                 FillSenderInfo fillSenderInfo,
                                 FillTextContent fillTextContent,
-                                FillPhotoContent fillPhotoContent) {
+                                FillEncodedContent fillEncodedContent,
+                                FillUrlContent fillUrlContent) {
         this.fillMetaInfo = fillMetaInfo;
         this.fillSenderInfo = fillSenderInfo;
         this.fillTextContent = fillTextContent;
-        this.fillPhotoContent = fillPhotoContent;
+        this.fillEncodedContent = fillEncodedContent;
+        this.fillUrlContent = fillUrlContent;
     }
 
     @Override
     public ChatMessage apply(TdApi.Message message) {
         return fillMetaInfo
                 .andThen(fillSenderInfo)
-                .andThen(fillPhotoContent)
+                .andThen(fillEncodedContent)
                 .andThen(fillTextContent)
+                .andThen(fillUrlContent)
                 .apply(new ConvertChatMessageContext(message, new ChatMessage()))
                 .chatMessage();
     }

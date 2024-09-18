@@ -19,7 +19,8 @@ public class DeleteMessages implements Consumer<DeleteMessagesDto> {
 
     @Override
     public void accept(DeleteMessagesDto deleteMessagesDto) {
-        telegramClient.sendAsync(new TdApi.DeleteMessages(deleteMessagesDto.chatId(), deleteMessagesDto.ids(), true));
+        telegramClient
+                .sendAsync(new TdApi.DeleteMessages(deleteMessagesDto.chatId(), deleteMessagesDto.ids(), true));
         log.info("Messages deleted: [chatId: {}, count: {}]", deleteMessagesDto.chatId(), deleteMessagesDto.ids().length);
     }
 }

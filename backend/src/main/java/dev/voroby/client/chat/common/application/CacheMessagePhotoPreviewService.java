@@ -27,9 +27,7 @@ public class CacheMessagePhotoPreviewService implements Consumer<MessagePhotoInf
 
     private static void cacheMessagePhotoIdentifiers(MessagePhotoInfo messagePhotoInfo, Integer photoPreviewId) {
         Caches.messageIdToPhotoPreviewIdCache.put(messagePhotoInfo.messageId(), photoPreviewId);
-        Caches.photoPreviewIdToMessageIdCache.put(
-                photoPreviewId,
-                new MessageId(messagePhotoInfo.chatId(), messagePhotoInfo.messageId())
-        );
+        var messageId = new MessageId(messagePhotoInfo.chatId(), messagePhotoInfo.messageId());
+        Caches.photoPreviewIdToMessageIdCache.put(photoPreviewId, messageId);
     }
 }

@@ -42,6 +42,10 @@ public final class Caches {
 
     public final static Map<Integer, MessageId> photoPreviewIdToMessageIdCache = new ConcurrentHashMap<>();
 
+    public final static Map<Long, Integer> messageIdToGifAnimationIdCache = new ConcurrentHashMap<>();
+
+    public final static Map<Integer, MessageId> gifAnimationIdToMessageIdCache = new ConcurrentHashMap<>();
+
     private Caches() {}
 
 }

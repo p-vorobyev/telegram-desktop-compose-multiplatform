@@ -1,6 +1,6 @@
 package dev.voroby.client.messages.delete.presentation;
 
-import dev.voroby.client.messages.delete.application.api.DeleteMessages;
+import dev.voroby.client.messages.delete.application.DeleteMessagesService;
 import dev.voroby.client.messages.delete.dto.DeleteMessagesDto;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -14,14 +14,14 @@ import static dev.voroby.client.messages.MessagesConstants.REQUEST_MAPPING_PATH;
 @RequestMapping(value = REQUEST_MAPPING_PATH)
 public class DeleteMessagesController {
 
-    private final DeleteMessages deleteMessages;
+    private final DeleteMessagesService deleteMessagesService;
 
-    public DeleteMessagesController(DeleteMessages deleteMessages) {
-        this.deleteMessages = deleteMessages;
+    public DeleteMessagesController(DeleteMessagesService deleteMessagesService) {
+        this.deleteMessagesService = deleteMessagesService;
     }
 
     @PostMapping(value = "/delete", consumes = MediaType.APPLICATION_JSON_VALUE)
     public void deleteMessages(@RequestBody DeleteMessagesDto deleteMessagesDto) {
-        deleteMessages.accept(deleteMessagesDto);
+        deleteMessagesService.accept(deleteMessagesDto);
     }
 }
