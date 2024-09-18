@@ -5,8 +5,8 @@ data class ChatMessage(
     val chatId: Long,
     val privateChat: Boolean,
     val textContent: Content.TextContent,
-    /*If null - no photo in message, if empty - photo exists, but not loaded yet(will come with message update)*/
-    val photoPreview: String?,
+    val encodedContent: Content.EncodedContent?,
+    val urlContent: Content.UrlContent?,
     val date: String,
     val editDate: String,
     val senderInfo: String,

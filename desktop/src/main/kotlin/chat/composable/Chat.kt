@@ -7,10 +7,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -18,18 +15,20 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import chat.api.*
 import chat.dto.ChatMessage
+import chat.dto.Content
+import chat.dto.Content.EncodedContentType.Photo
+import chat.dto.Content.UrlContentType.Gif
 import common.Colors
-import common.Resources
+import common.States
 import common.composable.ChatIcon
 import common.composable.ScrollButton
 import common.composable.ScrollDirection
-import common.States
-import kotlinx.coroutines.*
-import org.jetbrains.skia.Codec
-import org.jetbrains.skia.Data
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.async
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import terminatingApp
 import util.blockingIO
-import java.nio.file.Files
 import java.util.concurrent.locks.ReentrantLock
 
 
@@ -75,7 +74,7 @@ fun ChatWindow(
                 chatLock.unlock()
             }
 
-            delay(100)
+            delay(500)
 
             while (!terminatingApp.get() && openedId.value == chatId) {
                 chatLock.lock()
@@ -87,15 +86,16 @@ fun ChatWindow(
                             chatHistoryListState = chatHistoryListState
                         )
                     }
-                    delay(100)
+                    delay(500)
                     getIncomingMessages(chatId, hasIncomingMessages)
-                    delay(100)
+                    delay(500)
                     getEditedMessages()
-                    delay(100)
+                    delay(500)
                     handleDeletedMessages()
                 } finally {
                     chatLock.unlock()
                 }
+                delay(500)
             }
         }
 
@@ -125,8 +125,6 @@ fun ChatWindow(
                     state = chatHistoryListState
                 ) {
 
-                    val contentLoaderCodec: Codec = contentLoaderCodec()
-
                     items(States.chatHistory, key = {it.id}) { message ->
 
                         ContextMenuArea(items = { messageContextMenuItems(message) } ) {
@@ -137,9 +135,8 @@ fun ChatWindow(
                                 Column {
                                     Text(text = message.senderInfo, fontWeight = FontWeight.Bold, fontSize = 12.sp, color = Colors.messageHeaderColor)
                                     Spacer(Modifier.height(4.dp))
-                                    message.photoPreview?.let {
-                                        MessagePhoto(it, contentLoaderCodec)
-                                    }
+                                    message.encodedContent?.draw()
+                                    message.urlContent?.draw()
                                     MessageTextCard(message)
                                 }
                             }
@@ -201,10 +198,14 @@ private fun messageContextMenuItems(message: ChatMessage): List<ContextMenuItem>
     return items
 }
 
+@Composable
+private fun Content.EncodedContent.draw() =
+    when (type) {
+        Photo -> MessagePhoto(content)
+    }
 
-private fun contentLoaderCodec(): Codec {
-    val loaderFile = Resources.resolve("content_loader.gif")
-    val loaderGifBytes: ByteArray = Files.readAllBytes(loaderFile.toPath())
-    val codec: Codec = Codec.makeFromData(Data.makeFromBytes(loaderGifBytes))
-    return codec
-}
+@Composable
+private fun Content.UrlContent.draw() =
+    when (type) {
+        Gif -> MessageGif(this as Content.UrlContent.GifFile)
+    }

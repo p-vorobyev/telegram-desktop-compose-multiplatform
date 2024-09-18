@@ -2,16 +2,12 @@ package common
 
 import java.io.File
 
-class Resources {
+object Resources {
 
-    companion object {
+    val resourcesDirectory: File = File(System.getProperty("compose.application.resources.dir"))
 
-        private val resourcesDirectory: File = File(System.getProperty("compose.application.resources.dir"))
+    val loaderFile: File = resourcesDirectory.resolve("content_loader.gif")
 
-        fun resourcesDirectory(): File = resourcesDirectory
-
-        fun resolve(relative: String) : File = resourcesDirectory.resolve(relative)
-
-    }
+    val backendJar: File = resourcesDirectory.resolve("backend.jar")
 
 }

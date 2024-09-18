@@ -18,6 +18,7 @@ import scene.composable.LoadingDisclaimer
 import transport.baseUrl
 import transport.clientUri
 import transport.httpClient
+import util.io
 import java.io.IOException
 import java.util.*
 import java.util.concurrent.atomic.AtomicBoolean
@@ -44,9 +45,9 @@ fun App() {
                 status = authorizationStatus()
                 if (status == Status.AUTHORIZED) break
                 waitCode = waitCode()
-                delay(300)
+                delay(100)
                 waitPass = waitPass()
-                delay(300)
+                delay(100)
             }
         }
 
@@ -61,18 +62,18 @@ fun App() {
 }
 
 
-suspend fun startBackend() = withContext(Dispatchers.IO) {
+suspend fun startBackend() = io {
     val os: String = System.getProperty("os.name")
 
-    val nativeLibPath = Resources.resourcesDirectory().absolutePath
-    val backendJar = Resources.resolve("backend-0.0.1.jar").absolutePath
+    val nativeLibPath = Resources.resourcesDirectory.absolutePath
+    val backendJar = Resources.backendJar.absolutePath
     val backendExecCommand = if (os.lowercase(Locale.getDefault()).startsWith("windows")) {
         "javaw -Xms64m -Xmx256m -Djava.library.path=$nativeLibPath -jar $backendJar"
     } else {
         "nohup java -Xms64m -Xmx256m -Djava.library.path=$nativeLibPath -jar $backendJar >/dev/null 2>&1 &"
     }
     Runtime.getRuntime().exec(backendExecCommand)
-    delay(500)
+    Unit
 }
 
 

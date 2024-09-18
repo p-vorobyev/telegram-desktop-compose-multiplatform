@@ -19,7 +19,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import chat.api.sendMessage
 import chat.dto.NewMessage
-import common.Colors
 import common.Colors.blueColor
 import common.Colors.chatBackgroundColor
 import common.Colors.greyColor
