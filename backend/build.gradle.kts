@@ -34,9 +34,8 @@ dependencies {
     implementation("dev.voroby:spring-boot-starter-telegram:1.13.0")
     compileOnly("org.projectlombok:lombok:$lombokVersion")
     annotationProcessor("org.projectlombok:lombok:$lombokVersion")
-    testImplementation("org.springframework.boot:spring-boot-starter-test")
 }
 
-tasks.withType<Test> {
-    useJUnitPlatform()
+tasks.bootJar {
+    archiveFileName = "backend.jar"
 }
