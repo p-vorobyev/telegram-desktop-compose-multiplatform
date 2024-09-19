@@ -10,9 +10,11 @@ import auth.api.waitCode
 import auth.api.waitPass
 import auth.composable.AuthForm
 import auth.composable.AuthType
-import common.Resources
+import common.BackendCommands.startNix
+import common.BackendCommands.startWindows
 import io.ktor.client.request.*
-import kotlinx.coroutines.*
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import scene.composable.InitialLoad
 import scene.composable.LoadingDisclaimer
 import transport.baseUrl
@@ -20,7 +22,6 @@ import transport.clientUri
 import transport.httpClient
 import util.io
 import java.io.IOException
-import java.util.*
 import java.util.concurrent.atomic.AtomicBoolean
 
 
@@ -64,14 +65,7 @@ fun App() {
 
 suspend fun startBackend() = io {
     val os: String = System.getProperty("os.name")
-
-    val nativeLibPath = Resources.resourcesDirectory.absolutePath
-    val backendJar = Resources.backendJar.absolutePath
-    val backendExecCommand = if (os.lowercase(Locale.getDefault()).startsWith("windows")) {
-        "javaw -Xms64m -Xmx256m -Djava.library.path=$nativeLibPath -jar $backendJar"
-    } else {
-        "nohup java -Xms64m -Xmx256m -Djava.library.path=$nativeLibPath -jar $backendJar >/dev/null 2>&1 &"
-    }
+    val backendExecCommand = if (os.lowercase().startsWith("windows")) startWindows else startNix
     Runtime.getRuntime().exec(backendExecCommand)
     Unit
 }
