@@ -3,10 +3,13 @@ package chat.composable
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.KeyboardArrowDown
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -21,8 +24,7 @@ import chat.dto.Content.UrlContentType.Gif
 import common.Colors
 import common.States
 import common.composable.ChatIcon
-import common.composable.ScrollButton
-import common.composable.ScrollDirection
+import common.composable.CircleButton
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
@@ -159,13 +161,10 @@ fun ChatWindow(
             val visibleItemsCount = chatHistoryListState.layoutInfo.visibleItemsInfo.size
             if ((firstVisibleIndex + visibleItemsCount) < States.chatHistory.size) {
                 Row(modifier = Modifier.align(Alignment.BottomEnd).padding(bottom = 12.dp, end = 12.dp)) {
-                    ScrollButton(
-                        direction = ScrollDirection.DOWN,
+                    CircleButton(
+                        imageVector = Icons.Rounded.KeyboardArrowDown,
                         onClick = {
-                            chatListUpdateScope.launch {
-                                chatHistoryListState.animateScrollToItem(States.chatHistory.size - 1)
-                                hasIncomingMessages.value = false
-                            }
+                            scrollMessagesToEnd(chatListUpdateScope, chatHistoryListState, hasIncomingMessages)
                         }
                     )
                 }
@@ -185,6 +184,17 @@ fun ChatWindow(
         }
     }
 
+}
+
+private fun scrollMessagesToEnd(
+    chatListUpdateScope: CoroutineScope,
+    chatHistoryListState: LazyListState,
+    hasIncomingMessages: MutableState<Boolean>
+) {
+    chatListUpdateScope.launch {
+        chatHistoryListState.animateScrollToItem(States.chatHistory.size - 1)
+        hasIncomingMessages.value = false
+    }
 }
 
 

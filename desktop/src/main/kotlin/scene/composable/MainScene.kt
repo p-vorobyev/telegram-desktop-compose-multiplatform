@@ -7,6 +7,8 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.Divider
 import androidx.compose.material.Scaffold
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.KeyboardArrowUp
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -15,8 +17,7 @@ import chat.composable.SelectChatOffer
 import common.Colors.greyColor
 import common.Colors.surfaceColor
 import common.States
-import common.composable.ScrollButton
-import common.composable.ScrollDirection
+import common.composable.CircleButton
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import scene.api.handleChatListUpdates
@@ -108,8 +109,8 @@ fun MainScene() {
                             modifier = Modifier.fillMaxSize().padding(top = 12.dp, end = 12.dp),
                             horizontalArrangement = Arrangement.End
                         ) {
-                            ScrollButton(
-                                direction = ScrollDirection.UP,
+                            CircleButton(
+                                imageVector = Icons.Rounded.KeyboardArrowUp ,
                                 onClick = {
                                     chatListUpdateScope.launch {
                                         lazyListState.animateScrollToItem(0)
@@ -136,8 +137,8 @@ fun MainScene() {
 
                     States.selectedChatPreview.let {
                         it.value?.let { currentChat ->
-                            currentChat.unreadCount?.let {
-                                if (it > 0 && readChat != currentChat.id) {
+                            currentChat.unreadCount?.let { unreadCount ->
+                                if (unreadCount > 0 && readChat != currentChat.id) {
                                     readChat = currentChat.id
                                     chatListUpdateScope.launch { markAsRead(readChat) }
                                 }
