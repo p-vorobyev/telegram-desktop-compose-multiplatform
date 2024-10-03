@@ -21,7 +21,7 @@ public class GetChatHistory implements Function<ChatHistoryRequest, List<TdApi.M
 
     @Override
     public List<TdApi.Message> apply(ChatHistoryRequest chatHistoryRequest) {
-        int pageSizeLimit = 30;
+        int pageSizeLimit = chatHistoryRequest.limit();
         List<TdApi.Message> messageList = new ArrayList<>();
         long fromMsgId = chatHistoryRequest.fromMessageId();
         do {
@@ -29,10 +29,10 @@ public class GetChatHistory implements Function<ChatHistoryRequest, List<TdApi.M
             if (!messageList.isEmpty()) {
                 fromMsgId = messageList.getFirst().id;
             }
-            var getChatHistory = new TdApi.GetChatHistory(chatHistoryRequest.chatId(), fromMsgId, chatHistoryRequest.offset(), queryLimit, false);
-            TdApi.Messages messages = telegramClient.sendSync(getChatHistory);
-            log.info("Load chat history [chatId: {}, fromMsgId: {}, offset: {}]",
-                    chatHistoryRequest.chatId(), fromMsgId, chatHistoryRequest.offset());
+            var getChatHistory = new TdApi.GetChatHistory(chatHistoryRequest.chatId(), fromMsgId, 0, queryLimit, false);
+            TdApi.Messages messages = telegramClient.send(getChatHistory).object();
+            log.info("Load chat history [chatId: {}, fromMsgId: {}, limit: {}]",
+                    chatHistoryRequest.chatId(), fromMsgId, chatHistoryRequest.limit());
             if (messages.messages == null || messages.messages.length == 0) {
                 return messageList;
             }

@@ -38,7 +38,7 @@ public class OpenChatController extends CommonChatController {
     @PostMapping(value = "/open/{chatId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<ChatMessage> openChat(@PathVariable("chatId") long chatId) {
         openChatService.accept(chatId);
-        return loadChatHistory(new ChatHistoryRequest(chatId, 0, 0));
+        return loadChatHistory(new ChatHistoryRequest(chatId, 0, 30));
     }
 
     @PostMapping(value = "/history", produces = MediaType.APPLICATION_JSON_VALUE)
