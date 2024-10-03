@@ -1,4 +1,4 @@
-package dev.voroby.client.chat.common.application;
+package dev.voroby.client.chat.open.application;
 
 import dev.voroby.client.cache.Caches;
 import dev.voroby.client.chat.common.application.api.DownloadPhotoPreview;

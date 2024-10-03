@@ -1,4 +1,4 @@
-package dev.voroby.client.chat.common.application;
+package dev.voroby.client.chat.convertChatMessage.application.api;
 
 import dev.voroby.client.cache.Caches;
 import dev.voroby.client.chat.common.application.api.GetBase64FileContent;
@@ -9,16 +9,12 @@ import org.springframework.stereotype.Service;
 import java.util.function.Function;
 
 @Service
-public class GetPhotoPreviewService implements Function<MessagePhotoInfo, Photo> {
+public class GetPhotoPreview implements Function<MessagePhotoInfo, Photo> {
 
     private final GetBase64FileContent getBase64FileContent;
 
-    private final CacheMessagePhotoPreviewService cacheMessagePhotoPreviewService;
-
-    public GetPhotoPreviewService(GetBase64FileContent getBase64FileContent,
-                                  CacheMessagePhotoPreviewService cacheMessagePhotoPreviewService) {
+    public GetPhotoPreview(GetBase64FileContent getBase64FileContent) {
         this.getBase64FileContent = getBase64FileContent;
-        this.cacheMessagePhotoPreviewService = cacheMessagePhotoPreviewService;
     }
 
     @Override
@@ -27,8 +23,6 @@ public class GetPhotoPreviewService implements Function<MessagePhotoInfo, Photo>
         Integer photoPreviewId = Caches.messageIdToPhotoPreviewIdCache.get(messagePhotoInfo.messageId());
         if (photoPreviewId != null) {
             encodedPhoto = getBase64FileContent.apply(photoPreviewId);
-        } else {
-            cacheMessagePhotoPreviewService.accept(messagePhotoInfo);
         }
         return new Photo(encodedPhoto);
     }

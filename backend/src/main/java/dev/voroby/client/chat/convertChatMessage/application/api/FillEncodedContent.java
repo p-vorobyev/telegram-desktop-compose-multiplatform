@@ -1,6 +1,5 @@
 package dev.voroby.client.chat.convertChatMessage.application.api;
 
-import dev.voroby.client.chat.common.application.GetPhotoPreviewService;
 import dev.voroby.client.chat.common.dto.ChatMessage;
 import dev.voroby.client.chat.common.dto.EncodedContent.Photo;
 import dev.voroby.client.chat.common.dto.MessagePhotoInfo;
@@ -13,10 +12,10 @@ import java.util.function.Function;
 @Component
 public class FillEncodedContent implements Function<ConvertChatMessageContext, ConvertChatMessageContext> {
 
-    private final GetPhotoPreviewService getPhotoPreviewService;
+    private final GetPhotoPreview getPhotoPreview;
 
-    public FillEncodedContent(GetPhotoPreviewService getPhotoPreviewService) {
-        this.getPhotoPreviewService = getPhotoPreviewService;
+    public FillEncodedContent(GetPhotoPreview getPhotoPreview) {
+        this.getPhotoPreview = getPhotoPreview;
     }
 
     @Override
@@ -32,7 +31,7 @@ public class FillEncodedContent implements Function<ConvertChatMessageContext, C
                                                     TdApi.MessagePhoto messagePhoto,
                                                     TdApi.Message message) {
         var messagePhotoInfo = new MessagePhotoInfo(message.id, message.chatId, messagePhoto);
-        Photo photoPreview = getPhotoPreviewService.apply(messagePhotoInfo);
+        Photo photoPreview = getPhotoPreview.apply(messagePhotoInfo);
         return convertChatMessageContext.chatMessage().withEncodedContent(photoPreview);
     }
 }

@@ -1,7 +1,5 @@
 package dev.voroby.client.chat.open.application;
 
-import dev.voroby.client.chat.common.application.CacheGifAnimationService;
-import dev.voroby.client.chat.common.application.CacheMessagePhotoPreviewService;
 import dev.voroby.client.chat.common.dto.MessageGifAnimationInfo;
 import dev.voroby.client.chat.common.dto.MessagePhotoInfo;
 import dev.voroby.client.chat.open.application.api.GetChatHistory;

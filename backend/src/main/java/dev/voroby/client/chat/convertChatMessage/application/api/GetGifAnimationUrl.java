@@ -1,4 +1,4 @@
-package dev.voroby.client.chat.common.application;
+package dev.voroby.client.chat.convertChatMessage.application.api;
 
 import dev.voroby.client.cache.Caches;
 import dev.voroby.client.chat.common.dto.MessageGifAnimationInfo;
@@ -12,15 +12,11 @@ import java.io.File;
 import java.util.function.Function;
 
 @Service
-public class GetGifAnimationUrlService implements Function<MessageGifAnimationInfo, UrlContent.GifFile> {
-
-    private final CacheGifAnimationService cacheGifAnimationService;
+public class GetGifAnimationUrl implements Function<MessageGifAnimationInfo, UrlContent.GifFile> {
 
     private final TelegramClient telegramClient;
 
-    public GetGifAnimationUrlService(CacheGifAnimationService cacheGifAnimationService,
-                                     TelegramClient telegramClient) {
-        this.cacheGifAnimationService = cacheGifAnimationService;
+    public GetGifAnimationUrl(TelegramClient telegramClient) {
         this.telegramClient = telegramClient;
     }
 
@@ -38,8 +34,6 @@ public class GetGifAnimationUrlService implements Function<MessageGifAnimationIn
                     gifUrlInfo = getGifUrlInfo(file);
                 }
             }
-        } else {
-            cacheGifAnimationService.accept(messageGifAnimationInfo);
         }
         return new UrlContent.GifFile(gifUrlInfo.gifAnimationUrl, gifUrlInfo.fileName);
     }

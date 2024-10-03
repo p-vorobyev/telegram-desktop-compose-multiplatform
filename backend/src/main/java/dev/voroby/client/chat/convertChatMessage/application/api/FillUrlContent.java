@@ -1,6 +1,5 @@
 package dev.voroby.client.chat.convertChatMessage.application.api;
 
-import dev.voroby.client.chat.common.application.GetGifAnimationUrlService;
 import dev.voroby.client.chat.common.dto.ChatMessage;
 import dev.voroby.client.chat.common.dto.MessageGifAnimationInfo;
 import dev.voroby.client.chat.common.dto.UrlContent.GifFile;
@@ -13,10 +12,10 @@ import java.util.function.Function;
 @Component
 public class FillUrlContent implements Function<ConvertChatMessageContext, ConvertChatMessageContext> {
 
-    private final GetGifAnimationUrlService getGifAnimationUrlService;
+    private final GetGifAnimationUrl getGifAnimationUrl;
 
-    public FillUrlContent(GetGifAnimationUrlService getGifAnimationUrlService) {
-        this.getGifAnimationUrlService = getGifAnimationUrlService;
+    public FillUrlContent(GetGifAnimationUrl getGifAnimationUrl) {
+        this.getGifAnimationUrl = getGifAnimationUrl;
     }
 
     @Override
@@ -32,7 +31,7 @@ public class FillUrlContent implements Function<ConvertChatMessageContext, Conve
                                            TdApi.MessageAnimation messageAnimation,
                                            TdApi.Message message) {
         var messageGifAnimationInfo = new MessageGifAnimationInfo(message.id, message.chatId, messageAnimation);
-        GifFile gifFile = getGifAnimationUrlService.apply(messageGifAnimationInfo);
+        GifFile gifFile = getGifAnimationUrl.apply(messageGifAnimationInfo);
         return convertChatMessageContext.chatMessage().withUrlContent(gifFile);
     }
 }
