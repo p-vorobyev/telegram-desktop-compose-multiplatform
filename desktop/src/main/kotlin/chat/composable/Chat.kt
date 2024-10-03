@@ -31,12 +31,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import terminatingApp
 import util.blockingIO
-import java.util.concurrent.locks.ReentrantLock
-
-
-// lock to separate initial load operation and an updates for chat (when open new chat we need to avoid updates from previous window)
-val chatLock = ReentrantLock()
-
 
 @Composable
 fun ChatWindow(
@@ -57,46 +51,36 @@ fun ChatWindow(
 
     chatListUpdateScope.launch {
         if (openedId.value != chatId) {
-            chatLock.lock()
             val isChannelAdminCheck = async {
                 isChannelAdmin.value = isChannelAdmin(chatId)
             }
-            try {
-                loadOpenedChatMessages(chatId = chatId) {
-                    //scroll to the end when open chat
-                    chatListUpdateScope.launch {
-                        chatHistoryListState.scrollToItem(States.chatHistory.size - 1)
-                    }
-                    fullHistoryLoaded.value = false // turn off flag when open new chat if it was activated
+            loadOpenedChatMessages(chatId = chatId) {
+                //scroll to the end when open chat
+                chatListUpdateScope.launch {
+                    chatHistoryListState.scrollToItem(States.chatHistory.size - 1)
                 }
-                isChannelAdminCheck.await()
-                inputTextDraft.value = ""
-                openedId.value = chatId
-            } finally {
-                chatLock.unlock()
+                fullHistoryLoaded.value = false // turn off flag when open new chat if it was activated
             }
+            isChannelAdminCheck.await()
+            inputTextDraft.value = ""
+            openedId.value = chatId
 
             delay(500)
 
             while (!terminatingApp.get() && openedId.value == chatId) {
-                chatLock.lock()
-                try {
-                    if (!fullHistoryLoaded.value && chatHistoryListState.firstVisibleItemIndex == 0) {
-                        preloadChatHistory(
-                            chatId = chatId,
-                            fullHistoryLoaded = fullHistoryLoaded,
-                            chatHistoryListState = chatHistoryListState
-                        )
-                    }
-                    delay(500)
-                    getIncomingMessages(chatId, hasIncomingMessages)
-                    delay(500)
-                    getEditedMessages()
-                    delay(500)
-                    handleDeletedMessages()
-                } finally {
-                    chatLock.unlock()
+                if (!fullHistoryLoaded.value && chatHistoryListState.firstVisibleItemIndex == 0) {
+                    preloadChatHistory(
+                        chatId = chatId,
+                        fullHistoryLoaded = fullHistoryLoaded,
+                        chatHistoryListState = chatHistoryListState
+                    )
                 }
+                delay(500)
+                getIncomingMessages(chatId, hasIncomingMessages)
+                delay(500)
+                getEditedMessages()
+                delay(500)
+                handleDeletedMessages()
                 delay(500)
             }
         }

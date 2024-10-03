@@ -46,7 +46,7 @@ compose.desktop {
     application {
         mainClass = "TelegramComposeMultiplatformKt"
 
-        jvmArgs += listOf("-Xmx256m")
+        jvmArgs += listOf("-Xmx512m")
 
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
