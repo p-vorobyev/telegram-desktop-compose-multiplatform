@@ -7,7 +7,7 @@ import dev.voroby.client.chat.open.application.OpenChatService;
 import dev.voroby.client.chat.open.application.api.IsUserAdminInChannel;
 import dev.voroby.client.chat.open.dto.ChatHistoryRequest;
 import dev.voroby.client.chat.common.dto.ChatMessage;
-import dev.voroby.springframework.telegram.client.TdApi;
+import org.drinkless.tdlib.TdApi;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;

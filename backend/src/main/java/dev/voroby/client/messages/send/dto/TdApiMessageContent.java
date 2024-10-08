@@ -1,6 +1,6 @@
 package dev.voroby.client.messages.send.dto;
 
-import dev.voroby.springframework.telegram.client.TdApi;
+import org.drinkless.tdlib.TdApi;
 
 public record TdApiMessageContent(
         long chatId,

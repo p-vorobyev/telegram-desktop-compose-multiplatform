@@ -2,7 +2,7 @@ package dev.voroby.client.cache;
 
 import dev.voroby.client.chatList.dto.ChatGroupInfo;
 import dev.voroby.client.chat.common.dto.MessageId;
-import dev.voroby.springframework.telegram.client.TdApi;
+import org.drinkless.tdlib.TdApi;
 
 import java.util.Map;
 import java.util.Set;

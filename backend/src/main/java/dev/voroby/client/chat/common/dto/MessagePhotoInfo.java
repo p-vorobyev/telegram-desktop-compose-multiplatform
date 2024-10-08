@@ -1,6 +1,6 @@
 package dev.voroby.client.chat.common.dto;
 
-import dev.voroby.springframework.telegram.client.TdApi;
+import org.drinkless.tdlib.TdApi;
 
 public record MessagePhotoInfo(
         long messageId,

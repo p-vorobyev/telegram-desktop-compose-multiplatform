@@ -4,7 +4,7 @@ import dev.voroby.client.cache.Caches;
 import dev.voroby.client.chatList.application.ChatListUpdatesQueue;
 import dev.voroby.client.chatList.dto.ChatPhotoFile;
 import dev.voroby.client.util.Utils;
-import dev.voroby.springframework.telegram.client.TdApi;
+import org.drinkless.tdlib.TdApi;
 import org.springframework.stereotype.Component;
 
 import java.util.function.Consumer;

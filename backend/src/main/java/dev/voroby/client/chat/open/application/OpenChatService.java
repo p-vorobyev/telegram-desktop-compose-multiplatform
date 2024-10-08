@@ -2,7 +2,7 @@ package dev.voroby.client.chat.open.application;
 
 import dev.voroby.client.chat.open.application.api.OpenChat;
 import dev.voroby.client.cache.Caches;
-import dev.voroby.springframework.telegram.client.TdApi;
+import org.drinkless.tdlib.TdApi;
 import dev.voroby.springframework.telegram.client.TelegramClient;
 import jakarta.annotation.PreDestroy;
 import lombok.extern.slf4j.Slf4j;

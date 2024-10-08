@@ -1,6 +1,6 @@
 package dev.voroby.client.chatList.application;
 
-import dev.voroby.springframework.telegram.client.TdApi;
+import org.drinkless.tdlib.TdApi;
 import org.springframework.stereotype.Component;
 
 import java.util.Deque;

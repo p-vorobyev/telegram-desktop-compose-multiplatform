@@ -1,7 +1,7 @@
 package dev.voroby.client.chat.common.application;
 
 import dev.voroby.client.chat.common.application.api.GetCurrentUser;
-import dev.voroby.springframework.telegram.client.TdApi;
+import org.drinkless.tdlib.TdApi;
 import org.springframework.stereotype.Component;
 
 import java.util.concurrent.atomic.AtomicReference;

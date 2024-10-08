@@ -3,7 +3,7 @@ package dev.voroby.client.messages.send.application;
 import dev.voroby.client.messages.send.application.api.SendMessage;
 import dev.voroby.client.messages.send.dto.NewMessage;
 import dev.voroby.client.messages.send.dto.TdApiMessageContent;
-import dev.voroby.springframework.telegram.client.TdApi;
+import org.drinkless.tdlib.TdApi;
 import org.springframework.stereotype.Service;
 
 import java.util.function.Consumer;

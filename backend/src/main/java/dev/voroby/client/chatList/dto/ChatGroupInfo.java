@@ -1,6 +1,6 @@
 package dev.voroby.client.chatList.dto;
 
-import dev.voroby.springframework.telegram.client.TdApi;
+import org.drinkless.tdlib.TdApi;
 import lombok.Data;
 
 @Data

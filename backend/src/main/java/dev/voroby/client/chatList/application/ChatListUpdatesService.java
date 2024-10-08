@@ -2,7 +2,7 @@ package dev.voroby.client.chatList.application;
 
 import dev.voroby.client.chatList.application.api.*;
 import dev.voroby.client.chatList.dto.ChatPreview;
-import dev.voroby.springframework.telegram.client.TdApi;
+import org.drinkless.tdlib.TdApi;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;

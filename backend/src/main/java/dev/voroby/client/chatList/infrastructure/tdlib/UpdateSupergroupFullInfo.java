@@ -3,7 +3,7 @@ package dev.voroby.client.chatList.infrastructure.tdlib;
 import dev.voroby.client.cache.Caches;
 import dev.voroby.client.chatList.dto.ChatGroupInfo;
 import dev.voroby.client.chatList.application.ChatListUpdatesQueue;
-import dev.voroby.springframework.telegram.client.TdApi;
+import org.drinkless.tdlib.TdApi;
 import dev.voroby.springframework.telegram.client.updates.UpdateNotificationListener;
 import org.springframework.stereotype.Component;
 

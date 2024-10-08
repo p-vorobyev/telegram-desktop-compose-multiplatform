@@ -4,7 +4,7 @@ import dev.voroby.client.chat.common.dto.MessageGifAnimationInfo;
 import dev.voroby.client.chat.common.dto.MessagePhotoInfo;
 import dev.voroby.client.chat.open.application.api.GetChatHistory;
 import dev.voroby.client.chat.open.dto.ChatHistoryRequest;
-import dev.voroby.springframework.telegram.client.TdApi;
+import org.drinkless.tdlib.TdApi;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

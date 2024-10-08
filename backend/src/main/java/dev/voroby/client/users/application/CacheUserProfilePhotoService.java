@@ -3,7 +3,7 @@ package dev.voroby.client.users.application;
 import dev.voroby.client.cache.Caches;
 import dev.voroby.client.files.application.api.StartDownloadFile;
 import dev.voroby.client.util.Utils;
-import dev.voroby.springframework.telegram.client.TdApi;
+import org.drinkless.tdlib.TdApi;
 import dev.voroby.springframework.telegram.client.templates.response.Response;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

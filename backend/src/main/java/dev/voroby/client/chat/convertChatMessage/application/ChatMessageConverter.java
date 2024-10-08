@@ -3,7 +3,7 @@ package dev.voroby.client.chat.convertChatMessage.application;
 import dev.voroby.client.chat.common.dto.ChatMessage;
 import dev.voroby.client.chat.convertChatMessage.application.api.*;
 import dev.voroby.client.chat.convertChatMessage.dto.ConvertChatMessageContext;
-import dev.voroby.springframework.telegram.client.TdApi;
+import org.drinkless.tdlib.TdApi;
 import org.springframework.stereotype.Component;
 
 import java.util.function.Function;

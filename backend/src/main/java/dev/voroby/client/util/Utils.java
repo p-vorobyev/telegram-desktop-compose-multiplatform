@@ -1,6 +1,6 @@
 package dev.voroby.client.util;
 
-import dev.voroby.springframework.telegram.client.TdApi;
+import org.drinkless.tdlib.TdApi;
 import dev.voroby.springframework.telegram.client.templates.response.Response;
 import dev.voroby.springframework.telegram.exception.TelegramClientTdApiException;
 import lombok.SneakyThrows;

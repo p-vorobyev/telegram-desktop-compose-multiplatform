@@ -3,9 +3,9 @@ package dev.voroby.client.chat.convertChatMessage.application.api;
 import dev.voroby.client.cache.Caches;
 import dev.voroby.client.chat.common.dto.MessageGifAnimationInfo;
 import dev.voroby.client.chat.common.dto.UrlContent;
-import dev.voroby.springframework.telegram.client.TdApi;
 import dev.voroby.springframework.telegram.client.TelegramClient;
 import dev.voroby.springframework.telegram.client.templates.response.Response;
+import org.drinkless.tdlib.TdApi;
 import org.springframework.stereotype.Service;
 
 import java.io.File;

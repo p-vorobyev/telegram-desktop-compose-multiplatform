@@ -1,6 +1,6 @@
 package dev.voroby.client.chat.open.application.api;
 
-import dev.voroby.springframework.telegram.client.TdApi;
+import org.drinkless.tdlib.TdApi;
 import dev.voroby.springframework.telegram.client.TelegramClient;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;

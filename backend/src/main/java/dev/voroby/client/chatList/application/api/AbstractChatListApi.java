@@ -7,7 +7,7 @@ import dev.voroby.client.chatList.dto.ChatType;
 import dev.voroby.client.files.application.NotifyChatPhotoCached;
 import dev.voroby.client.files.application.api.StartDownloadFile;
 import dev.voroby.client.util.Utils;
-import dev.voroby.springframework.telegram.client.TdApi;
+import org.drinkless.tdlib.TdApi;
 import dev.voroby.springframework.telegram.client.TelegramClient;
 import dev.voroby.springframework.telegram.client.templates.response.Response;
 import org.springframework.beans.factory.annotation.Autowired;

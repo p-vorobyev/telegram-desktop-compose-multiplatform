@@ -5,7 +5,7 @@ import dev.voroby.client.chat.common.dto.ChatMessage;
 import dev.voroby.client.chat.common.dto.TextContent;
 import dev.voroby.client.chat.common.dto.TextEntity;
 import dev.voroby.client.chat.common.dto.TextEntityType;
-import dev.voroby.springframework.telegram.client.TdApi;
+import org.drinkless.tdlib.TdApi;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
