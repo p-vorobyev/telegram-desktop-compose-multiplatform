@@ -1,7 +1,7 @@
 package dev.voroby.client.chat.open.application;
 
 import dev.voroby.client.cache.Caches;
-import dev.voroby.client.chat.common.application.api.DownloadPhotoPreview;
+import dev.voroby.client.chat.open.application.api.DownloadPhotoPreview;
 import dev.voroby.client.chat.common.dto.MessagePhotoInfo;
 import dev.voroby.client.chat.common.dto.MessageId;
 import org.springframework.stereotype.Service;

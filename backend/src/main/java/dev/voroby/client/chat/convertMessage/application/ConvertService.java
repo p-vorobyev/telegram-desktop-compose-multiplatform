@@ -1,4 +1,4 @@
-package dev.voroby.client.chat.convertChatMessage.application;
+package dev.voroby.client.chat.convertMessage.application;
 
 import dev.voroby.client.chat.common.dto.ChatMessage;
 import org.drinkless.tdlib.TdApi;
@@ -10,15 +10,15 @@ import java.util.function.Function;
 @Service
 public class ConvertService implements Function<List<TdApi.Message>, List<ChatMessage>> {
 
-    private final ChatMessageConverter chatMessageConverter;
+    private final MessageConverter messageConverter;
 
-    protected ConvertService(ChatMessageConverter chatMessageConverter) {
-        this.chatMessageConverter = chatMessageConverter;
+    protected ConvertService(MessageConverter messageConverter) {
+        this.messageConverter = messageConverter;
     }
 
     @Override
     public List<ChatMessage> apply(List<TdApi.Message> messages) {
-        return messages.stream().map(chatMessageConverter).toList();
+        return messages.stream().map(messageConverter).toList();
     }
 
 }

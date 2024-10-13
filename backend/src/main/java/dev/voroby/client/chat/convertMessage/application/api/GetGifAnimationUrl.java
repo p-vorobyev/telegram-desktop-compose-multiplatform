@@ -1,4 +1,4 @@
-package dev.voroby.client.chat.convertChatMessage.application.api;
+package dev.voroby.client.chat.convertMessage.application.api;
 
 import dev.voroby.client.cache.Caches;
 import dev.voroby.client.chat.common.dto.MessageGifAnimationInfo;

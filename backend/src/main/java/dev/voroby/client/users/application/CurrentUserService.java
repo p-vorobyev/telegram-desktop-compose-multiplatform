@@ -1,6 +1,6 @@
-package dev.voroby.client.chat.common.application;
+package dev.voroby.client.users.application;
 
-import dev.voroby.client.chat.common.application.api.GetCurrentUser;
+import dev.voroby.client.users.application.api.GetCurrentUser;
 import org.drinkless.tdlib.TdApi;
 import org.springframework.stereotype.Component;
 
@@ -17,7 +17,7 @@ public class CurrentUserService {
         this.getCurrentUser = getCurrentUser;
     }
 
-    private void checkAndLazyInit() {
+    private void lazyInit() {
         if (me.get() == null) {
             synchronized (CurrentUserService.class) {
                 if (me.get() == null) {
@@ -28,12 +28,12 @@ public class CurrentUserService {
     }
 
     public TdApi.User getMe() {
-        checkAndLazyInit();
+        lazyInit();
         return me.get();
     }
 
     public boolean isCurrentUserId(long userId) {
-        checkAndLazyInit();
+        lazyInit();
         return me.get().id == userId;
     }
 

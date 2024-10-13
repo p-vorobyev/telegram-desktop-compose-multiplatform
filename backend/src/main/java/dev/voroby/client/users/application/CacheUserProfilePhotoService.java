@@ -41,7 +41,7 @@ public class CacheUserProfilePhotoService implements Consumer<TdApi.User> {
                 .thenAccept(response -> startDownloadCallback(user, response));
     }
 
-    private static void startDownloadCallback(TdApi.User user, Response<TdApi.File> response) {
+    private void startDownloadCallback(TdApi.User user, Response<TdApi.File> response) {
         if (response.error() != null) {
             Utils.logError(response.error());
             return;

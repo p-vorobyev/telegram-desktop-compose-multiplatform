@@ -1,6 +1,6 @@
 package dev.voroby.client.chat.open.presentation;
 
-import dev.voroby.client.chat.convertChatMessage.application.ConvertService;
+import dev.voroby.client.chat.convertMessage.application.ConvertService;
 import dev.voroby.client.chat.common.presentation.CommonChatController;
 import dev.voroby.client.chat.open.application.GetChatHistoryService;
 import dev.voroby.client.chat.open.application.OpenChatService;

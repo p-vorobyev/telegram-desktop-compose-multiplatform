@@ -1,6 +1,6 @@
-package dev.voroby.client.chat.convertChatMessage.application.api;
+package dev.voroby.client.chat.convertMessage.application.api;
 
-import dev.voroby.client.chat.convertChatMessage.dto.ConvertChatMessageContext;
+import dev.voroby.client.chat.convertMessage.dto.ConvertChatMessageContext;
 import dev.voroby.client.chat.common.dto.ChatMessage;
 import dev.voroby.client.chat.common.dto.TextContent;
 import dev.voroby.client.chat.common.dto.TextEntity;

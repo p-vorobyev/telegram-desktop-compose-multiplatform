@@ -1,4 +1,4 @@
-package dev.voroby.client.chat.common.application.api;
+package dev.voroby.client.chat.open.application.api;
 
 import dev.voroby.client.files.application.api.StartDownloadFile;
 import org.drinkless.tdlib.TdApi;

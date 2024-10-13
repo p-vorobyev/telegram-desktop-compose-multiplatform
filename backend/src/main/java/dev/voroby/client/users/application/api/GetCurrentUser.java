@@ -1,4 +1,4 @@
-package dev.voroby.client.chat.common.application.api;
+package dev.voroby.client.users.application.api;
 
 import org.drinkless.tdlib.TdApi;
 import dev.voroby.springframework.telegram.client.TelegramClient;

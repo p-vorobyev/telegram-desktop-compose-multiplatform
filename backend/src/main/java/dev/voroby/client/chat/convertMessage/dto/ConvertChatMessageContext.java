@@ -1,4 +1,4 @@
-package dev.voroby.client.chat.convertChatMessage.dto;
+package dev.voroby.client.chat.convertMessage.dto;
 
 import dev.voroby.client.chat.common.dto.ChatMessage;
 import org.drinkless.tdlib.TdApi;

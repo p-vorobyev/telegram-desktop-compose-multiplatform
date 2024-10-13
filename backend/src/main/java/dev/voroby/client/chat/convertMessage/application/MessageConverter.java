@@ -1,15 +1,15 @@
-package dev.voroby.client.chat.convertChatMessage.application;
+package dev.voroby.client.chat.convertMessage.application;
 
 import dev.voroby.client.chat.common.dto.ChatMessage;
-import dev.voroby.client.chat.convertChatMessage.application.api.*;
-import dev.voroby.client.chat.convertChatMessage.dto.ConvertChatMessageContext;
+import dev.voroby.client.chat.convertMessage.application.api.*;
+import dev.voroby.client.chat.convertMessage.dto.ConvertChatMessageContext;
 import org.drinkless.tdlib.TdApi;
 import org.springframework.stereotype.Component;
 
 import java.util.function.Function;
 
 @Component
-public class ChatMessageConverter implements Function<TdApi.Message, ChatMessage> {
+public class MessageConverter implements Function<TdApi.Message, ChatMessage> {
 
     private final FillMetaInfo fillMetaInfo;
 
@@ -21,11 +21,11 @@ public class ChatMessageConverter implements Function<TdApi.Message, ChatMessage
 
     private final FillUrlContent fillUrlContent;
 
-    public ChatMessageConverter(FillMetaInfo fillMetaInfo,
-                                FillSenderInfo fillSenderInfo,
-                                FillTextContent fillTextContent,
-                                FillEncodedContent fillEncodedContent,
-                                FillUrlContent fillUrlContent) {
+    public MessageConverter(FillMetaInfo fillMetaInfo,
+                            FillSenderInfo fillSenderInfo,
+                            FillTextContent fillTextContent,
+                            FillEncodedContent fillEncodedContent,
+                            FillUrlContent fillUrlContent) {
         this.fillMetaInfo = fillMetaInfo;
         this.fillSenderInfo = fillSenderInfo;
         this.fillTextContent = fillTextContent;

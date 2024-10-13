@@ -1,9 +1,9 @@
-package dev.voroby.client.chat.convertChatMessage.application.api;
+package dev.voroby.client.chat.convertMessage.application.api;
 
 import dev.voroby.client.chat.common.dto.ChatMessage;
 import dev.voroby.client.chat.common.dto.EncodedContent.Photo;
 import dev.voroby.client.chat.common.dto.MessagePhotoInfo;
-import dev.voroby.client.chat.convertChatMessage.dto.ConvertChatMessageContext;
+import dev.voroby.client.chat.convertMessage.dto.ConvertChatMessageContext;
 import org.drinkless.tdlib.TdApi;
 import org.springframework.stereotype.Component;
 
