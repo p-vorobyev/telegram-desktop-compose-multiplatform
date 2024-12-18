@@ -7,13 +7,14 @@ import chat.dto.ChatMessage
 import common.States
 import scene.api.markAsRead
 
-suspend fun getIncomingMessages(chatId: Long, hasIncomingMessages: MutableState<Boolean>) {
+suspend fun getIncomingMessages(chatId: Long): Boolean {
     val incomingMessages: List<ChatMessage> = incomingMessages()
     if (incomingMessages.isNotEmpty()) {
         States.chatHistory.addAll(incomingMessages)
-        hasIncomingMessages.value = true
         markAsRead(chatId) // mark as read incoming messages
+        return true
     }
+    return false
 }
 
 

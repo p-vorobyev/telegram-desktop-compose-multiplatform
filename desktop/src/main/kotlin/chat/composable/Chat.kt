@@ -76,7 +76,7 @@ fun ChatWindow(
                     )
                 }
                 delay(500)
-                getIncomingMessages(chatId, hasIncomingMessages)
+                hasIncomingMessages.value = getIncomingMessages(chatId)
                 delay(500)
                 getEditedMessages()
                 delay(500)

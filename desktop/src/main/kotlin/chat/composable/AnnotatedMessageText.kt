@@ -1,10 +1,9 @@
 package chat.composable
 
-import androidx.compose.foundation.text.ClickableText
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.platform.UriHandler
 import androidx.compose.ui.text.*
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
@@ -13,12 +12,9 @@ import chat.dto.Content
 import common.Colors.blockQuoteColor
 import common.Colors.blueUrlColor
 
-@OptIn(ExperimentalTextApi::class)
 @Composable
 fun AnnotatedMessageText(messageText: String, textEntities: Collection<Content.TextEntity>) {
     val uriHandler = LocalUriHandler.current
-
-    val clickedOffset = remember { mutableStateOf(-1) }
 
     val annotatedString = buildAnnotatedString {
         append(messageText)
@@ -37,7 +33,14 @@ fun AnnotatedMessageText(messageText: String, textEntities: Collection<Content.T
                         start = startIndex,
                         end = endIndex
                     )
-                    addUrlAnnotation(UrlAnnotation(it.url), startIndex, endIndex)
+                    addLink(
+                        url = LinkAnnotation.Url(
+                            url = it.url,
+                            linkInteractionListener = uriHandler::openIfUrlAnnotationLink
+                        ),
+                        start = startIndex,
+                        end = endIndex
+                    )
                 }
 
                 is Content.TextEntity.Url -> {
@@ -47,23 +50,27 @@ fun AnnotatedMessageText(messageText: String, textEntities: Collection<Content.T
                         end = endIndex
                     )
                     val url = messageText.substring(startIndex, endIndex)
-                    addUrlAnnotation(UrlAnnotation(url), startIndex, endIndex)
+                    addLink(
+                        url = LinkAnnotation.Url(
+                            url = url,
+                            linkInteractionListener = uriHandler::openIfUrlAnnotationLink
+                        ),
+                        start = startIndex,
+                        end = endIndex
+                    )
                 }
             }
         }
     }
 
-    ClickableText(
+    Text(
         text = annotatedString,
-        style = TextStyle(fontSize = 14.sp),
-        onClick = { offset -> clickedOffset.value = offset }
+        style = TextStyle(fontSize = 14.sp)
     )
+}
 
-    if (clickedOffset.value != -1) {
-        annotatedString.getUrlAnnotations(clickedOffset.value, clickedOffset.value)
-            .firstOrNull()?.let {
-                uriHandler.openUri(it.item.url)
-                clickedOffset.value = -1
-            }
+private fun UriHandler.openIfUrlAnnotationLink(link: LinkAnnotation) {
+    if (link is LinkAnnotation.Url) {
+        openUri(link.url)
     }
 }
