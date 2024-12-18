@@ -1,10 +1,9 @@
 package dev.voroby.client.messages.send.application.api;
 
 import dev.voroby.client.messages.send.dto.TdApiMessageContent;
-import org.drinkless.tdlib.TdApi;
 import dev.voroby.springframework.telegram.client.TelegramClient;
-import dev.voroby.springframework.telegram.client.templates.response.Response;
 import lombok.extern.slf4j.Slf4j;
+import org.drinkless.tdlib.TdApi;
 import org.springframework.stereotype.Component;
 
 import java.util.function.Consumer;
@@ -26,13 +25,11 @@ public class SendMessage implements Consumer<TdApiMessageContent> {
         log.info("Sending a message to chat: [chatId: {}, queryIdentifier: {}]",
                 tdApiMessageContent.chatId(), tdApiMessageContent.content().getConstructor());
         telegramClient.sendAsync(sendMessage)
-                .thenAccept(response -> debugLog(tdApiMessageContent, response));
+                .thenAccept(response -> response.onSuccess(message -> debugLog(tdApiMessageContent, message)));
     }
 
-    private static void debugLog(TdApiMessageContent tdApiMessageContent, Response<TdApi.Message> response) {
-        if (response.error() == null) {
-            log.debug("Sent message to chat: [chatId: {}, msgId: {}, queryIdentifier: {}]",
-                    tdApiMessageContent.chatId(), response.object().id, tdApiMessageContent.content().getConstructor());
-        }
+    private static void debugLog(TdApiMessageContent tdApiMessageContent, TdApi.Message message) {
+        log.debug("Sent message to chat: [chatId: {}, msgId: {}, queryIdentifier: {}]",
+                tdApiMessageContent.chatId(), message.id, tdApiMessageContent.content().getConstructor());
     }
 }

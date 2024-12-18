@@ -31,7 +31,7 @@ repositories {
 dependencies {
     val lombokVersion = "1.18.30"
     implementation("org.springframework.boot:spring-boot-starter-web")
-    implementation("dev.voroby:spring-boot-starter-telegram:1.14.0")
+    implementation("dev.voroby:spring-boot-starter-telegram:1.15.0")
     compileOnly("org.projectlombok:lombok:$lombokVersion")
     annotationProcessor("org.projectlombok:lombok:$lombokVersion")
 }

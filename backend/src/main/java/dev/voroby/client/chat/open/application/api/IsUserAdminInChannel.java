@@ -1,8 +1,8 @@
 package dev.voroby.client.chat.open.application.api;
 
-import org.drinkless.tdlib.TdApi;
 import dev.voroby.springframework.telegram.client.TelegramClient;
 import dev.voroby.springframework.telegram.client.templates.response.Response;
+import org.drinkless.tdlib.TdApi;
 import org.springframework.stereotype.Component;
 
 import java.util.concurrent.CompletableFuture;
@@ -34,9 +34,8 @@ public class IsUserAdminInChannel implements Function<Long, Boolean> {
     }
 
     private CompletableFuture<Response<TdApi.Supergroup>> getAsSupergroup(Response<TdApi.Chat> chatResponse) {
-        if (chatResponse.error() != null) {
-            return CompletableFuture.completedFuture(new Response<>(null, new TdApi.Error()));
-        } else if (chatResponse.object().type instanceof TdApi.ChatTypeSupergroup supergroup) {
+        if (chatResponse.getObject().isPresent() &&
+                chatResponse.getObject().get().type instanceof TdApi.ChatTypeSupergroup supergroup) {
             return telegramClient.sendAsync(new TdApi.GetSupergroup(supergroup.supergroupId));
         } else {
             return CompletableFuture.completedFuture(new Response<>(null, new TdApi.Error()));
@@ -44,13 +43,14 @@ public class IsUserAdminInChannel implements Function<Long, Boolean> {
     }
 
     private Boolean hasAdminRights(Response<TdApi.Supergroup> supergroupResponse) {
-        if (supergroupResponse.error() != null) {
-            return false;
-        } else if (supergroupResponse.object().status instanceof TdApi.ChatMemberStatusCreator) {
-            return true;
-        } else if (supergroupResponse.object().status instanceof TdApi.ChatMemberStatusAdministrator admin) {
-            TdApi.ChatAdministratorRights rights = admin.rights;
-            return rights.canPostMessages;
-        } else return false;
+        return supergroupResponse.getObject()
+                .map(supergroup -> switch (supergroup.status) {
+                    case TdApi.ChatMemberStatusCreator creator -> true;
+                    case TdApi.ChatMemberStatusAdministrator admin -> {
+                        TdApi.ChatAdministratorRights rights = admin.rights;
+                        yield rights.canPostMessages;
+                    }
+                    default -> false;
+                }).orElse(false);
     }
 }

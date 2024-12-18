@@ -29,9 +29,15 @@ public class GetChatHistory implements Function<ChatHistoryRequest, List<TdApi.M
             if (!messageList.isEmpty()) {
                 fromMsgId = messageList.getFirst().id;
             }
-            var getChatHistory = new TdApi.GetChatHistory(chatHistoryRequest.chatId(), fromMsgId, 0, queryLimit, false);
-            TdApi.Messages messages = telegramClient.send(getChatHistory).object();
-            log.info("Load chat history [chatId: {}, fromMsgId: {}, limit: {}]",
+            var getChatHistory = new TdApi.GetChatHistory(
+                    chatHistoryRequest.chatId(),
+                    fromMsgId,
+                    0,
+                    queryLimit,
+                    false
+            );
+            TdApi.Messages messages = telegramClient.send(getChatHistory).getObject().orElseThrow();
+            log.debug("Load chat history [chatId: {}, fromMsgId: {}, limit: {}]",
                     chatHistoryRequest.chatId(), fromMsgId, chatHistoryRequest.limit());
             if (messages.messages == null || messages.messages.length == 0) {
                 return messageList;

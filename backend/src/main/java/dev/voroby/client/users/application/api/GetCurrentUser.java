@@ -17,7 +17,9 @@ public class GetCurrentUser implements Supplier<TdApi.User> {
 
     @Override
     public TdApi.User get() {
-        return telegramClient.send(new TdApi.GetMe()).object();
+        return telegramClient.send(new TdApi.GetMe())
+                .getObject()
+                .orElseThrow();
     }
 
 }

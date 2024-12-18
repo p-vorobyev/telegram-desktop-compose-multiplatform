@@ -28,8 +28,8 @@ public class GetGifAnimationUrl implements Function<MessageGifAnimationInfo, Url
         Integer gifAnimationId = Caches.messageIdToGifAnimationIdCache.get(messageGifAnimationInfo.messageId());
         if (gifAnimationId != null) {
             Response<TdApi.File> fileResponse = telegramClient.send(new TdApi.GetFile(gifAnimationId));
-            if (fileResponse.object() != null) {
-                TdApi.File file = fileResponse.object();
+            if (fileResponse.getObject().isPresent()) {
+                TdApi.File file = fileResponse.getObject().get();
                 if (file.local.isDownloadingCompleted) {
                     gifUrlInfo = getGifUrlInfo(file);
                 }

@@ -42,12 +42,11 @@ abstract public class AbstractChatListApi {
 
     public ChatPreview getCurrentChatPreview(long chatId) {
         Response<TdApi.Chat> chatResponse = telegramClient.send(new TdApi.GetChat(chatId));
-        if (chatResponse.error() == null) {
-            TdApi.Chat chat = chatResponse.object();
-            if (!hasChatList(chat)) return null; // chat is not listed
-            initialChatCache.put(chat.id, chat);
-            return getCurrentChatPreview(chat);
-        } else throw new RuntimeException(chatResponse.error().message);
+        TdApi.Chat chat = chatResponse.getObject()
+                .orElseThrow(() -> new RuntimeException(chatResponse.getError().orElse(new TdApi.Error()).message));
+        if (!hasChatList(chat)) return null; // chat is not listed
+        initialChatCache.put(chat.id, chat);
+        return getCurrentChatPreview(chat);
     }
 
     private boolean hasChatList(TdApi.Chat chat) {
@@ -93,7 +92,17 @@ abstract public class AbstractChatListApi {
             unreadCount = 0;
         }
 
-        return new ChatPreview(chat.id, chat.title, photoBase64, msgText, unreadCount, order, chatType, isChannel, chat.permissions.canSendBasicMessages);
+        return new ChatPreview(
+                chat.id,
+                chat.title,
+                photoBase64,
+                msgText,
+                unreadCount,
+                order,
+                chatType,
+                isChannel,
+                chat.permissions.canSendBasicMessages
+        );
     }
 
     private long mainChatListPositionOrder(TdApi.ChatPosition[] positions) {
@@ -111,11 +120,9 @@ abstract public class AbstractChatListApi {
             notifyChatPhotoCached.accept(new ChatPhotoFile(chatId, file));
         } else {
             startDownloadFile.apply(file)
-                    .thenAccept(response -> {
-                        if (response.error() == null) {
-                            Caches.photoIdToChatIdCache.put(response.object().id, chatId);
-                        }
-                    });
+                    .thenAccept(response ->
+                            response.onSuccess(f -> Caches.photoIdToChatIdCache.put(f.id, chatId))
+                    );
         }
     }
 

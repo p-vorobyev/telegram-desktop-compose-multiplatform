@@ -3,9 +3,8 @@ package dev.voroby.client.users.application;
 import dev.voroby.client.cache.Caches;
 import dev.voroby.client.files.application.api.StartDownloadFile;
 import dev.voroby.client.util.Utils;
-import org.drinkless.tdlib.TdApi;
-import dev.voroby.springframework.telegram.client.templates.response.Response;
 import lombok.extern.slf4j.Slf4j;
+import org.drinkless.tdlib.TdApi;
 import org.springframework.stereotype.Service;
 
 import java.util.function.Consumer;
@@ -38,17 +37,14 @@ public class CacheUserProfilePhotoService implements Consumer<TdApi.User> {
 
     private void downloadProfilePhotoAsync(TdApi.User user, TdApi.File smallPhotoFile) {
         startDownloadFile.apply(smallPhotoFile)
-                .thenAccept(response -> startDownloadCallback(user, response));
+                .thenAccept(response ->
+                        response.onError(Utils::logError)
+                                .onSuccess(file -> cacheProfilePhotoToUserIds(user.id, file.id))
+                );
     }
 
-    private void startDownloadCallback(TdApi.User user, Response<TdApi.File> response) {
-        if (response.error() != null) {
-            Utils.logError(response.error());
-            return;
-        }
-        var file = response.object();
-        Caches.profilePhotoIdToUserIdCache.put(file.id, user.id);
-        log.debug("Downloading user profile photo to local storage: [userId: {}, photoId: {}]",
-                user.id, file.id);
+    private static void cacheProfilePhotoToUserIds(long userId, int fileId) {
+        Caches.profilePhotoIdToUserIdCache.put(fileId, userId);
+        log.debug("Downloading user profile photo to local storage: [userId: {}, photoId: {}]", userId, fileId);
     }
 }

@@ -59,11 +59,11 @@ public class Utils {
     }
 
     public static <T extends TdApi.Object> T objectOrThrow(Response<T> response) {
-        if (response.error() != null) {
-            logError(response.error());
-            throw new TelegramClientTdApiException(response.error().message);
-        }
-        return response.object();
+        return response.getObject().orElseThrow(() -> {
+            TdApi.Error error = response.getError().orElseThrow();
+            logError(error);
+            return new TelegramClientTdApiException(error.message);
+        });
     }
 
 }

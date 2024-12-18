@@ -1,10 +1,9 @@
 package dev.voroby.client.files.application;
 
-import dev.voroby.client.chat.open.application.OpenChatService;
 import dev.voroby.client.chat.common.dto.MessageId;
-import org.drinkless.tdlib.TdApi;
+import dev.voroby.client.chat.open.application.OpenChatService;
 import dev.voroby.springframework.telegram.client.TelegramClient;
-import dev.voroby.springframework.telegram.client.templates.response.Response;
+import org.drinkless.tdlib.TdApi;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
@@ -26,8 +25,7 @@ public class NotifyMessageContentCached implements Consumer<MessageId> {
     public void accept(MessageId messageId) {
         var getMessage = new TdApi.GetMessage(messageId.chatId(), messageId.messageId());
         telegramClient.sendAsync(getMessage)
-                .thenApply(Response::object)
-                .thenAccept(openChatService::addUpdatedMessage);
+                .thenAccept(response -> response.onSuccess(openChatService::addUpdatedMessage));
     }
 
 }
