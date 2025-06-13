@@ -42,8 +42,7 @@ abstract public class AbstractChatListApi {
 
     public ChatPreview getCurrentChatPreview(long chatId) {
         Response<TdApi.Chat> chatResponse = telegramClient.send(new TdApi.GetChat(chatId));
-        TdApi.Chat chat = chatResponse.getObject()
-                .orElseThrow(() -> new RuntimeException(chatResponse.getError().orElse(new TdApi.Error()).message));
+        TdApi.Chat chat = chatResponse.getObjectOrThrow();
         if (!hasChatList(chat)) return null; // chat is not listed
         initialChatCache.put(chat.id, chat);
         return getCurrentChatPreview(chat);

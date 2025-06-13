@@ -22,7 +22,7 @@
 |                       | Version |
 |-----------------------|---------|
 | Compose Multiplatform | 1.7.3   |
-| TDLib                 | 1.8.44  |
+| TDLib                 | 1.8.49  |
 
 
 

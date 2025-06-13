@@ -1,10 +1,8 @@
 package dev.voroby.client.util;
 
-import org.drinkless.tdlib.TdApi;
-import dev.voroby.springframework.telegram.client.templates.response.Response;
-import dev.voroby.springframework.telegram.exception.TelegramClientTdApiException;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.drinkless.tdlib.TdApi;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -57,13 +55,4 @@ public class Utils {
         byte[] bytes = Files.readAllBytes(Path.of(path));
         return Base64.getEncoder().encodeToString(bytes);
     }
-
-    public static <T extends TdApi.Object> T objectOrThrow(Response<T> response) {
-        return response.getObject().orElseThrow(() -> {
-            TdApi.Error error = response.getError().orElseThrow();
-            logError(error);
-            return new TelegramClientTdApiException(error.message);
-        });
-    }
-
 }

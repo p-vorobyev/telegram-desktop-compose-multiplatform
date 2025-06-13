@@ -36,7 +36,7 @@ public class GetChatHistory implements Function<ChatHistoryRequest, List<TdApi.M
                     queryLimit,
                     false
             );
-            TdApi.Messages messages = telegramClient.send(getChatHistory).getObject().orElseThrow();
+            TdApi.Messages messages = telegramClient.send(getChatHistory).getObjectOrThrow();
             log.debug("Load chat history [chatId: {}, fromMsgId: {}, limit: {}]",
                     chatHistoryRequest.chatId(), fromMsgId, chatHistoryRequest.limit());
             if (messages.messages == null || messages.messages.length == 0) {
