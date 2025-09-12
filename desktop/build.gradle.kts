@@ -15,7 +15,7 @@ repositories {
     google()
 }
 
-val ktor_version = "2.3.5"
+val ktor_version = "3.2.3"
 
 dependencies {
     // Note, if you develop a library, you should use compose.desktop.common.
