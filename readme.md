@@ -21,8 +21,8 @@
 ## Current versions
 |                       | Version |
 |-----------------------|---------|
-| Compose Multiplatform | 1.8.2   |
-| TDLib                 | 1.8.52  |
+| Compose Multiplatform | 1.9.3   |
+| TDLib                 | 1.8.60  |
 
 
 
@@ -67,7 +67,11 @@ spring.telegram.client.database-encryption-key=
 spring.telegram.client.database-directory=<directory_for_telegram_data>
 ```
 
-4) Run the build script in the project root directory:
+4) Compile `TDLib` native library for you operating system following these [instructions](https://github.com/p-vorobyev/spring-boot-starter-telegram/blob/master/libs/build/readme.md).
+   Place the compiled library in the folder `/desktop/resources/<operating_system_folder>`.
+
+
+5) Run the build script in the project root directory:
 ```shell
 ./build.sh
 ```
