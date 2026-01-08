@@ -7,8 +7,16 @@ object BackendCommands {
     private val backendJar = Resources.backendJar.absolutePath
 
     val startWindows =
-        "javaw -Xms64m -Xmx256m -XX:+UseStringDeduplication -Djava.library.path=$nativeLibPath -jar $backendJar"
+        "javaw -Xms64m -Xmx256m " +
+                "-XX:+UseStringDeduplication " +
+                "-Djava.library.path=$nativeLibPath " +
+                "--enable-native-access=ALL-UNNAMED " +
+                "-jar $backendJar"
 
     val startNix =
-        "nohup java -Xms64m -Xmx256m -XX:+UseStringDeduplication -Djava.library.path=$nativeLibPath -jar $backendJar >/dev/null 2>&1 &"
+        "nohup java -Xms64m -Xmx256m " +
+                "-XX:+UseStringDeduplication " +
+                "-Djava.library.path=$nativeLibPath " +
+                "--enable-native-access=ALL-UNNAMED " +
+                "-jar $backendJar >/dev/null 2>&1 &"
 }

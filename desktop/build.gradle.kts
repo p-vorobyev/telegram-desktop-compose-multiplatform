@@ -15,7 +15,7 @@ repositories {
     google()
 }
 
-val ktor_version = "3.2.3"
+val ktor_version = "3.3.3"
 
 dependencies {
     // Note, if you develop a library, you should use compose.desktop.common.
@@ -38,6 +38,7 @@ kotlin {
 }
 
 tasks.register<Copy>("copyTelegramBackend") {
+    dependsOn("prepareAppResources")
     from("../backend/build/libs")
     into("resources/common")
 }
