@@ -68,7 +68,7 @@ spring.telegram.client.database-directory=<directory_for_telegram_data>
 ```
 
 4) Compile `TDLib` native library for you operating system following these [instructions](https://github.com/p-vorobyev/spring-boot-starter-telegram/blob/master/libs/build/readme.md).
-   Place the compiled library in the folder `/desktop/resources/<operating_system_folder>`.
+   Place the compiled library in the folder `desktop/resources/<operating_system_folder>`.
 
 
 5) Run the build script in the project root directory:
